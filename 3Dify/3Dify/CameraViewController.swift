@@ -73,8 +73,10 @@ final class CameraViewController: UIViewController {
         depthImageView.contentMode = .scaleAspectFit
         view.addSubview(depthImageView)
         
-        button.frame = .init(x: 0, y: 0, width: 100, height: 32)
+        button.frame = .init(x: 12, y: 12, width: 128, height: 32)
         button.setTitle("Capture", for: .normal)
+        button.backgroundColor = .blue
+        button.layer.cornerRadius = 12
         button.addTarget(self, action: #selector(capturePhoto), for: .touchUpInside)
         view.addSubview(button)
         
@@ -97,14 +99,23 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
     ) {
         guard
             error == nil,
-            let depthData = photo.depthData
+            let depthData = photo.depthData,
+            let imageData = photo.fileDataRepresentation()
         else {return}
         let convertedDepthData = depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32)
         let map = convertedDepthData.depthDataMap
         map.normalize()
         let ciImage = CIImage(cvPixelBuffer: map)
-        let uiImage = UIImage(ciImage: ciImage)
-        depthImageView.image = uiImage
+        let depthImageData = UIImage(ciImage: ciImage).jpegData(compressionQuality: 1.0)!
+        let depthImage = UIImage(data: depthImageData)
+        let image = UIImage(data: imageData)
+        
+        depthImageView.image = depthImage
+        
+        let imageViewController = ImageViewController()
+        imageViewController.depthImage = depthImage
+        imageViewController.image = image
+        present(imageViewController, animated: true)
     }
 }
 

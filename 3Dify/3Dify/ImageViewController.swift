@@ -13,22 +13,25 @@ import SpriteKit
 
 
 final class ImageViewController: UIViewController {
-    let sceneView = SKView()
-    var scene: ImageScene?
+    private let sceneView = SKView()
+    private var scene: ImageScene?
+    
+    var depthImage: UIImage!
+    var image: UIImage!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         sceneView.frame = .init(
             x: 0,
-            y: 0,
+            y: 128,
             width: UIScreen.main.bounds.width,
-            height: UIScreen.main.bounds.height
+            height: UIScreen.main.bounds.height - 128
         )
-        scene = ImageScene(size: sceneView.bounds.size)
+        scene = ImageScene(size: sceneView.bounds.size, image: image, depthImage: depthImage)
         sceneView.presentScene(scene)
         view.addSubview(sceneView)
         
-        view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(userDidPan)))
+        sceneView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(userDidPan)))
     }
     
     @objc func userDidPan(_ gestureRecognizer: UIPanGestureRecognizer) {

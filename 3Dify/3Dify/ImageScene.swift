@@ -14,26 +14,31 @@ class ImageScene: SKScene {
     public var offset: CGPoint = .zero {
         didSet {
             u_offset.vectorFloat2Value = vector_float2(
-                Float(offset.x), Float(offset.y)
+                Float(offset.y), Float(offset.x)
             )
         }
     }
     
-    private var u_intensity = SKUniform(name: "u_intensity", float: 0.1)
+    private var u_intensity = SKUniform(name: "u_intensity", float: 0.2)
     private var u_offset = SKUniform(name: "u_offset", vectorFloat2: .zero)
-    private var u_image = SKUniform(name: "u_image", texture: SKTexture(image: UIImage(named: "header-background")!))
-    private var u_image_depth = SKUniform(name: "u_image_depth", texture: SKTexture(image: UIImage(named: "header-background-depth")!))
+    private var u_image: SKUniform!
+    private var u_image_depth: SKUniform!
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError()
     }
     
-    override init(size: CGSize) {
+    init(size: CGSize, image: UIImage, depthImage: UIImage) {
         super.init(size: size)
+        
+        u_image = SKUniform(name: "u_image", texture: SKTexture(image: image))
+        u_image_depth = SKUniform(name: "u_image_depth", texture: SKTexture(image: depthImage))
+        
         
         let imageNode = SKSpriteNode()
         imageNode.position = .init(x: size.width / 2, y: size.height / 2)
-        imageNode.size = size
+        imageNode.zRotation = -CGFloat.pi / 2
+        imageNode.size = .init(width: size.height, height: size.width)
         
         let imageShader = SKShader(fileNamed: "ImageParallax.fsh")
         imageNode.shader = imageShader
