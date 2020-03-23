@@ -13,6 +13,21 @@ import AVFoundation
 import SpriteKit
 
 
+internal extension UIImage {
+    func blurred(radius: CGFloat) -> UIImage {
+        let ciContext = CIContext(options: nil)
+        guard let cgImage = cgImage else { return self }
+        let inputImage = CIImage(cgImage: cgImage)
+        guard let ciFilter = CIFilter(name: "CIGaussianBlur") else { return self }
+        ciFilter.setValue(inputImage, forKey: kCIInputImageKey)
+        ciFilter.setValue(radius, forKey: "inputRadius")
+        guard let resultImage = ciFilter.value(forKey: kCIOutputImageKey) as? CIImage else { return self }
+        guard let cgImage2 = ciContext.createCGImage(resultImage, from: inputImage.extent) else { return self }
+        return UIImage(cgImage: cgImage2)
+    }
+}
+
+
 internal extension CVPixelBuffer {
   func normalize() {
     let width = CVPixelBufferGetWidth(self)
@@ -100,21 +115,28 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         guard
             error == nil,
             let depthData = photo.depthData,
-            let imageData = photo.fileDataRepresentation()
+            let colorImageData = photo.fileDataRepresentation(),
+            let colorUIImage = UIImage(data: colorImageData)
         else {return}
-        let convertedDepthData = depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32)
-        let map = convertedDepthData.depthDataMap
-        map.normalize()
-        let ciImage = CIImage(cvPixelBuffer: map)
-        let depthImageData = UIImage(ciImage: ciImage).jpegData(compressionQuality: 1.0)!
-        let depthImage = UIImage(data: depthImageData)
-        let image = UIImage(data: imageData)
         
-        depthImageView.image = depthImage
+        let convertedDepthData = depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32)
+        let depthMap = convertedDepthData.depthDataMap
+        depthMap.normalize()
+        
+        let depthCIImage = CIImage(cvPixelBuffer: depthMap)
+        
+        guard
+            let depthImageData = UIImage(ciImage: depthCIImage)
+                .jpegData(compressionQuality: 1.0),
+            let depthUIImage = UIImage(data: depthImageData)?
+                .blurred(radius: 4)
+        else {return}
+        
+        depthImageView.image = depthUIImage
         
         let imageViewController = ImageViewController()
-        imageViewController.depthImage = depthImage
-        imageViewController.image = image
+        imageViewController.depthImage = depthUIImage
+        imageViewController.image = colorUIImage
         present(imageViewController, animated: true)
     }
 }

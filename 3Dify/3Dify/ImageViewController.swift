@@ -13,7 +13,7 @@ import SpriteKit
 
 
 final class ImageViewController: UIViewController {
-    private let sceneView = SKView()
+    private var sceneView: ImageView?
     private var scene: ImageScene?
     
     var depthImage: UIImage!
@@ -21,23 +21,34 @@ final class ImageViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        sceneView.frame = .init(
-            x: 0,
-            y: 128,
-            width: UIScreen.main.bounds.width,
-            height: UIScreen.main.bounds.height - 128
-        )
-        scene = ImageScene(size: sceneView.bounds.size, image: image, depthImage: depthImage)
-        sceneView.presentScene(scene)
-        view.addSubview(sceneView)
+        view.backgroundColor = .white
         
-        sceneView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(userDidPan)))
+        let aspectRatio = image.size.height / image.size.width
+        let width = UIScreen.main.bounds.width - 16
+        let height = min(
+            UIScreen.main.bounds.height - 88,
+            aspectRatio * width
+        )
+        let y = UIScreen.main.bounds.height - height - 88
+        
+        sceneView = ImageView(
+            frame: .init(x: 8, y: y, width: width, height: height),
+            image: image,
+            depthImage: depthImage
+        )
+        sceneView!.layer.cornerRadius = 12
+        sceneView!.clipsToBounds = true
+        view.addSubview(sceneView!)
+        
+        sceneView!.addGestureRecognizer(
+            UIPanGestureRecognizer(target: self, action: #selector(userDidPan))
+        )
     }
     
     @objc func userDidPan(_ gestureRecognizer: UIPanGestureRecognizer) {
         let translation = gestureRecognizer.translation(in: view)
         let offset = CGPoint(x: translation.x / view.frame.width, y: translation.y / view.frame.height)
-        scene?.offset = offset
+        sceneView?.offset = offset
     }
 }
 
