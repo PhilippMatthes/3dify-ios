@@ -13,15 +13,26 @@ import SceneKit
 
 
 final class ImageViewController: UIViewController {
+    struct Uniforms {
+        var offset: SIMD2<Float>
+    }
+    
+    public var image: UIImage!
+    public var imageDepth: UIImage!
+    
     private var sceneView: SCNView!
     private var scene: SCNScene!
     private var plane: SCNPlane!
     
-    private var x: Float = 0
-    private var y: Float = 0
+    private var imageProperty: SCNMaterialProperty!
+    private var imageDepthProperty: SCNMaterialProperty!
     
-    var imageDepth: UIImage!
-    var image: UIImage!
+    private var uniforms: Uniforms! {
+        didSet {
+            let data = NSData(bytes: &uniforms, length: MemoryLayout.size(ofValue: uniforms))
+            plane?.firstMaterial?.setValue(data, forKey: "uniforms")
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,10 +42,7 @@ final class ImageViewController: UIViewController {
         let width = UIScreen.main.bounds.width
         let height = aspectRatio * width
         
-        sceneView = SCNView(
-            frame: .init(x: 0, y: 0, width: width, height: height),
-            options: [SCNView.Option.preferredRenderingAPI.rawValue: SCNRenderingAPI.openGLES2.rawValue]
-        )
+        sceneView = SCNView(frame: .init(x: 0, y: 0, width: width, height: height))
         sceneView.addGestureRecognizer(
             UIPanGestureRecognizer(target: self, action: #selector(userDidPan))
         )
@@ -46,50 +54,29 @@ final class ImageViewController: UIViewController {
         // Compute size of the view frustum at the orgin
         let cameraZPosition: CGFloat = 1
         let fieldOfView: CGFloat = 90
-        let frustumHeight: CGFloat = 2 * cameraZPosition * tan(fieldOfView * 0.5 * .pi / 180)
-        let frustumWidth: CGFloat = frustumHeight * 1 / aspectRatio
+        let frustumWidth: CGFloat = 2 * cameraZPosition * tan(fieldOfView * 0.5 * .pi / 180)
+        let frustumHeight: CGFloat = frustumWidth * 1 / aspectRatio
 
         // Set the plane size to exactly that computed size
         plane = SCNPlane(width: frustumWidth, height: frustumHeight)
         plane.widthSegmentCount = 1
         plane.heightSegmentCount = 1
         let planeNode = SCNNode(geometry: plane)
+        planeNode.runAction(SCNAction.rotateBy(x: 0, y: 0, z: -CGFloat.pi / 2, duration: 0.0))
         scene.rootNode.addChildNode(planeNode)
         
         // Set up the shader program
         let program = SCNProgram()
-        program.setSemantic(SCNGeometrySource.Semantic.texcoord.rawValue, forSymbol: "texCoord", options: nil)
-        program.setSemantic(SCNGeometrySource.Semantic.vertex.rawValue, forSymbol: "vertexPosition", options: nil)
-        program.setSemantic(SCNModelViewProjectionTransform, forSymbol: "modelViewProjectionMatrix", options: nil)
-        
-        program.vertexShader = try! String(contentsOfFile: Bundle.main.path(forResource: "ImageParallax", ofType: "vert")!)
-        program.fragmentShader = try! String(contentsOfFile: Bundle.main.path(forResource: "ImageParallax", ofType: "frag")!)
-        
+        program.fragmentFunctionName = "myFragment"
+        program.vertexFunctionName = "myVertex"
         plane.firstMaterial?.program = program
         
-        let imageTexture = try! GLKTextureLoader.texture(with: image.cgImage!, options: nil)
-        let imageDepthTexture = try! GLKTextureLoader.texture(withContentsOf: imageDepth.jpegData(compressionQuality: 1.0)!, options: nil)
+        let imageProperty = SCNMaterialProperty(contents: image!)
+        plane.firstMaterial?.setValue(imageProperty, forKey: "diffuseTexture")
+        let imageDepthProperty = SCNMaterialProperty(contents: imageDepth!)
+        plane.firstMaterial?.setValue(imageDepthProperty, forKey: "depthTexture")
         
-        plane.firstMaterial?.handleBinding(ofSymbol: "image") { (programId:UInt32, location:UInt32, node:SCNNode!, renderer:SCNRenderer!) -> Void in
-            glTexParameterf(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_WRAP_S), Float(GL_CLAMP_TO_EDGE) )
-            glTexParameterf(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_WRAP_T), Float(GL_CLAMP_TO_EDGE) )
-            glTexParameterf(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_MAG_FILTER), Float(GL_LINEAR) )
-            glTexParameterf(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_MIN_FILTER), Float(GL_LINEAR) )
-            glBindTexture(GLenum(GL_TEXTURE_2D), imageTexture.name)
-        }
-        
-        plane.firstMaterial?.handleBinding(ofSymbol: "imageDepth") { (programId:UInt32, location:UInt32, node:SCNNode!, renderer:SCNRenderer!) -> Void in
-            glTexParameterf(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_WRAP_S), Float(GL_CLAMP_TO_EDGE) )
-            glTexParameterf(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_WRAP_T), Float(GL_CLAMP_TO_EDGE) )
-            glTexParameterf(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_MAG_FILTER), Float(GL_LINEAR) )
-            glTexParameterf(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_MIN_FILTER), Float(GL_LINEAR) )
-            glBindTexture(GLenum(GL_TEXTURE_2D), imageDepthTexture.name)
-        }
-        
-        plane.firstMaterial?.handleBinding(ofSymbol: "offset") { (programId:UInt32, location:UInt32, node:SCNNode!, renderer:SCNRenderer!) -> Void in
-            let location = GLint(location)
-            glUniform2f(location, 0.0, 0.1)
-        }
+        uniforms = .init(offset: .init(x: 0, y: 0))
         
         // Configure the camera
         let cameraNode = SCNNode()
@@ -100,14 +87,18 @@ final class ImageViewController: UIViewController {
         cameraNode.position = .init(0, 0, cameraZPosition)
         scene.rootNode.addChildNode(cameraNode)
         
+        sceneView.antialiasingMode = .multisampling4X
+        
         sceneView.scene = scene
         sceneView.backgroundColor = .red
     }
     
     @objc func userDidPan(_ gestureRecognizer: UIPanGestureRecognizer) {
         let translation = gestureRecognizer.translation(in: view)
-        self.x = Float(translation.x / view.frame.width)
-        self.y = Float(translation.y / view.frame.height)
+        uniforms = Uniforms.init(offset: .init(
+            x: Float(translation.y / view.frame.width),
+            y: Float(translation.x / view.frame.height)
+        ))
     }
 }
 

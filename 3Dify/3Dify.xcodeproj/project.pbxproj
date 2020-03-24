@@ -16,9 +16,7 @@
 		BE1C250D242615A200276024 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C250C242615A200276024 /* CameraController.swift */; };
 		BE1C250F2426193E00276024 /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C250E2426193E00276024 /* CameraViewController.swift */; };
 		BE1C251124262F4B00276024 /* ImageScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C251024262F4B00276024 /* ImageScene.swift */; };
-		BE1C25132426318C00276024 /* ImageParallax.frag in Resources */ = {isa = PBXBuildFile; fileRef = BE1C25122426318C00276024 /* ImageParallax.frag */; };
 		BE1C251524264A8700276024 /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C251424264A8700276024 /* ImageViewController.swift */; };
-		BE31A117242A2DD100019FE1 /* ImageParallax.vert in Resources */ = {isa = PBXBuildFile; fileRef = BE31A116242A2DD100019FE1 /* ImageParallax.vert */; };
 		BE31A119242A383A00019FE1 /* ImageParallax.metal in Sources */ = {isa = PBXBuildFile; fileRef = BE31A118242A383A00019FE1 /* ImageParallax.metal */; };
 /* End PBXBuildFile section */
 
@@ -34,9 +32,7 @@
 		BE1C250C242615A200276024 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
 		BE1C250E2426193E00276024 /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 		BE1C251024262F4B00276024 /* ImageScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageScene.swift; sourceTree = "<group>"; };
-		BE1C25122426318C00276024 /* ImageParallax.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = ImageParallax.frag; sourceTree = "<group>"; };
 		BE1C251424264A8700276024 /* ImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
-		BE31A116242A2DD100019FE1 /* ImageParallax.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = ImageParallax.vert; sourceTree = "<group>"; };
 		BE31A118242A383A00019FE1 /* ImageParallax.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ImageParallax.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -72,8 +68,6 @@
 			children = (
 				BE1C250C242615A200276024 /* CameraController.swift */,
 				BE1C250E2426193E00276024 /* CameraViewController.swift */,
-				BE31A116242A2DD100019FE1 /* ImageParallax.vert */,
-				BE1C25122426318C00276024 /* ImageParallax.frag */,
 				BE31A118242A383A00019FE1 /* ImageParallax.metal */,
 				BE1C251424264A8700276024 /* ImageViewController.swift */,
 				BE1C251024262F4B00276024 /* ImageScene.swift */,
@@ -154,8 +148,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BE1C25132426318C00276024 /* ImageParallax.frag in Resources */,
-				BE31A117242A2DD100019FE1 /* ImageParallax.vert in Resources */,
 				BE1C25052426150900276024 /* LaunchScreen.storyboard in Resources */,
 				BE1C25022426150900276024 /* Preview Assets.xcassets in Resources */,
 				BE1C24FF2426150900276024 /* Assets.xcassets in Resources */,
