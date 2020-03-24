@@ -8,12 +8,13 @@
 
 import Foundation
 import SpriteKit
+import SceneKit
 import CoreMotion
 
 
-class ImageView: SKView {
+class SKImageView: SKView {
     
-    private var imageScene: ImageScene!
+    private var imageScene: SKImageScene!
     private var motionManager: CMMotionManager!
     
     public var offset: CGPoint = .zero {
@@ -27,7 +28,7 @@ class ImageView: SKView {
     init(frame: CGRect, image: UIImage, depthImage: UIImage) {
         super.init(frame: frame)
 
-        imageScene = ImageScene(size: frame.size, image: image, depthImage: depthImage)
+        imageScene = SKImageScene(size: frame.size, image: image, depthImage: depthImage)
         presentScene(imageScene)
     }
     
@@ -37,7 +38,7 @@ class ImageView: SKView {
 }
 
 
-class ImageScene: SKScene {
+class SKImageScene: SKScene {
     
     private var u_intensity = SKUniform(name: "u_intensity", float: 0.2)
     public var u_offset = SKUniform(name: "u_offset", vectorFloat2: .zero)

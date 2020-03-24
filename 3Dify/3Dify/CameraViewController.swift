@@ -135,7 +135,7 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         depthImageView.image = depthUIImage
         
         let imageViewController = ImageViewController()
-        imageViewController.depthImage = depthUIImage
+        imageViewController.imageDepth = depthUIImage
         imageViewController.image = colorUIImage
         present(imageViewController, animated: true)
     }
