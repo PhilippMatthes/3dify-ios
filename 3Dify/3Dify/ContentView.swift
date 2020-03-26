@@ -10,38 +10,41 @@ import SwiftUI
 import AVFoundation
 
 struct ContentView: View {
-    @State private var selectedTab = 0
+    let cameraCoordinator = CameraCoordinator()
+    
+    @State var selectedTab = 0
+    
     @State private var depthImage: DepthImage?
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            CameraViewControllerRepresentable(onCapture: { depthImage in
-                self.depthImage = depthImage
-                self.selectedTab = 1
-            })
-                .tabItem {
-                    Image(systemName: "camera.fill")
-                    Text("Camera")
-                }.tag(0)
-            ImageParallaxViewControllerRepresentable(depthImage: $depthImage)
-                .tabItem {
-                    Image(systemName: "square.stack.3d.down.right")
-                    Text("3Dify")
-                }.tag(1)
-            ImagePickerViewControllerRepresenable(onPicked: { depthImage in
-                self.depthImage = depthImage
-                self.selectedTab = 1
-            })
-                .tabItem {
-                    Image(systemName: "person.2.square.stack.fill")
-                    Text("Pick Image")
-                }.tag(2)
+        ZStack(alignment: .bottom) {
+            if selectedTab == 0 {
+                CameraViewControllerRepresentable(cameraCoordinator: cameraCoordinator, onCapture: { depthImage in
+                    self.depthImage = depthImage
+                    self.selectedTab = 1
+                })
+            } else if selectedTab == 1 {
+                ImageParallaxView(depthImage: $depthImage)
+            } else if selectedTab == 2 {
+                ImagePickerViewControllerRepresenable(onPicked: { depthImage in
+                    self.depthImage = depthImage
+                    self.selectedTab = 1
+                })
+            }
+            
+            TabBar(onTabSelected: { tab in
+                if (tab == 0 && self.selectedTab == 0) {
+                    self.cameraCoordinator.capturePhoto()
+                }
+                self.selectedTab = tab
+            }, selectedTab: self.$selectedTab)
         }
+        .edgesIgnoringSafeArea(.bottom)
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(selectedTab: 2)
     }
 }

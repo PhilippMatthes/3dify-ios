@@ -16,16 +16,32 @@
 		BE1C250D242615A200276024 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C250C242615A200276024 /* CameraController.swift */; };
 		BE1C250F2426193E00276024 /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C250E2426193E00276024 /* CameraViewController.swift */; };
 		BE1C251524264A8700276024 /* ImageParallaxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C251424264A8700276024 /* ImageParallaxViewController.swift */; };
+		BE26887B242B57CC00F165C5 /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26887A242B57CC00F165C5 /* TabBar.swift */; };
+		BE26887F242B583E00F165C5 /* ImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26887E242B583E00F165C5 /* ImageCell.swift */; };
+		BE268887242B5AD000F165C5 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE268886242B5AD000F165C5 /* CardView.swift */; };
+		BE268895242B5AF000F165C5 /* Path+Length.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26888A242B5AF000F165C5 /* Path+Length.swift */; };
+		BE268896242B5AF000F165C5 /* Array+VectorArithmetic.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26888B242B5AF000F165C5 /* Array+VectorArithmetic.swift */; };
+		BE268897242B5AF000F165C5 /* InterpolatedShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26888C242B5AF000F165C5 /* InterpolatedShape.swift */; };
+		BE268898242B5AF000F165C5 /* AnimatableDataSimilarShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26888D242B5AF000F165C5 /* AnimatableDataSimilarShape.swift */; };
+		BE268899242B5AF000F165C5 /* Path+VectorArithmetic.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26888E242B5AF000F165C5 /* Path+VectorArithmetic.swift */; };
+		BE26889A242B5AF000F165C5 /* SimilarShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26888F242B5AF000F165C5 /* SimilarShape.swift */; };
+		BE2688AB242B5B8700F165C5 /* AVDepthData+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2688A1242B5B1100F165C5 /* AVDepthData+Utils.swift */; };
+		BE2688AC242B5B8700F165C5 /* CGImageSource+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2688A4242B5B1200F165C5 /* CGImageSource+Utils.swift */; };
+		BE2688AD242B5B8700F165C5 /* CIImage+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2688A3242B5B1200F165C5 /* CIImage+Utils.swift */; };
+		BE2688AE242B5B8700F165C5 /* CVPixelBuffer+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26889F242B5B1100F165C5 /* CVPixelBuffer+Utils.swift */; };
+		BE2688AF242B5B8700F165C5 /* Photos+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2688A0242B5B1100F165C5 /* Photos+Utils.swift */; };
+		BE2688B0242B5B8700F165C5 /* UIImage+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2688A2242B5B1100F165C5 /* UIImage+Utils.swift */; };
+		BE2688B1242B5B8700F165C5 /* PHAsset+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26887C242B581600F165C5 /* PHAsset+Utils.swift */; };
 		BE31A119242A383A00019FE1 /* ImageParallax.metal in Sources */ = {isa = PBXBuildFile; fileRef = BE31A118242A383A00019FE1 /* ImageParallax.metal */; };
 		BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A11A242A7C7300019FE1 /* DepthImage.swift */; };
 		BE31A121242A81A100019FE1 /* ImagePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A120242A81A100019FE1 /* ImagePickerViewController.swift */; };
-		BE31A12A242AACAD00019FE1 /* UIImage+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A123242AACAD00019FE1 /* UIImage+Utils.swift */; };
-		BE31A12B242AACAD00019FE1 /* CVPixelBuffer+CIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A124242AACAD00019FE1 /* CVPixelBuffer+CIImage.swift */; };
-		BE31A12C242AACAD00019FE1 /* UIAlertController+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A125242AACAD00019FE1 /* UIAlertController+Utils.swift */; };
-		BE31A12D242AACAD00019FE1 /* AVDepthData+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A126242AACAD00019FE1 /* AVDepthData+Utils.swift */; };
-		BE31A12E242AACAD00019FE1 /* CIImage+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A127242AACAD00019FE1 /* CIImage+Utils.swift */; };
-		BE31A12F242AACAD00019FE1 /* PhotosUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A128242AACAD00019FE1 /* PhotosUtils.swift */; };
-		BE31A130242AACAD00019FE1 /* CGImageSource+Depth.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A129242AACAD00019FE1 /* CGImageSource+Depth.swift */; };
+		BEABE6E9242CD4860071C556 /* DepthToColorMap.metal in Sources */ = {isa = PBXBuildFile; fileRef = BEABE6E6242CD4830071C556 /* DepthToColorMap.metal */; };
+		BEABE6EA242CD4860071C556 /* DepthToColorMapConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEABE6E7242CD4840071C556 /* DepthToColorMapConverter.swift */; };
+		BEABE6EB242CD4860071C556 /* FilterRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEABE6E8242CD4860071C556 /* FilterRenderer.swift */; };
+		BEEA81B0242C9AA10074BBAE /* OptimizedPydnet.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = BEEA81AF242C9AA10074BBAE /* OptimizedPydnet.mlmodel */; };
+		BEFDCA34242B5CBB002AF520 /* Gradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFDCA33242B5CBB002AF520 /* Gradients.swift */; };
+		BEFDCA36242B9907002AF520 /* SlideOverCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFDCA35242B9907002AF520 /* SlideOverCard.swift */; };
+		BEFDCA38242B9916002AF520 /* Handle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFDCA37242B9916002AF520 /* Handle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,16 +56,32 @@
 		BE1C250C242615A200276024 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
 		BE1C250E2426193E00276024 /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 		BE1C251424264A8700276024 /* ImageParallaxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageParallaxViewController.swift; sourceTree = "<group>"; };
+		BE26887A242B57CC00F165C5 /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
+		BE26887C242B581600F165C5 /* PHAsset+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+Utils.swift"; sourceTree = "<group>"; };
+		BE26887E242B583E00F165C5 /* ImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCell.swift; sourceTree = "<group>"; };
+		BE268886242B5AD000F165C5 /* CardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		BE26888A242B5AF000F165C5 /* Path+Length.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+Length.swift"; sourceTree = "<group>"; };
+		BE26888B242B5AF000F165C5 /* Array+VectorArithmetic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+VectorArithmetic.swift"; sourceTree = "<group>"; };
+		BE26888C242B5AF000F165C5 /* InterpolatedShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterpolatedShape.swift; sourceTree = "<group>"; };
+		BE26888D242B5AF000F165C5 /* AnimatableDataSimilarShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimatableDataSimilarShape.swift; sourceTree = "<group>"; };
+		BE26888E242B5AF000F165C5 /* Path+VectorArithmetic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+VectorArithmetic.swift"; sourceTree = "<group>"; };
+		BE26888F242B5AF000F165C5 /* SimilarShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimilarShape.swift; sourceTree = "<group>"; };
+		BE26889F242B5B1100F165C5 /* CVPixelBuffer+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CVPixelBuffer+Utils.swift"; sourceTree = "<group>"; };
+		BE2688A0242B5B1100F165C5 /* Photos+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Photos+Utils.swift"; sourceTree = "<group>"; };
+		BE2688A1242B5B1100F165C5 /* AVDepthData+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVDepthData+Utils.swift"; sourceTree = "<group>"; };
+		BE2688A2242B5B1100F165C5 /* UIImage+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Utils.swift"; sourceTree = "<group>"; };
+		BE2688A3242B5B1200F165C5 /* CIImage+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CIImage+Utils.swift"; sourceTree = "<group>"; };
+		BE2688A4242B5B1200F165C5 /* CGImageSource+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGImageSource+Utils.swift"; sourceTree = "<group>"; };
 		BE31A118242A383A00019FE1 /* ImageParallax.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ImageParallax.metal; sourceTree = "<group>"; };
 		BE31A11A242A7C7300019FE1 /* DepthImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthImage.swift; sourceTree = "<group>"; };
 		BE31A120242A81A100019FE1 /* ImagePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerViewController.swift; sourceTree = "<group>"; };
-		BE31A123242AACAD00019FE1 /* UIImage+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIImage+Utils.swift"; path = "../../../../../Downloads/iOS-Depth-Sampler-master/iOS-Depth-Sampler/Utils/UIImage+Utils.swift"; sourceTree = "<group>"; };
-		BE31A124242AACAD00019FE1 /* CVPixelBuffer+CIImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CVPixelBuffer+CIImage.swift"; path = "../../../../../Downloads/iOS-Depth-Sampler-master/iOS-Depth-Sampler/Utils/CVPixelBuffer+CIImage.swift"; sourceTree = "<group>"; };
-		BE31A125242AACAD00019FE1 /* UIAlertController+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIAlertController+Utils.swift"; path = "../../../../../Downloads/iOS-Depth-Sampler-master/iOS-Depth-Sampler/Utils/UIAlertController+Utils.swift"; sourceTree = "<group>"; };
-		BE31A126242AACAD00019FE1 /* AVDepthData+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "AVDepthData+Utils.swift"; path = "../../../../../Downloads/iOS-Depth-Sampler-master/iOS-Depth-Sampler/Utils/AVDepthData+Utils.swift"; sourceTree = "<group>"; };
-		BE31A127242AACAD00019FE1 /* CIImage+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CIImage+Utils.swift"; path = "../../../../../Downloads/iOS-Depth-Sampler-master/iOS-Depth-Sampler/Utils/CIImage+Utils.swift"; sourceTree = "<group>"; };
-		BE31A128242AACAD00019FE1 /* PhotosUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PhotosUtils.swift; path = "../../../../../Downloads/iOS-Depth-Sampler-master/iOS-Depth-Sampler/Utils/PhotosUtils.swift"; sourceTree = "<group>"; };
-		BE31A129242AACAD00019FE1 /* CGImageSource+Depth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CGImageSource+Depth.swift"; path = "../../../../../Downloads/iOS-Depth-Sampler-master/iOS-Depth-Sampler/Utils/CGImageSource+Depth.swift"; sourceTree = "<group>"; };
+		BEABE6E6242CD4830071C556 /* DepthToColorMap.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = DepthToColorMap.metal; sourceTree = "<group>"; };
+		BEABE6E7242CD4840071C556 /* DepthToColorMapConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DepthToColorMapConverter.swift; sourceTree = "<group>"; };
+		BEABE6E8242CD4860071C556 /* FilterRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterRenderer.swift; sourceTree = "<group>"; };
+		BEEA81AF242C9AA10074BBAE /* OptimizedPydnet.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = OptimizedPydnet.mlmodel; sourceTree = "<group>"; };
+		BEFDCA33242B5CBB002AF520 /* Gradients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gradients.swift; sourceTree = "<group>"; };
+		BEFDCA35242B9907002AF520 /* SlideOverCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideOverCard.swift; sourceTree = "<group>"; };
+		BEFDCA37242B9916002AF520 /* Handle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Handle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,14 +114,18 @@
 		BE1C24F72426150900276024 /* 3Dify */ = {
 			isa = PBXGroup;
 			children = (
-				BE31A122242AAC9B00019FE1 /* Utils */,
-				BE31A11F242A815000019FE1 /* Picker */,
+				BEEA81A6242C93390074BBAE /* Depth Prediction */,
+				BE268888242B5AF000F165C5 /* Supporting Algorithms */,
+				BE31A122242AAC9B00019FE1 /* Supporting Extensions */,
+				BE268880242B594C00F165C5 /* Supporting Views */,
 				BE31A11C242A7F6000019FE1 /* Models */,
+				BE31A11F242A815000019FE1 /* Picker */,
 				BE31A11D242A7F7100019FE1 /* Camera */,
 				BE31A11E242A7F7C00019FE1 /* Parallax */,
 				BE1C24F82426150900276024 /* AppDelegate.swift */,
-				BE1C24FA2426150900276024 /* SceneDelegate.swift */,
+				BEFDCA33242B5CBB002AF520 /* Gradients.swift */,
 				BE1C24FC2426150900276024 /* ContentView.swift */,
+				BE1C24FA2426150900276024 /* SceneDelegate.swift */,
 				BE1C24FE2426150900276024 /* Assets.xcassets */,
 				BE1C25032426150900276024 /* LaunchScreen.storyboard */,
 				BE1C25062426150900276024 /* Info.plist */,
@@ -106,6 +142,93 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		BE268880242B594C00F165C5 /* Supporting Views */ = {
+			isa = PBXGroup;
+			children = (
+				BE268886242B5AD000F165C5 /* CardView.swift */,
+				BE26887A242B57CC00F165C5 /* TabBar.swift */,
+				BEFDCA35242B9907002AF520 /* SlideOverCard.swift */,
+				BEFDCA37242B9916002AF520 /* Handle.swift */,
+			);
+			path = "Supporting Views";
+			sourceTree = "<group>";
+		};
+		BE268881242B595B00F165C5 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BE1C251424264A8700276024 /* ImageParallaxViewController.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		BE268882242B596100F165C5 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				BE31A118242A383A00019FE1 /* ImageParallax.metal */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
+		BE268883242B597C00F165C5 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BE31A120242A81A100019FE1 /* ImagePickerViewController.swift */,
+				BE26887E242B583E00F165C5 /* ImageCell.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		BE268884242B59B400F165C5 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BE1C250E2426193E00276024 /* CameraViewController.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		BE268885242B59BB00F165C5 /* Coordinators */ = {
+			isa = PBXGroup;
+			children = (
+				BE1C250C242615A200276024 /* CameraController.swift */,
+			);
+			path = Coordinators;
+			sourceTree = "<group>";
+		};
+		BE268888242B5AF000F165C5 /* Supporting Algorithms */ = {
+			isa = PBXGroup;
+			children = (
+				BE268889242B5AF000F165C5 /* Path Animation */,
+			);
+			path = "Supporting Algorithms";
+			sourceTree = "<group>";
+		};
+		BE268889242B5AF000F165C5 /* Path Animation */ = {
+			isa = PBXGroup;
+			children = (
+				BE26888A242B5AF000F165C5 /* Path+Length.swift */,
+				BE26888B242B5AF000F165C5 /* Array+VectorArithmetic.swift */,
+				BE26888C242B5AF000F165C5 /* InterpolatedShape.swift */,
+				BE26888D242B5AF000F165C5 /* AnimatableDataSimilarShape.swift */,
+				BE26888E242B5AF000F165C5 /* Path+VectorArithmetic.swift */,
+				BE26888F242B5AF000F165C5 /* SimilarShape.swift */,
+			);
+			path = "Path Animation";
+			sourceTree = "<group>";
+		};
+		BE26889E242B5B1100F165C5 /* Computer Vision */ = {
+			isa = PBXGroup;
+			children = (
+				BE2688A1242B5B1100F165C5 /* AVDepthData+Utils.swift */,
+				BE2688A4242B5B1200F165C5 /* CGImageSource+Utils.swift */,
+				BE2688A3242B5B1200F165C5 /* CIImage+Utils.swift */,
+				BE26889F242B5B1100F165C5 /* CVPixelBuffer+Utils.swift */,
+				BE2688A0242B5B1100F165C5 /* Photos+Utils.swift */,
+				BE2688A2242B5B1100F165C5 /* UIImage+Utils.swift */,
+				BE26887C242B581600F165C5 /* PHAsset+Utils.swift */,
+			);
+			path = "Computer Vision";
+			sourceTree = "<group>";
+		};
 		BE31A11C242A7F6000019FE1 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -117,8 +240,8 @@
 		BE31A11D242A7F7100019FE1 /* Camera */ = {
 			isa = PBXGroup;
 			children = (
-				BE1C250C242615A200276024 /* CameraController.swift */,
-				BE1C250E2426193E00276024 /* CameraViewController.swift */,
+				BE268885242B59BB00F165C5 /* Coordinators */,
+				BE268884242B59B400F165C5 /* Views */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -126,8 +249,8 @@
 		BE31A11E242A7F7C00019FE1 /* Parallax */ = {
 			isa = PBXGroup;
 			children = (
-				BE31A118242A383A00019FE1 /* ImageParallax.metal */,
-				BE1C251424264A8700276024 /* ImageParallaxViewController.swift */,
+				BE268882242B596100F165C5 /* Shaders */,
+				BE268881242B595B00F165C5 /* Views */,
 			);
 			path = Parallax;
 			sourceTree = "<group>";
@@ -135,23 +258,28 @@
 		BE31A11F242A815000019FE1 /* Picker */ = {
 			isa = PBXGroup;
 			children = (
-				BE31A120242A81A100019FE1 /* ImagePickerViewController.swift */,
+				BE268883242B597C00F165C5 /* Views */,
 			);
 			path = Picker;
 			sourceTree = "<group>";
 		};
-		BE31A122242AAC9B00019FE1 /* Utils */ = {
+		BE31A122242AAC9B00019FE1 /* Supporting Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				BE31A126242AACAD00019FE1 /* AVDepthData+Utils.swift */,
-				BE31A129242AACAD00019FE1 /* CGImageSource+Depth.swift */,
-				BE31A127242AACAD00019FE1 /* CIImage+Utils.swift */,
-				BE31A124242AACAD00019FE1 /* CVPixelBuffer+CIImage.swift */,
-				BE31A128242AACAD00019FE1 /* PhotosUtils.swift */,
-				BE31A125242AACAD00019FE1 /* UIAlertController+Utils.swift */,
-				BE31A123242AACAD00019FE1 /* UIImage+Utils.swift */,
+				BE26889E242B5B1100F165C5 /* Computer Vision */,
 			);
-			path = Utils;
+			path = "Supporting Extensions";
+			sourceTree = "<group>";
+		};
+		BEEA81A6242C93390074BBAE /* Depth Prediction */ = {
+			isa = PBXGroup;
+			children = (
+				BEABE6E6242CD4830071C556 /* DepthToColorMap.metal */,
+				BEABE6E7242CD4840071C556 /* DepthToColorMapConverter.swift */,
+				BEABE6E8242CD4860071C556 /* FilterRenderer.swift */,
+				BEEA81AF242C9AA10074BBAE /* OptimizedPydnet.mlmodel */,
+			);
+			path = "Depth Prediction";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -226,20 +354,36 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE1C24F92426150900276024 /* AppDelegate.swift in Sources */,
+				BE268898242B5AF000F165C5 /* AnimatableDataSimilarShape.swift in Sources */,
+				BE2688AD242B5B8700F165C5 /* CIImage+Utils.swift in Sources */,
+				BEFDCA38242B9916002AF520 /* Handle.swift in Sources */,
 				BE31A121242A81A100019FE1 /* ImagePickerViewController.swift in Sources */,
-				BE31A130242AACAD00019FE1 /* CGImageSource+Depth.swift in Sources */,
-				BE31A12B242AACAD00019FE1 /* CVPixelBuffer+CIImage.swift in Sources */,
+				BE2688AF242B5B8700F165C5 /* Photos+Utils.swift in Sources */,
+				BE2688B1242B5B8700F165C5 /* PHAsset+Utils.swift in Sources */,
+				BEABE6EA242CD4860071C556 /* DepthToColorMapConverter.swift in Sources */,
+				BE268899242B5AF000F165C5 /* Path+VectorArithmetic.swift in Sources */,
+				BE26887B242B57CC00F165C5 /* TabBar.swift in Sources */,
+				BEFDCA36242B9907002AF520 /* SlideOverCard.swift in Sources */,
 				BE1C250F2426193E00276024 /* CameraViewController.swift in Sources */,
-				BE31A12A242AACAD00019FE1 /* UIImage+Utils.swift in Sources */,
-				BE31A12D242AACAD00019FE1 /* AVDepthData+Utils.swift in Sources */,
+				BEABE6EB242CD4860071C556 /* FilterRenderer.swift in Sources */,
+				BE268896242B5AF000F165C5 /* Array+VectorArithmetic.swift in Sources */,
+				BEEA81B0242C9AA10074BBAE /* OptimizedPydnet.mlmodel in Sources */,
+				BE26889A242B5AF000F165C5 /* SimilarShape.swift in Sources */,
+				BE268895242B5AF000F165C5 /* Path+Length.swift in Sources */,
+				BE2688B0242B5B8700F165C5 /* UIImage+Utils.swift in Sources */,
+				BEFDCA34242B5CBB002AF520 /* Gradients.swift in Sources */,
+				BE268887242B5AD000F165C5 /* CardView.swift in Sources */,
+				BE2688AE242B5B8700F165C5 /* CVPixelBuffer+Utils.swift in Sources */,
+				BE2688AC242B5B8700F165C5 /* CGImageSource+Utils.swift in Sources */,
 				BE1C24FB2426150900276024 /* SceneDelegate.swift in Sources */,
 				BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */,
 				BE1C251524264A8700276024 /* ImageParallaxViewController.swift in Sources */,
-				BE31A12E242AACAD00019FE1 /* CIImage+Utils.swift in Sources */,
-				BE31A12F242AACAD00019FE1 /* PhotosUtils.swift in Sources */,
+				BEABE6E9242CD4860071C556 /* DepthToColorMap.metal in Sources */,
+				BE2688AB242B5B8700F165C5 /* AVDepthData+Utils.swift in Sources */,
+				BE268897242B5AF000F165C5 /* InterpolatedShape.swift in Sources */,
+				BE26887F242B583E00F165C5 /* ImageCell.swift in Sources */,
 				BE31A119242A383A00019FE1 /* ImageParallax.metal in Sources */,
 				BE1C250D242615A200276024 /* CameraController.swift in Sources */,
-				BE31A12C242AACAD00019FE1 /* UIAlertController+Utils.swift in Sources */,
 				BE1C24FD2426150900276024 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
