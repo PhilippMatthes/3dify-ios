@@ -1,5 +1,5 @@
 //
-//  CameraController.swift
+//  CameraCoordinator.swift
 //  3Dify
 //
 //  Created by It's free real estate on 21.03.20.
@@ -19,7 +19,20 @@ class CameraCoordinator: NSObject {
     
     var captureDelegate: AVCapturePhotoCaptureDelegate?
     
+    private var isPrepared: Bool {
+        captureSession != nil &&
+        cameraDevice != nil &&
+        cameraInput != nil &&
+        cameraOutput != nil
+    }
+    
     func prepare(completion: @escaping () -> ()) {
+        guard !isPrepared else {
+            captureSession?.startRunning()
+            completion()
+            return
+        }
+        
         let captureSession = AVCaptureSession()
         self.captureSession = captureSession
         captureSession.beginConfiguration()
@@ -71,7 +84,7 @@ class CameraCoordinator: NSObject {
         cameraOutput.capturePhoto(with: photoSettings, delegate: captureDelegate)
     }
     
-    func displayPreview(on view: UIView) {
+    func displayPreview(on view: UIView, completion: @escaping () -> ()) {
         guard
             let captureSession = self.captureSession,
             captureSession.isRunning
@@ -81,7 +94,8 @@ class CameraCoordinator: NSObject {
         previewLayer.videoGravity = .resizeAspectFill
         previewLayer.connection?.videoOrientation = .portrait
         previewLayer.frame = view.frame
-
+        
         view.layer.insertSublayer(previewLayer, at: 0)
+        completion()
     }
 }

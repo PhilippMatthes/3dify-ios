@@ -119,6 +119,6 @@ fragment half4 myFragment(SimpleVertex in [[stage_in]],
     float2 parallaxUv = parallaxOcclusionMapping(uniforms.offset, in.texCoords, depthTexture);
     
     float4 diffuseColor = diffuseTexture.sample(sampler2d, parallaxUv);
-    float depthColor = depthTexture.sample(sampler2d, parallaxUv).r;
+    // float depthColor = depthTexture.sample(sampler2d, parallaxUv).r;
     return half4(diffuseColor);
 }

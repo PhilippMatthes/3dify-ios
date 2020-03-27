@@ -16,10 +16,9 @@ import Accelerate
 
 final class CameraViewController: UIViewController {
     let cameraCoordinator: CameraCoordinator
+    let loadingIndicator = UIActivityIndicatorView(style: .large)
     let previewView = UIView()
     let button = UIButton()
-    
-    let photoDepthConverter = DepthToColorMapConverter()
     
     private let onCapture: ((DepthImage) -> ())
     
@@ -42,12 +41,21 @@ final class CameraViewController: UIViewController {
             width: UIScreen.main.bounds.width,
             height: UIScreen.main.bounds.height
         )
+        previewView.backgroundColor = .black
         previewView.contentMode = .scaleAspectFit
         view.addSubview(previewView)
         
+        loadingIndicator.frame = self.view.bounds
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.color = .white
+        loadingIndicator.startAnimating()
+        view.addSubview(loadingIndicator)
+        
         cameraCoordinator.captureDelegate = self
         cameraCoordinator.prepare() {
-            self.cameraCoordinator.displayPreview(on: self.previewView)
+            self.cameraCoordinator.displayPreview(on: self.previewView) {
+                self.loadingIndicator.stopAnimating()
+            }
         }
     }
 }
@@ -58,6 +66,7 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         didFinishProcessingPhoto photo: AVCapturePhoto,
         error: Error?
     ) {
+        
         guard
             error == nil,
             let colorImageData = photo.fileDataRepresentation(),
@@ -74,10 +83,11 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
             let depthCGImage = depthMapImage.cgImage,
             let rotatedDepthImage = UIImage(cgImage: depthCGImage, scale: 1.0, orientation: image.imageOrientation)
                 .rotate(radians: 0),
-            let rotatedImage = image.rotate(radians: 0)
+            let rotatedImage = image.rotate(radians: 0),
+            let depthImage = DepthImage(diffuse: rotatedImage, trueDepth: rotatedDepthImage)
         else {return}
-
-        onCapture(DepthImage(diffuse: rotatedImage, trueDepth: rotatedDepthImage))
+        
+        onCapture(depthImage)
     }
 }
 

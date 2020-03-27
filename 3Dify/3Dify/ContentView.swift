@@ -13,13 +13,13 @@ struct ContentView: View {
     let cameraCoordinator = CameraCoordinator()
     
     @State var selectedTab = 0
-    
-    @State private var depthImage: DepthImage?
+    @State var depthImage: DepthImage?
     
     var body: some View {
         ZStack(alignment: .bottom) {
             if selectedTab == 0 {
                 CameraViewControllerRepresentable(cameraCoordinator: cameraCoordinator, onCapture: { depthImage in
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
                     self.depthImage = depthImage
                     self.selectedTab = 1
                 })
@@ -27,12 +27,14 @@ struct ContentView: View {
                 ImageParallaxView(depthImage: $depthImage)
             } else if selectedTab == 2 {
                 ImagePickerViewControllerRepresenable(onPicked: { depthImage in
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
                     self.depthImage = depthImage
                     self.selectedTab = 1
                 })
             }
             
             TabBar(onTabSelected: { tab in
+                UISelectionFeedbackGenerator().selectionChanged()
                 if (tab == 0 && self.selectedTab == 0) {
                     self.cameraCoordinator.capturePhoto()
                 }
