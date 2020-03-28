@@ -40,10 +40,17 @@ extension PHAsset {
                 let url = url,
                 let image = UIImage(contentsOfFile: url.path),
                 let rotatedImage = image.rotate(radians: 0),
-                let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil),
-                let disparityPixelBuffer = imageSource.getDisparityData()?.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32).depthDataMap
+                let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil)
             else {
                 completion(nil)
+                return
+            }
+            
+            
+            guard let disparityPixelBuffer = imageSource.getDisparityData()?
+                .converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32)
+                .depthDataMap else {
+                completion(DepthImage(diffuse: rotatedImage, trueDepth: nil))
                 return
             }
             

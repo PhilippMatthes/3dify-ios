@@ -13,11 +13,8 @@
 		BE1C24FF2426150900276024 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE1C24FE2426150900276024 /* Assets.xcassets */; };
 		BE1C25022426150900276024 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE1C25012426150900276024 /* Preview Assets.xcassets */; };
 		BE1C25052426150900276024 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE1C25032426150900276024 /* LaunchScreen.storyboard */; };
-		BE1C250D242615A200276024 /* CameraCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C250C242615A200276024 /* CameraCoordinator.swift */; };
-		BE1C250F2426193E00276024 /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C250E2426193E00276024 /* CameraViewController.swift */; };
 		BE1C251524264A8700276024 /* ImageParallaxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C251424264A8700276024 /* ImageParallaxViewController.swift */; };
 		BE26887B242B57CC00F165C5 /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26887A242B57CC00F165C5 /* TabBar.swift */; };
-		BE26887F242B583E00F165C5 /* ImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26887E242B583E00F165C5 /* ImageCell.swift */; };
 		BE268887242B5AD000F165C5 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE268886242B5AD000F165C5 /* CardView.swift */; };
 		BE268895242B5AF000F165C5 /* Path+Length.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26888A242B5AF000F165C5 /* Path+Length.swift */; };
 		BE268896242B5AF000F165C5 /* Array+VectorArithmetic.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26888B242B5AF000F165C5 /* Array+VectorArithmetic.swift */; };
@@ -34,11 +31,14 @@
 		BE2688B1242B5B8700F165C5 /* PHAsset+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26887C242B581600F165C5 /* PHAsset+Utils.swift */; };
 		BE31A119242A383A00019FE1 /* ImageParallax.metal in Sources */ = {isa = PBXBuildFile; fileRef = BE31A118242A383A00019FE1 /* ImageParallax.metal */; };
 		BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A11A242A7C7300019FE1 /* DepthImage.swift */; };
-		BE31A121242A81A100019FE1 /* ImagePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A120242A81A100019FE1 /* ImagePickerViewController.swift */; };
-		BE6D380C242E591A00DDF82D /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6D380B242E591A00DDF82D /* BlurView.swift */; };
+		BE8B3FDB242FE86E0075F6EA /* VideoConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8B3FDA242FE86E0075F6EA /* VideoConverter.swift */; };
 		BEABE6E9242CD4860071C556 /* DepthToColorMap.metal in Sources */ = {isa = PBXBuildFile; fileRef = BEABE6E6242CD4830071C556 /* DepthToColorMap.metal */; };
 		BEABE6EA242CD4860071C556 /* DepthToColorMapConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEABE6E7242CD4840071C556 /* DepthToColorMapConverter.swift */; };
 		BEABE6EB242CD4860071C556 /* FilterRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEABE6E8242CD4860071C556 /* FilterRenderer.swift */; };
+		BEBF333E242F9342008EEDAD /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF333D242F9342008EEDAD /* ImagePickerView.swift */; };
+		BEBF3340242F9907008EEDAD /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF333F242F9907008EEDAD /* CameraView.swift */; };
+		BEBF3342242F9B09008EEDAD /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF3341242F9B09008EEDAD /* CameraPreviewView.swift */; };
+		BEBF3344242FA8D9008EEDAD /* Color+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF3343242FA8D9008EEDAD /* Color+Tools.swift */; };
 		BEEA81B0242C9AA10074BBAE /* OptimizedPydnet.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = BEEA81AF242C9AA10074BBAE /* OptimizedPydnet.mlmodel */; };
 		BEFDCA34242B5CBB002AF520 /* Gradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFDCA33242B5CBB002AF520 /* Gradients.swift */; };
 		BEFDCA36242B9907002AF520 /* SlideOverCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFDCA35242B9907002AF520 /* SlideOverCard.swift */; };
@@ -54,12 +54,9 @@
 		BE1C25012426150900276024 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BE1C25042426150900276024 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		BE1C25062426150900276024 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BE1C250C242615A200276024 /* CameraCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCoordinator.swift; sourceTree = "<group>"; };
-		BE1C250E2426193E00276024 /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 		BE1C251424264A8700276024 /* ImageParallaxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageParallaxViewController.swift; sourceTree = "<group>"; };
 		BE26887A242B57CC00F165C5 /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
 		BE26887C242B581600F165C5 /* PHAsset+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+Utils.swift"; sourceTree = "<group>"; };
-		BE26887E242B583E00F165C5 /* ImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCell.swift; sourceTree = "<group>"; };
 		BE268886242B5AD000F165C5 /* CardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		BE26888A242B5AF000F165C5 /* Path+Length.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+Length.swift"; sourceTree = "<group>"; };
 		BE26888B242B5AF000F165C5 /* Array+VectorArithmetic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+VectorArithmetic.swift"; sourceTree = "<group>"; };
@@ -75,11 +72,14 @@
 		BE2688A4242B5B1200F165C5 /* CGImageSource+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGImageSource+Utils.swift"; sourceTree = "<group>"; };
 		BE31A118242A383A00019FE1 /* ImageParallax.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ImageParallax.metal; sourceTree = "<group>"; };
 		BE31A11A242A7C7300019FE1 /* DepthImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthImage.swift; sourceTree = "<group>"; };
-		BE31A120242A81A100019FE1 /* ImagePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerViewController.swift; sourceTree = "<group>"; };
-		BE6D380B242E591A00DDF82D /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
+		BE8B3FDA242FE86E0075F6EA /* VideoConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoConverter.swift; sourceTree = "<group>"; };
 		BEABE6E6242CD4830071C556 /* DepthToColorMap.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = DepthToColorMap.metal; sourceTree = "<group>"; };
 		BEABE6E7242CD4840071C556 /* DepthToColorMapConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DepthToColorMapConverter.swift; sourceTree = "<group>"; };
 		BEABE6E8242CD4860071C556 /* FilterRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterRenderer.swift; sourceTree = "<group>"; };
+		BEBF333D242F9342008EEDAD /* ImagePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
+		BEBF333F242F9907008EEDAD /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		BEBF3341242F9B09008EEDAD /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		BEBF3343242FA8D9008EEDAD /* Color+Tools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Tools.swift"; sourceTree = "<group>"; };
 		BEEA81AF242C9AA10074BBAE /* OptimizedPydnet.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = OptimizedPydnet.mlmodel; sourceTree = "<group>"; };
 		BEFDCA33242B5CBB002AF520 /* Gradients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gradients.swift; sourceTree = "<group>"; };
 		BEFDCA35242B9907002AF520 /* SlideOverCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideOverCard.swift; sourceTree = "<group>"; };
@@ -151,7 +151,6 @@
 				BE26887A242B57CC00F165C5 /* TabBar.swift */,
 				BEFDCA35242B9907002AF520 /* SlideOverCard.swift */,
 				BEFDCA37242B9916002AF520 /* Handle.swift */,
-				BE6D380B242E591A00DDF82D /* BlurView.swift */,
 			);
 			path = "Supporting Views";
 			sourceTree = "<group>";
@@ -202,8 +201,8 @@
 		BE31A11D242A7F7100019FE1 /* Camera */ = {
 			isa = PBXGroup;
 			children = (
-				BE1C250C242615A200276024 /* CameraCoordinator.swift */,
-				BE1C250E2426193E00276024 /* CameraViewController.swift */,
+				BEBF333F242F9907008EEDAD /* CameraView.swift */,
+				BEBF3341242F9B09008EEDAD /* CameraPreviewView.swift */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -213,6 +212,7 @@
 			children = (
 				BE31A118242A383A00019FE1 /* ImageParallax.metal */,
 				BE1C251424264A8700276024 /* ImageParallaxViewController.swift */,
+				BE8B3FDA242FE86E0075F6EA /* VideoConverter.swift */,
 			);
 			path = Parallax;
 			sourceTree = "<group>";
@@ -220,8 +220,7 @@
 		BE31A11F242A815000019FE1 /* Picker */ = {
 			isa = PBXGroup;
 			children = (
-				BE31A120242A81A100019FE1 /* ImagePickerViewController.swift */,
-				BE26887E242B583E00F165C5 /* ImageCell.swift */,
+				BEBF333D242F9342008EEDAD /* ImagePickerView.swift */,
 			);
 			path = Picker;
 			sourceTree = "<group>";
@@ -230,6 +229,7 @@
 			isa = PBXGroup;
 			children = (
 				BE26889E242B5B1100F165C5 /* Computer Vision */,
+				BEBF3343242FA8D9008EEDAD /* Color+Tools.swift */,
 			);
 			path = "Supporting Extensions";
 			sourceTree = "<group>";
@@ -316,38 +316,38 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE8B3FDB242FE86E0075F6EA /* VideoConverter.swift in Sources */,
 				BE1C24F92426150900276024 /* AppDelegate.swift in Sources */,
 				BE268898242B5AF000F165C5 /* AnimatableDataSimilarShape.swift in Sources */,
+				BEBF3344242FA8D9008EEDAD /* Color+Tools.swift in Sources */,
 				BE2688AD242B5B8700F165C5 /* CIImage+Utils.swift in Sources */,
+				BEBF333E242F9342008EEDAD /* ImagePickerView.swift in Sources */,
 				BEFDCA38242B9916002AF520 /* Handle.swift in Sources */,
-				BE31A121242A81A100019FE1 /* ImagePickerViewController.swift in Sources */,
 				BE2688AF242B5B8700F165C5 /* Photos+Utils.swift in Sources */,
 				BE2688B1242B5B8700F165C5 /* PHAsset+Utils.swift in Sources */,
 				BEABE6EA242CD4860071C556 /* DepthToColorMapConverter.swift in Sources */,
 				BE268899242B5AF000F165C5 /* Path+VectorArithmetic.swift in Sources */,
 				BE26887B242B57CC00F165C5 /* TabBar.swift in Sources */,
 				BEFDCA36242B9907002AF520 /* SlideOverCard.swift in Sources */,
-				BE1C250F2426193E00276024 /* CameraViewController.swift in Sources */,
 				BEABE6EB242CD4860071C556 /* FilterRenderer.swift in Sources */,
 				BE268896242B5AF000F165C5 /* Array+VectorArithmetic.swift in Sources */,
 				BEEA81B0242C9AA10074BBAE /* OptimizedPydnet.mlmodel in Sources */,
 				BE26889A242B5AF000F165C5 /* SimilarShape.swift in Sources */,
 				BE268895242B5AF000F165C5 /* Path+Length.swift in Sources */,
 				BE2688B0242B5B8700F165C5 /* UIImage+Utils.swift in Sources */,
+				BEBF3340242F9907008EEDAD /* CameraView.swift in Sources */,
 				BEFDCA34242B5CBB002AF520 /* Gradients.swift in Sources */,
 				BE268887242B5AD000F165C5 /* CardView.swift in Sources */,
 				BE2688AE242B5B8700F165C5 /* CVPixelBuffer+Utils.swift in Sources */,
 				BE2688AC242B5B8700F165C5 /* CGImageSource+Utils.swift in Sources */,
 				BE1C24FB2426150900276024 /* SceneDelegate.swift in Sources */,
+				BEBF3342242F9B09008EEDAD /* CameraPreviewView.swift in Sources */,
 				BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */,
 				BE1C251524264A8700276024 /* ImageParallaxViewController.swift in Sources */,
 				BEABE6E9242CD4860071C556 /* DepthToColorMap.metal in Sources */,
-				BE6D380C242E591A00DDF82D /* BlurView.swift in Sources */,
 				BE2688AB242B5B8700F165C5 /* AVDepthData+Utils.swift in Sources */,
 				BE268897242B5AF000F165C5 /* InterpolatedShape.swift in Sources */,
-				BE26887F242B583E00F165C5 /* ImageCell.swift in Sources */,
 				BE31A119242A383A00019FE1 /* ImageParallax.metal in Sources */,
-				BE1C250D242615A200276024 /* CameraCoordinator.swift in Sources */,
 				BE1C24FD2426150900276024 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -489,11 +489,12 @@
 				DEVELOPMENT_TEAM = S36925NV4E;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = 3Dify/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.philippmatthes.-Dify";
+				PRODUCT_BUNDLE_IDENTIFIER = com.philippmatthes.3Dify;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -509,11 +510,12 @@
 				DEVELOPMENT_TEAM = S36925NV4E;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = 3Dify/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.philippmatthes.-Dify";
+				PRODUCT_BUNDLE_IDENTIFIER = com.philippmatthes.3Dify;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

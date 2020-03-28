@@ -30,5 +30,9 @@ class Gradients {
         Color(red: 247/255, green: 149/255, blue: 30/255),
         Color(red: 255/255, green: 210/255, blue: 0/255),
     ])
+    
+    static let royal = Gradient(colors: [
+        Color(hex: "#141E30"), Color(hex: "#243B55")
+    ])
 }
 

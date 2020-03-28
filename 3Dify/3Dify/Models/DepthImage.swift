@@ -18,18 +18,19 @@ struct DepthImage {
     static let model = OptimizedPydnet()
     
     let diffuse: UIImage
-    let predictedDepth: UIImage
     let trueDepth: UIImage?
     
-    init?(diffuse: UIImage, trueDepth: UIImage?) {
+    var predictedDepth: UIImage? {
         guard
             let pixelBuffer = diffuse.resized(height: 448, width: 640)?.toBuffer(),
             let prediction = try? DepthImage.model.prediction(im0__0: pixelBuffer).PSD__resize__ResizeBilinear__0
-        else {return nil}
-        
+        else {
+            return nil
+        }
+
         let context = CIContext()
         let predictionCIImage = CIImage(cvPixelBuffer: prediction)
-        
+
         guard
             let displayImage = context.createCGImage(predictionCIImage, from: predictionCIImage.extent),
             let converted = DepthImage.photoDepthConverter.render(image: displayImage),
@@ -37,10 +38,27 @@ struct DepthImage {
                 .blurred(radius: 4)
                 .rotate(radians: 0)?
                 .normalize()
-        else {return nil}
+        else {
+            return nil
+        }
         
+        return predictedDepth
+    }
+    
+    var aspectRatio: CGFloat {
+        return diffuse.size.width / diffuse.size.height
+    }
+    
+    var screenWidth: CGFloat {
+        return UIScreen.main.bounds.width / aspectRatio
+    }
+    
+    var screenHeight: CGFloat {
+        return UIScreen.main.bounds.height * aspectRatio
+    }
+    
+    init(diffuse: UIImage, trueDepth: UIImage?) {
         self.diffuse = diffuse
-        self.predictedDepth = predictedDepth
         self.trueDepth = trueDepth
     }
 }
