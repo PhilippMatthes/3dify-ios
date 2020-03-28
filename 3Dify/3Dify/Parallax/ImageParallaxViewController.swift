@@ -12,6 +12,51 @@ import SwiftUI
 import SceneKit
 
 
+enum ImageParallaxAnimationType: Int {
+    case turnTable
+    case horizontalSwitch
+}
+
+
+protocol ImageParallaxAnimationCoordinatorDelegate {
+    func renderer(_ renderer: SCNSceneRenderer, didUpdateOffset offset: CGPoint)
+}
+
+
+class ImageParallaxAnimationCoordinator: NSObject, SCNSceneRendererDelegate {
+    public var animationDuration: TimeInterval
+    public var animationType: ImageParallaxAnimationType
+    
+    public var delegate: ImageParallaxAnimationCoordinatorDelegate?
+    
+    init(animationDuration: TimeInterval, animationType: ImageParallaxAnimationType) {
+        self.animationDuration = animationDuration
+        self.animationType = animationType
+        super.init()
+    }
+    
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        let progress = 0.5 + (time.remainder(dividingBy: animationDuration)) / animationDuration
+        
+        let offset: CGPoint
+        switch animationType {
+        case .turnTable:
+            offset = CGPoint(
+                x: sin(CGFloat(progress) * 2 * CGFloat.pi),
+                y: cos(CGFloat(progress) * 2 * CGFloat.pi)
+            ).scaled(by: 0.02)
+        case .horizontalSwitch:
+            offset = CGPoint(
+                x: progress < 0.5 ? (4 * progress - 1) : (-4 * progress + 3),
+                y: 0
+            ).scaled(by: 0.04)
+        }
+        
+        delegate?.renderer(renderer, didUpdateOffset: offset)
+    }
+}
+
+
 enum ImageParallaxType: Int {
     case imagePredictedDepth
     case imageTrueDepth
@@ -28,7 +73,33 @@ final class ImageParallaxViewController: UIViewController {
     public var depthImage: DepthImage?
     public var parallaxType: ImageParallaxType {
         didSet {
-            viewDidLoad()
+            guard let depthImage = depthImage else {return}
+            
+            let imageProperty: SCNMaterialProperty
+            let imageDepthProperty: SCNMaterialProperty
+            
+            switch self.parallaxType {
+            case .imagePredictedDepth:
+                imageProperty = SCNMaterialProperty(contents: depthImage.diffuse)
+                imageDepthProperty = SCNMaterialProperty(contents: depthImage.predictedDepth)
+            case .imageTrueDepth:
+                imageProperty = SCNMaterialProperty(contents: depthImage.diffuse)
+                imageDepthProperty = SCNMaterialProperty(contents: depthImage.trueDepth!)
+            case .predictedDepthOnly:
+                imageProperty = SCNMaterialProperty(contents: depthImage.predictedDepth)
+                imageDepthProperty = SCNMaterialProperty(contents: depthImage.predictedDepth)
+            case .trueDepthOnly:
+                imageProperty = SCNMaterialProperty(contents: depthImage.trueDepth!)
+                imageDepthProperty = SCNMaterialProperty(contents: depthImage.trueDepth!)
+            }
+            
+            for property in [imageProperty, imageDepthProperty] {
+                property.wrapT = .clamp
+                property.wrapS = .clamp
+            }
+            
+            plane.firstMaterial?.setValue(imageProperty, forKey: "diffuseTexture")
+            plane.firstMaterial?.setValue(imageDepthProperty, forKey: "depthTexture")
         }
     }
     
@@ -39,6 +110,15 @@ final class ImageParallaxViewController: UIViewController {
     private var imageProperty: SCNMaterialProperty!
     private var imageDepthProperty: SCNMaterialProperty!
     
+    private var animationCoordinator: ImageParallaxAnimationCoordinator!
+    private var animationCoordinatorShouldAnimate = true
+    public var animationType: ImageParallaxAnimationType {
+        didSet {
+            guard let coordinator = self.animationCoordinator else {return}
+            coordinator.animationType = animationType
+        }
+    }
+    
     private var uniforms: Uniforms! {
         didSet {
             let data = NSData(bytes: &uniforms, length: MemoryLayout.size(ofValue: uniforms))
@@ -46,9 +126,10 @@ final class ImageParallaxViewController: UIViewController {
         }
     }
     
-    init(depthImage: DepthImage?, parallaxType: ImageParallaxType) {
+    init(depthImage: DepthImage?, parallaxType: ImageParallaxType, animationType: ImageParallaxAnimationType) {
         self.depthImage = depthImage
         self.parallaxType = parallaxType
+        self.animationType = animationType
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -91,32 +172,6 @@ final class ImageParallaxViewController: UIViewController {
         program.vertexFunctionName = "myVertex"
         plane.firstMaterial?.program = program
         
-        let imageProperty: SCNMaterialProperty
-        let imageDepthProperty: SCNMaterialProperty
-        
-        switch self.parallaxType {
-        case .imagePredictedDepth:
-            imageProperty = SCNMaterialProperty(contents: depthImage.diffuse)
-            imageDepthProperty = SCNMaterialProperty(contents: depthImage.predictedDepth)
-        case .imageTrueDepth:
-            imageProperty = SCNMaterialProperty(contents: depthImage.diffuse)
-            imageDepthProperty = SCNMaterialProperty(contents: depthImage.trueDepth!)
-        case .predictedDepthOnly:
-            imageProperty = SCNMaterialProperty(contents: depthImage.predictedDepth)
-            imageDepthProperty = SCNMaterialProperty(contents: depthImage.predictedDepth)
-        case .trueDepthOnly:
-            imageProperty = SCNMaterialProperty(contents: depthImage.trueDepth!)
-            imageDepthProperty = SCNMaterialProperty(contents: depthImage.trueDepth!)
-        }
-        
-        for property in [imageProperty, imageDepthProperty] {
-            property.wrapT = .clamp
-            property.wrapS = .clamp
-        }
-        
-        plane.firstMaterial?.setValue(imageProperty, forKey: "diffuseTexture")
-        plane.firstMaterial?.setValue(imageDepthProperty, forKey: "depthTexture")
-        
         uniforms = .init(offset: .init(x: 0, y: 0))
         
         // Configure the camera
@@ -129,6 +184,20 @@ final class ImageParallaxViewController: UIViewController {
         scene.rootNode.addChildNode(cameraNode)
         
         sceneView.scene = scene
+        
+        animationCoordinator = ImageParallaxAnimationCoordinator(animationDuration: 1, animationType: animationType)
+        sceneView.delegate = animationCoordinator
+        animationCoordinator.delegate = self
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        sceneView?.isPlaying = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        sceneView?.isPlaying = false
     }
     
     override func viewWillLayoutSubviews() {
@@ -137,11 +206,26 @@ final class ImageParallaxViewController: UIViewController {
     
     @objc func userDidPan(_ gestureRecognizer: UIPanGestureRecognizer) {
         let translation = gestureRecognizer.translation(in: view)
-        
+        switch gestureRecognizer.state {
+        case .began:
+            animationCoordinatorShouldAnimate = false
+        case .ended:
+            animationCoordinatorShouldAnimate = true
+        default:
+            break
+        }
         uniforms = Uniforms.init(offset: .init(
             x: max(min(Float(translation.x / view.frame.width) * 0.3, 0.06), -0.06),
             y: max(min(Float(translation.y / view.frame.height) * 0.3, 0.06), -0.06)
         ))
+    }
+}
+
+
+extension ImageParallaxViewController: ImageParallaxAnimationCoordinatorDelegate {
+    func renderer(_ renderer: SCNSceneRenderer, didUpdateOffset offset: CGPoint) {
+        guard animationCoordinatorShouldAnimate else {return}
+        uniforms = Uniforms(offset: .init(x: Float(offset.x), y: Float(offset.y)))
     }
 }
 
@@ -152,17 +236,21 @@ struct ImageParallaxViewControllerRepresentable: UIViewControllerRepresentable {
     
     @Binding public var depthImage: DepthImage?
     @Binding public var parallaxTypeRawValue: Int
+    @Binding public var animationTypeRawValue: Int
     
     public func makeUIViewController(
         context: UIViewControllerRepresentableContext<ImageParallaxViewControllerRepresentable>
     ) -> ImageParallaxViewController {
         let parallaxType = ImageParallaxType.init(rawValue: parallaxTypeRawValue)!
-        return ImageParallaxViewController(depthImage: depthImage, parallaxType: parallaxType)
+        let animationType = ImageParallaxAnimationType.init(rawValue: animationTypeRawValue)!
+        return ImageParallaxViewController(depthImage: depthImage, parallaxType: parallaxType, animationType: animationType)
     }
     
     public func updateUIViewController(_ uiViewController: ImageParallaxViewController, context: UIViewControllerRepresentableContext<ImageParallaxViewControllerRepresentable>) {
         let parallaxType = ImageParallaxType.init(rawValue: parallaxTypeRawValue)!
+        let animationType = ImageParallaxAnimationType.init(rawValue: animationTypeRawValue)!
         uiViewController.parallaxType = parallaxType
+        uiViewController.animationType = animationType
     }
 }
 
@@ -173,6 +261,7 @@ struct ImageParallaxView: View {
     @State var cardOffset: CGFloat = min(UIScreen.main.bounds.height - 128, CardPosition.bottom.rawValue)
     
     @State var selectedImageParallaxRawValue = ImageParallaxType.imagePredictedDepth.rawValue
+    @State var selectedAnimationTypeRawValue = ImageParallaxAnimationType.turnTable.rawValue
     
     var imageControllerHeight: CGFloat {
         guard let depthImage = depthImage else {return .zero}
@@ -190,7 +279,7 @@ struct ImageParallaxView: View {
             .mask(LinearGradient(gradient: Gradient(colors: [Color.white, Color.clear]), startPoint: .top, endPoint: .bottom))
             
             VStack {
-                ImageParallaxViewControllerRepresentable(depthImage: $depthImage, parallaxTypeRawValue: $selectedImageParallaxRawValue)
+                ImageParallaxViewControllerRepresentable(depthImage: $depthImage, parallaxTypeRawValue: $selectedImageParallaxRawValue, animationTypeRawValue: $selectedAnimationTypeRawValue)
                 .frame(width: UIScreen.main.bounds.width, height: cardOffset + 24)
                 .offset(x: 0, y: 0)
                 Spacer()
@@ -208,7 +297,7 @@ struct ImageParallaxView: View {
                         .foregroundColor(Color.white.opacity(0.9))
                         .padding(.vertical, 4)
                     
-                    Picker(selection: self.$selectedImageParallaxRawValue, label: Text("What is your favorite color?")) {
+                    Picker(selection: self.$selectedImageParallaxRawValue, label: Text("")) {
                         Text("AI 3D").tag(ImageParallaxType.imagePredictedDepth.rawValue)
                         Text("AI Depth").tag(ImageParallaxType.predictedDepthOnly.rawValue)
                         if (self.depthImage?.trueDepth != nil) {
@@ -217,7 +306,14 @@ struct ImageParallaxView: View {
                         }
                     }
                     .pickerStyle(SegmentedPickerStyle())
-                    .padding(12)
+                    .padding(4)
+                    
+                    Picker(selection: self.$selectedAnimationTypeRawValue, label: Text("")) {
+                        Text("Turntable").tag(ImageParallaxAnimationType.turnTable.rawValue)
+                        Text("Shaker").tag(ImageParallaxAnimationType.horizontalSwitch.rawValue)
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .padding(4)
                     
                     Spacer()
                 }
