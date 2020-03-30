@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>passes</key>
+	<dict>
+		<key>passParallaxOcclusionMapping</key>
+		<dict>
+			<key>draw</key>
+			<string>DRAW_QUAD</string>
+			<key>program</key>
+			<string>Using Metal</string>
+			<key>metalVertexShader</key>
+			<string>parallaxOcclusionMappingVertexShader</string>
+			<key>metalFragmentShader</key>
+			<string>parallaxOcclusionMappingFragmentShader</string>
+			<key>inputs</key>
+			<dict>
+				<key>diffuseTexture</key>
+				<string>diffuseTextureSymbol</string>
+				<key>depthTexture</key>
+				<string>depthTextureSymbol</string>
+				<key>offset</key>
+				<string>offsetSymbol</string>
+				<key>selectedFocalPoint</key>
+				<string>selectedFocalPointSymbol</string>
+			</dict>
+			<key>outputs</key>
+			<dict>
+				<key>color</key>
+				<string>COLOR</string>
+			</dict>
+		</dict>
+	</dict>
+	<key>sequence</key>
+	<array>
+		<string>passParallaxOcclusionMapping</string>
+	</array>
+	<key>symbols</key>
+	<dict>
+		<key>diffuseTextureSymbol</key>
+		<dict>
+			<key>semantic</key>
+			<string>sampler2D</string>
+		</dict>
+		<key>depthTextureSymbol</key>
+		<dict>
+			<key>semantic</key>
+			<string>sampler2D</string>
+		</dict>
+		<key>selectedFocalPointSymbol</key>
+		<dict>
+			<key>type</key>
+			<string>float</string>
+		</dict>
+		<key>offsetSymbol</key>
+		<dict>
+			<key>type</key>
+			<string>vec2</string>
+		</dict>
+	</dict>
+	<key>targets</key>
+	<dict>
+		<key>ParallaxOcclusionTarget</key>
+		<dict>
+			<key>type</key>
+			<string>color</string>
+			<key>format</key>
+			<string>rgb</string>
+			<key>size</key>
+			<string>2048x2048</string>
+			<key>scaleFactor</key>
+			<integer>1</integer>
+		</dict>
+	</dict>
+</dict>
+</plist>

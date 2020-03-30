@@ -52,8 +52,8 @@ class ImageParallaxView: SCNView {
                 property.wrapT = .mirror
                 property.wrapS = .mirror
             }
-            plane?.firstMaterial?.setValue(imageProperty, forKey: "diffuseTexture")
-            plane?.firstMaterial?.setValue(imageDepthProperty, forKey: "depthTexture")
+            technique?.setObject(imageProperty, forKeyedSubscript: "diffuseTextureSymbol" as NSCopying)
+            technique?.setObject(imageDepthProperty, forKeyedSubscript: "depthTextureSymbol" as NSCopying)
         }
     }
     
@@ -70,8 +70,7 @@ class ImageParallaxView: SCNView {
     private var offset: SIMD2<Float>? {
         didSet {
             guard var offset = offset else {return}
-            let data = NSData(bytes: &offset, length: MemoryLayout.size(ofValue: offset))
-            plane?.firstMaterial?.setValue(data, forKey: "offset")
+            technique?.setValue(NSValue(cgPoint: CGPoint(x: CGFloat(offset.x), y: CGFloat(offset.y))), forKeyPath: "offsetSymbol")
         }
     }
        
@@ -79,13 +78,12 @@ class ImageParallaxView: SCNView {
         didSet {
             guard var selectedFocalPoint = selectedFocalPoint else {return}
             let data = NSData(bytes: &selectedFocalPoint, length: MemoryLayout.size(ofValue: selectedFocalPoint))
-            plane?.firstMaterial?.setValue(data, forKey: "selectedFocalPoint")
+            technique?.setValue(data, forKeyPath: "selectedFocalPointSymbol")
         }
     }
     
     private var plane: SCNPlane?
     private var planeNode: SCNNode?
-    private var program: SCNProgram?
     private var camera: SCNCamera?
     private var cameraNode: SCNNode?
     private var textNode: SKNode?
@@ -99,17 +97,20 @@ class ImageParallaxView: SCNView {
     
     func prepareScene() {
         scene = SCNScene()
+        
+        guard
+            let path = Bundle.main.path(forResource: "ImageParallaxTechnique", ofType: "plist"),
+            let dict = NSDictionary(contentsOfFile: path) as? [String: AnyObject],
+            let technique = SCNTechnique(dictionary: dict)
+        else {fatalError()}
+        
+        self.technique = technique
 
         plane = SCNPlane()
         plane!.widthSegmentCount = 1
         plane!.heightSegmentCount = 1
         planeNode = SCNNode(geometry: plane)
         scene!.rootNode.addChildNode(planeNode!)
-        
-        program = SCNProgram()
-        program!.fragmentFunctionName = "myFragment"
-        program!.vertexFunctionName = "myVertex"
-        plane!.firstMaterial?.program = program
         
         camera = SCNCamera()
         camera!.fieldOfView = Self.fov

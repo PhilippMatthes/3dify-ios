@@ -1,5 +1,5 @@
 //
-//  Parallax.metal
+//  ImageParallax.metal
 //  3Dify
 //
 //  Created by It's free real estate on 24.03.20.
@@ -11,17 +11,22 @@ using namespace metal;
 
 #include <SceneKit/scn_metal>
 
-struct MyNodeBuffer {
+
+struct ParallaxOcclusionMappingNodeBuffer
+{
     float4x4 modelTransform;
     float4x4 modelViewTransform;
     float4x4 normalTransform;
     float4x4 modelViewProjectionTransform;
 };
 
-typedef struct {
+
+typedef struct
+{
     float3 position [[ attribute(SCNVertexSemanticPosition) ]];
     float2 texCoords [[ attribute(SCNVertexSemanticTexcoord0) ]];
-} MyVertexInput;
+} ParallaxOcclusionMappingVertexInput;
+
 
 struct SimpleVertex
 {
@@ -29,24 +34,28 @@ struct SimpleVertex
     float2 texCoords;
 };
 
-vertex SimpleVertex myVertex(MyVertexInput in [[ stage_in ]],
-                             constant SCNSceneBuffer& scn_frame [[buffer(0)]],
-                             constant MyNodeBuffer& scn_node [[buffer(1)]])
+vertex SimpleVertex parallaxOcclusionMappingVertexShader(
+    ParallaxOcclusionMappingVertexInput in [[ stage_in ]],
+    constant SCNSceneBuffer& scn_frame [[buffer(0)]],
+    constant ParallaxOcclusionMappingNodeBuffer& scn_node [[buffer(1)]]
+)
 {
     SimpleVertex vert;
     vert.position = scn_node.modelViewProjectionTransform * float4(in.position, 1.0);
     vert.texCoords = in.texCoords;
-    
     return vert;
 }
 
-float2 parallaxOcclusionMapping(float2 offset,
-                                float2 texCoords,
-                                texture2d<float, access::sample> depthTexture,
-                                float minLayers,
-                                float maxLayers,
-                                float pivot,
-                                float heightScale)
+
+float2 parallaxOcclusionMapping(
+    float2 offset,
+    float2 texCoords,
+    texture2d<float, access::sample> depthTexture,
+    float minLayers,
+    float maxLayers,
+    float pivot,
+    float heightScale
+)
 {
     constexpr sampler sampler2d(coord::normalized, filter::linear, address::repeat);
 
@@ -88,10 +97,12 @@ float2 parallaxOcclusionMapping(float2 offset,
     return finalTexCoords;
 }
 
-float2 parallaxOcclusionMapping(float2 offset,
-                                float2 texCoords,
-                                float pivot,
-                                texture2d<float, access::sample> depthTexture)
+float2 parallaxOcclusionMapping(
+    float2 offset,
+    float2 texCoords,
+    float pivot,
+    texture2d<float, access::sample> depthTexture
+)
 {
     // number of depth layers
     const float minLayers = 32.0;
@@ -104,16 +115,22 @@ float2 parallaxOcclusionMapping(float2 offset,
 }
 
 
+typedef struct {
+    float2 offset;
+    float selectedFocalPoint;
+} ParallaxOcclusionMappingFragmentInput;
 
-fragment half4 myFragment(SimpleVertex in [[stage_in]],
-                          texture2d<float, access::sample> diffuseTexture [[texture(0)]],
-                          texture2d<float, access::sample> depthTexture [[texture(1)]],
-                          constant float2& offset [[buffer(0)]],
-                          constant float& selectedFocalPoint [[buffer(1)]])
+
+fragment half4 parallaxOcclusionMappingFragmentShader(
+    SimpleVertex in [[stage_in]],
+    texture2d<float, access::sample> diffuseTexture [[texture(0)]],
+    texture2d<float, access::sample> depthTexture [[texture(1)]],
+    constant ParallaxOcclusionMappingFragmentInput& inputs [[buffer(0)]]
+)
 {
     constexpr sampler sampler2d(coord::normalized, filter::linear, address::repeat);
     
-    float2 parallaxUv = parallaxOcclusionMapping(offset, in.texCoords, selectedFocalPoint, depthTexture);
+    float2 parallaxUv = parallaxOcclusionMapping(inputs.offset, in.texCoords, inputs.selectedFocalPoint, depthTexture);
     
     float4 diffuseColor = diffuseTexture.sample(sampler2d, parallaxUv);
     // float depthColor = depthTexture.sample(sampler2d, parallaxUv).r;
