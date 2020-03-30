@@ -23,10 +23,6 @@ typedef struct {
     float2 texCoords [[ attribute(SCNVertexSemanticTexcoord0) ]];
 } MyVertexInput;
 
-struct Uniforms {
-    float2 offset;
-};
-
 struct SimpleVertex
 {
     float4 position [[position]];
@@ -40,7 +36,7 @@ vertex SimpleVertex myVertex(MyVertexInput in [[ stage_in ]],
     SimpleVertex vert;
     vert.position = scn_node.modelViewProjectionTransform * float4(in.position, 1.0);
     vert.texCoords = in.texCoords;
-
+    
     return vert;
 }
 
@@ -94,14 +90,12 @@ float2 parallaxOcclusionMapping(float2 offset,
 
 float2 parallaxOcclusionMapping(float2 offset,
                                 float2 texCoords,
+                                float pivot,
                                 texture2d<float, access::sample> depthTexture)
 {
     // number of depth layers
     const float minLayers = 32.0;
     const float maxLayers = 128.0;
-    
-    // the rotation base depth
-    const float pivot = 1.0;
     
     // the scale of depth
     const float heightScale = 1.0;
@@ -109,14 +103,17 @@ float2 parallaxOcclusionMapping(float2 offset,
     return parallaxOcclusionMapping(offset, texCoords, depthTexture, minLayers, maxLayers, pivot, heightScale);
 }
 
+
+
 fragment half4 myFragment(SimpleVertex in [[stage_in]],
                           texture2d<float, access::sample> diffuseTexture [[texture(0)]],
                           texture2d<float, access::sample> depthTexture [[texture(1)]],
-                          constant Uniforms& uniforms [[buffer(2)]])
+                          constant float2& offset [[buffer(0)]],
+                          constant float& selectedFocalPoint [[buffer(1)]])
 {
     constexpr sampler sampler2d(coord::normalized, filter::linear, address::repeat);
     
-    float2 parallaxUv = parallaxOcclusionMapping(uniforms.offset, in.texCoords, depthTexture);
+    float2 parallaxUv = parallaxOcclusionMapping(offset, in.texCoords, selectedFocalPoint, depthTexture);
     
     float4 diffuseColor = diffuseTexture.sample(sampler2d, parallaxUv);
     // float depthColor = depthTexture.sample(sampler2d, parallaxUv).r;

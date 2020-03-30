@@ -270,6 +270,21 @@ extension UIImage {
 
         return pixelBuffer
     }
+    
+    func getBrightness(pos: CGPoint) -> CGFloat? {
+        guard
+            let pixelData = self.cgImage?.dataProvider?.data
+        else {return nil}
+        let data: UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
+
+        let pixelInfo: Int = ((Int(self.size.width) * Int(pos.y)) + Int(pos.x)) * 4
+
+        let r = CGFloat(data[pixelInfo])
+        let g = CGFloat(data[pixelInfo+1])
+        let b = CGFloat(data[pixelInfo+2])
+
+        return (r + g + b) / (3 * 255)
+    }
 }
 
 

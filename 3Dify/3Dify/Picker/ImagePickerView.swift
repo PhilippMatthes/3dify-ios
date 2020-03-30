@@ -12,41 +12,36 @@ import Combine
 import Photos
 
 
-struct ImagePickerView: UIViewControllerRepresentable {
+class ImagePickerViewOrchestrator: NSObject, ObservableObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    public let onCapture: (DepthImage?) -> ()
     
-    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-        let parent: ImagePickerView
-
-        init(_ parent: ImagePickerView) {
-            self.parent = parent
+    init(onCapture: @escaping (DepthImage?) -> ()) {
+        self.onCapture = onCapture
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        guard let asset = info[UIImagePickerController.InfoKey.phAsset] as? PHAsset else {
+            onCapture(nil)
+            return
         }
         
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-            guard let asset = info[UIImagePickerController.InfoKey.phAsset] as? PHAsset else {
-                parent.presentationMode.wrappedValue.dismiss()
-                return
-            }
-            
-            asset.requestDepthImage() {
-                depthImage in
-                self.parent.image = depthImage
-                self.parent.presentationMode.wrappedValue.dismiss()
-            }
+        asset.requestDepthImage() {
+            depthImage in
+            self.onCapture(depthImage)
         }
     }
-    
+}
+
+
+struct ImagePickerView: UIViewControllerRepresentable {
+    @EnvironmentObject var orchestrator: ImagePickerViewOrchestrator
     @Environment(\.presentationMode) var presentationMode
-    @Binding var image: DepthImage?
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePickerView>) -> UIImagePickerController {
         let picker = UIImagePickerController()
         picker.sourceType = .photoLibrary
         picker.allowsEditing = false
-        picker.delegate = context.coordinator
+        picker.delegate = orchestrator
         return picker
     }
 

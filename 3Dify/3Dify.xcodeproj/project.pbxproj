@@ -9,11 +9,10 @@
 /* Begin PBXBuildFile section */
 		BE1C24F92426150900276024 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C24F82426150900276024 /* AppDelegate.swift */; };
 		BE1C24FB2426150900276024 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C24FA2426150900276024 /* SceneDelegate.swift */; };
-		BE1C24FD2426150900276024 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C24FC2426150900276024 /* ContentView.swift */; };
+		BE1C24FD2426150900276024 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C24FC2426150900276024 /* HomeView.swift */; };
 		BE1C24FF2426150900276024 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE1C24FE2426150900276024 /* Assets.xcassets */; };
 		BE1C25022426150900276024 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE1C25012426150900276024 /* Preview Assets.xcassets */; };
 		BE1C25052426150900276024 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE1C25032426150900276024 /* LaunchScreen.storyboard */; };
-		BE1C251524264A8700276024 /* ImageParallaxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C251424264A8700276024 /* ImageParallaxViewController.swift */; };
 		BE26887B242B57CC00F165C5 /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26887A242B57CC00F165C5 /* TabBar.swift */; };
 		BE268887242B5AD000F165C5 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE268886242B5AD000F165C5 /* CardView.swift */; };
 		BE268895242B5AF000F165C5 /* Path+Length.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26888A242B5AF000F165C5 /* Path+Length.swift */; };
@@ -31,6 +30,8 @@
 		BE2688B1242B5B8700F165C5 /* PHAsset+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26887C242B581600F165C5 /* PHAsset+Utils.swift */; };
 		BE31A119242A383A00019FE1 /* ImageParallax.metal in Sources */ = {isa = PBXBuildFile; fileRef = BE31A118242A383A00019FE1 /* ImageParallax.metal */; };
 		BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A11A242A7C7300019FE1 /* DepthImage.swift */; };
+		BE7581922431F2A900A47FE3 /* ImageParallaxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7581912431F2A900A47FE3 /* ImageParallaxView.swift */; };
+		BE8535262430F15600557392 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8535252430F15600557392 /* ControlView.swift */; };
 		BE8B3FDB242FE86E0075F6EA /* VideoConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8B3FDA242FE86E0075F6EA /* VideoConverter.swift */; };
 		BEABE6E9242CD4860071C556 /* DepthToColorMap.metal in Sources */ = {isa = PBXBuildFile; fileRef = BEABE6E6242CD4830071C556 /* DepthToColorMap.metal */; };
 		BEABE6EA242CD4860071C556 /* DepthToColorMapConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEABE6E7242CD4840071C556 /* DepthToColorMapConverter.swift */; };
@@ -39,6 +40,7 @@
 		BEBF3340242F9907008EEDAD /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF333F242F9907008EEDAD /* CameraView.swift */; };
 		BEBF3342242F9B09008EEDAD /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF3341242F9B09008EEDAD /* CameraPreviewView.swift */; };
 		BEBF3344242FA8D9008EEDAD /* Color+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF3343242FA8D9008EEDAD /* Color+Tools.swift */; };
+		BED5F75F24310A2F001A2667 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5F75E24310A2F001A2667 /* LoadingView.swift */; };
 		BEEA81B0242C9AA10074BBAE /* OptimizedPydnet.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = BEEA81AF242C9AA10074BBAE /* OptimizedPydnet.mlmodel */; };
 		BEFDCA34242B5CBB002AF520 /* Gradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFDCA33242B5CBB002AF520 /* Gradients.swift */; };
 		BEFDCA36242B9907002AF520 /* SlideOverCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFDCA35242B9907002AF520 /* SlideOverCard.swift */; };
@@ -49,12 +51,11 @@
 		BE1C24F52426150900276024 /* 3Dify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = 3Dify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE1C24F82426150900276024 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BE1C24FA2426150900276024 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		BE1C24FC2426150900276024 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BE1C24FC2426150900276024 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		BE1C24FE2426150900276024 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BE1C25012426150900276024 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BE1C25042426150900276024 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		BE1C25062426150900276024 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BE1C251424264A8700276024 /* ImageParallaxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageParallaxViewController.swift; sourceTree = "<group>"; };
 		BE26887A242B57CC00F165C5 /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
 		BE26887C242B581600F165C5 /* PHAsset+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+Utils.swift"; sourceTree = "<group>"; };
 		BE268886242B5AD000F165C5 /* CardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
@@ -72,6 +73,8 @@
 		BE2688A4242B5B1200F165C5 /* CGImageSource+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGImageSource+Utils.swift"; sourceTree = "<group>"; };
 		BE31A118242A383A00019FE1 /* ImageParallax.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ImageParallax.metal; sourceTree = "<group>"; };
 		BE31A11A242A7C7300019FE1 /* DepthImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthImage.swift; sourceTree = "<group>"; };
+		BE7581912431F2A900A47FE3 /* ImageParallaxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageParallaxView.swift; sourceTree = "<group>"; };
+		BE8535252430F15600557392 /* ControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlView.swift; sourceTree = "<group>"; };
 		BE8B3FDA242FE86E0075F6EA /* VideoConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoConverter.swift; sourceTree = "<group>"; };
 		BEABE6E6242CD4830071C556 /* DepthToColorMap.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = DepthToColorMap.metal; sourceTree = "<group>"; };
 		BEABE6E7242CD4840071C556 /* DepthToColorMapConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DepthToColorMapConverter.swift; sourceTree = "<group>"; };
@@ -80,6 +83,7 @@
 		BEBF333F242F9907008EEDAD /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		BEBF3341242F9B09008EEDAD /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
 		BEBF3343242FA8D9008EEDAD /* Color+Tools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Tools.swift"; sourceTree = "<group>"; };
+		BED5F75E24310A2F001A2667 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		BEEA81AF242C9AA10074BBAE /* OptimizedPydnet.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = OptimizedPydnet.mlmodel; sourceTree = "<group>"; };
 		BEFDCA33242B5CBB002AF520 /* Gradients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gradients.swift; sourceTree = "<group>"; };
 		BEFDCA35242B9907002AF520 /* SlideOverCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideOverCard.swift; sourceTree = "<group>"; };
@@ -126,7 +130,7 @@
 				BE31A11E242A7F7C00019FE1 /* Parallax */,
 				BE1C24F82426150900276024 /* AppDelegate.swift */,
 				BEFDCA33242B5CBB002AF520 /* Gradients.swift */,
-				BE1C24FC2426150900276024 /* ContentView.swift */,
+				BE1C24FC2426150900276024 /* HomeView.swift */,
 				BE1C24FA2426150900276024 /* SceneDelegate.swift */,
 				BE1C24FE2426150900276024 /* Assets.xcassets */,
 				BE1C25032426150900276024 /* LaunchScreen.storyboard */,
@@ -151,6 +155,7 @@
 				BE26887A242B57CC00F165C5 /* TabBar.swift */,
 				BEFDCA35242B9907002AF520 /* SlideOverCard.swift */,
 				BEFDCA37242B9916002AF520 /* Handle.swift */,
+				BED5F75E24310A2F001A2667 /* LoadingView.swift */,
 			);
 			path = "Supporting Views";
 			sourceTree = "<group>";
@@ -211,8 +216,9 @@
 			isa = PBXGroup;
 			children = (
 				BE31A118242A383A00019FE1 /* ImageParallax.metal */,
-				BE1C251424264A8700276024 /* ImageParallaxViewController.swift */,
+				BE8535252430F15600557392 /* ControlView.swift */,
 				BE8B3FDA242FE86E0075F6EA /* VideoConverter.swift */,
+				BE7581912431F2A900A47FE3 /* ImageParallaxView.swift */,
 			);
 			path = Parallax;
 			sourceTree = "<group>";
@@ -255,6 +261,7 @@
 				BE1C24F12426150900276024 /* Sources */,
 				BE1C24F22426150900276024 /* Frameworks */,
 				BE1C24F32426150900276024 /* Resources */,
+				BED5F7602431E433001A2667 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -311,6 +318,26 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		BED5F7602431E433001A2667 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "./unused.rb xcode";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		BE1C24F12426150900276024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -329,6 +356,7 @@
 				BE268899242B5AF000F165C5 /* Path+VectorArithmetic.swift in Sources */,
 				BE26887B242B57CC00F165C5 /* TabBar.swift in Sources */,
 				BEFDCA36242B9907002AF520 /* SlideOverCard.swift in Sources */,
+				BE7581922431F2A900A47FE3 /* ImageParallaxView.swift in Sources */,
 				BEABE6EB242CD4860071C556 /* FilterRenderer.swift in Sources */,
 				BE268896242B5AF000F165C5 /* Array+VectorArithmetic.swift in Sources */,
 				BEEA81B0242C9AA10074BBAE /* OptimizedPydnet.mlmodel in Sources */,
@@ -339,16 +367,17 @@
 				BEFDCA34242B5CBB002AF520 /* Gradients.swift in Sources */,
 				BE268887242B5AD000F165C5 /* CardView.swift in Sources */,
 				BE2688AE242B5B8700F165C5 /* CVPixelBuffer+Utils.swift in Sources */,
+				BE8535262430F15600557392 /* ControlView.swift in Sources */,
 				BE2688AC242B5B8700F165C5 /* CGImageSource+Utils.swift in Sources */,
 				BE1C24FB2426150900276024 /* SceneDelegate.swift in Sources */,
 				BEBF3342242F9B09008EEDAD /* CameraPreviewView.swift in Sources */,
 				BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */,
-				BE1C251524264A8700276024 /* ImageParallaxViewController.swift in Sources */,
 				BEABE6E9242CD4860071C556 /* DepthToColorMap.metal in Sources */,
 				BE2688AB242B5B8700F165C5 /* AVDepthData+Utils.swift in Sources */,
 				BE268897242B5AF000F165C5 /* InterpolatedShape.swift in Sources */,
 				BE31A119242A383A00019FE1 /* ImageParallax.metal in Sources */,
-				BE1C24FD2426150900276024 /* ContentView.swift in Sources */,
+				BED5F75F24310A2F001A2667 /* LoadingView.swift in Sources */,
+				BE1C24FD2426150900276024 /* HomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -415,6 +444,8 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -469,6 +500,8 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				MTL_ENABLE_DEBUG_INFO = NO;

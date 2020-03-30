@@ -9,22 +9,23 @@
 import UIKit
 import SwiftUI
 
+class HostingController: UIHostingController<HomeView> {
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+}
+
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        let sampleDepthImages = [
-            DepthImage(diffuse: UIImage(named: "mango-image")!, trueDepth: UIImage(named: "mango-depth")!),
-            DepthImage(diffuse: UIImage(named: "flowers-image")!, trueDepth: UIImage(named: "flowers-depth")!),
-            DepthImage(diffuse: UIImage(named: "tunnel-image")!, trueDepth: UIImage(named: "tunnel-depth")!),
-            DepthImage(diffuse: UIImage(named: "hut-image")!, trueDepth: UIImage(named: "hut-depth")!)
-        ]
         
-        let contentView = ContentView(depthImage: sampleDepthImages.randomElement()!)
+        let contentView = HomeView(depthImage: DepthImage(diffuse: UIImage(named: "mango-image")!, trueDepth: UIImage(named: "mango-depth")!))
 
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
-            window.rootViewController = UIHostingController(rootView: contentView)
+            window.rootViewController = HostingController(rootView: contentView)
             self.window = window
             window.makeKeyAndVisible()
         }

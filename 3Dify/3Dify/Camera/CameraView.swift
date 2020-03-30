@@ -31,103 +31,102 @@ struct CameraButtonStyle: ButtonStyle {
 }
 
 
-struct CameraView: View {
+class CameraViewOrchestrator: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
+    public let onCapture: (DepthImage?) -> ()
     
-    class Coordinator: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
-        public let captureSession: AVCaptureSession
-        public let onCapture: (DepthImage?) -> ()
-        
-        private var cameraDevice: AVCaptureDevice?
-        private var cameraInput: AVCaptureDeviceInput?
-        private var cameraOutput: AVCapturePhotoOutput?
+    public var captureSession: AVCaptureSession!
+    
+    private var cameraDevice: AVCaptureDevice?
+    private var cameraInput: AVCaptureDeviceInput?
+    private var cameraOutput: AVCapturePhotoOutput?
 
-        init(captureSession: AVCaptureSession, onCapture: @escaping (DepthImage?) -> ()) {
-            self.captureSession = captureSession
-            self.onCapture = onCapture
-            
-            captureSession.beginConfiguration()
-            captureSession.sessionPreset = .photo
-            
-            guard
-                let cameraDevice = AVCaptureDevice.default(
-                    .builtInDualCamera,
-                    for: .video,
-                    position: .unspecified
-                )
-            else {return}
-            self.cameraDevice = cameraDevice
-            
-            guard
-                let cameraInput = try? AVCaptureDeviceInput(device: cameraDevice)
-            else {return}
-            self.cameraInput = cameraInput
-            
-            guard
-                captureSession.canAddInput(cameraInput)
-            else {return}
-            
-            captureSession.addInput(cameraInput)
-            
-            let cameraOutput = AVCapturePhotoOutput()
-            
-            guard captureSession.canAddOutput(cameraOutput) else {return}
-            
-            captureSession.addOutput(cameraOutput)
+    init(onCapture: @escaping (DepthImage?) -> ()) {
+        self.captureSession = AVCaptureSession()
+        self.onCapture = onCapture
+        
+        captureSession.beginConfiguration()
+        captureSession.sessionPreset = .photo
+        
+        guard
+            let cameraDevice = AVCaptureDevice.default(
+                .builtInDualCamera,
+                for: .video,
+                position: .unspecified
+            )
+        else {return}
+        self.cameraDevice = cameraDevice
+        
+        guard
+            let cameraInput = try? AVCaptureDeviceInput(device: cameraDevice)
+        else {return}
+        self.cameraInput = cameraInput
+        
+        guard
+            captureSession.canAddInput(cameraInput)
+        else {return}
+        
+        captureSession.addInput(cameraInput)
+        
+        let cameraOutput = AVCapturePhotoOutput()
+        
+        guard captureSession.canAddOutput(cameraOutput) else {return}
+        
+        captureSession.addOutput(cameraOutput)
 
-            cameraOutput.isDepthDataDeliveryEnabled = cameraOutput.isDepthDataDeliverySupported
-            self.cameraOutput = cameraOutput
-            
-            captureSession.commitConfiguration()
-            captureSession.startRunning()
-        }
+        cameraOutput.isDepthDataDeliveryEnabled = cameraOutput.isDepthDataDeliverySupported
+        self.cameraOutput = cameraOutput
         
-        func capturePhoto() {
-            guard
-                let cameraOutput = cameraOutput,
-                cameraOutput.isDepthDataDeliverySupported
-            else {return}
-            let photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
-            photoSettings.isDepthDataDeliveryEnabled = true
-            cameraOutput.capturePhoto(with: photoSettings, delegate: self)
-        }
-        
-        func photoOutput(
-            _ output: AVCapturePhotoOutput,
-            didFinishProcessingPhoto photo: AVCapturePhoto,
-            error: Error?
-        ) {
-            
-            guard
-                error == nil,
-                let colorImageData = photo.fileDataRepresentation(),
-                let image = UIImage(data: colorImageData),
-                let depthData = photo.depthData
-            else {return}
-            
-            let convertedDepthData = depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32)
-            let depthMap = convertedDepthData.depthDataMap
-            depthMap.normalize()
-            
-            guard
-                let depthMapImage = UIImage(pixelBuffer: depthMap),
-                let depthCGImage = depthMapImage.cgImage,
-                let rotatedDepthImage = UIImage(cgImage: depthCGImage, scale: 1.0, orientation: image.imageOrientation)
-                    .rotate(radians: 0),
-                let rotatedImage = image.rotate(radians: 0)
-            else {return}
-            
-            let depthImage = DepthImage(diffuse: rotatedImage, trueDepth: rotatedDepthImage)
-            
-            onCapture(depthImage)
-        }
+        captureSession.commitConfiguration()
+        captureSession.startRunning()
     }
     
-    public let captureSession: AVCaptureSession
+    func capturePhoto() {
+        guard
+            let cameraOutput = cameraOutput,
+            cameraOutput.isDepthDataDeliverySupported
+        else {return}
+        let photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+        photoSettings.isDepthDataDeliveryEnabled = true
+        cameraOutput.capturePhoto(with: photoSettings, delegate: self)
+    }
+    
+    func photoOutput(
+        _ output: AVCapturePhotoOutput,
+        didFinishProcessingPhoto photo: AVCapturePhoto,
+        error: Error?
+    ) {
         
+        guard
+            error == nil,
+            let colorImageData = photo.fileDataRepresentation(),
+            let image = UIImage(data: colorImageData),
+            let depthData = photo.depthData
+        else {return}
+        
+        let convertedDepthData = depthData.converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32)
+        let depthMap = convertedDepthData.depthDataMap
+        depthMap.normalize()
+        
+        guard
+            let depthMapImage = UIImage(pixelBuffer: depthMap),
+            let depthCGImage = depthMapImage.cgImage,
+            let rotatedDepthImage = UIImage(cgImage: depthCGImage, scale: 1.0, orientation: image.imageOrientation)
+                .rotate(radians: 0),
+            let rotatedImage = image.rotate(radians: 0)
+        else {return}
+        
+        let depthImage = DepthImage(diffuse: rotatedImage, trueDepth: rotatedDepthImage)
+        
+        onCapture(depthImage)
+    }
+}
+
+
+
+struct CameraView: View {
     @GestureState private var cameraButtonIsPressed = false
     
-    @EnvironmentObject var coordinator: Coordinator
-    @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var orchestrator: CameraViewOrchestrator
 
     var body: some View {
         ZStack {
@@ -138,12 +137,12 @@ struct CameraView: View {
             
             
             VStack(spacing: 0) {
-                CameraPreviewView(captureSession: captureSession)
+                CameraPreviewView(captureSession: orchestrator.captureSession)
                     .background(Color(hex: "#222222"))
                 VStack {
                     Button(action: {
                         UISelectionFeedbackGenerator().selectionChanged()
-                        self.coordinator.capturePhoto()
+                        self.orchestrator.capturePhoto()
                     }) {
                         Text("")
                     }
@@ -157,11 +156,9 @@ struct CameraView: View {
     }
 }
 
-struct CameraView_Previews: PreviewProvider {
-    static let pseudoCaptureSession = AVCaptureSession()
-    
+struct CameraView_Previews: PreviewProvider {    
     static var previews: some View {
-        CameraView(captureSession: pseudoCaptureSession).environmentObject(CameraView.Coordinator(captureSession: pseudoCaptureSession) {
+        CameraView().environmentObject(CameraViewOrchestrator() {
             _ in
         })
     }

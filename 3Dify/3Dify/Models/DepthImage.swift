@@ -50,15 +50,21 @@ struct DepthImage {
     }
     
     var screenWidth: CGFloat {
-        return UIScreen.main.bounds.width / aspectRatio
+        return UIScreen.main.bounds.width
     }
     
     var screenHeight: CGFloat {
-        return UIScreen.main.bounds.height * aspectRatio
+        return UIScreen.main.bounds.width / aspectRatio
     }
     
     init(diffuse: UIImage, trueDepth: UIImage?) {
         self.diffuse = diffuse
         self.trueDepth = trueDepth
+    }
+}
+
+extension DepthImage: Equatable {
+    static func == (lhs: DepthImage, rhs: DepthImage) -> Bool {
+        return lhs.diffuse == rhs.diffuse
     }
 }
