@@ -37,7 +37,12 @@ struct ImagePickerView: UIViewControllerRepresentable {
     @EnvironmentObject var orchestrator: ImagePickerViewOrchestrator
     @Environment(\.presentationMode) var presentationMode
 
-    func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePickerView>) -> UIImagePickerController {
+    func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePickerView>) -> UIViewController {
+        let status = PHPhotoLibrary.authorizationStatus()
+        if status != .authorized {
+            PHPhotoLibrary.requestAuthorization() {status in}
+        }
+        
         let picker = UIImagePickerController()
         picker.sourceType = .photoLibrary
         picker.allowsEditing = false
@@ -45,7 +50,7 @@ struct ImagePickerView: UIViewControllerRepresentable {
         return picker
     }
 
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: UIViewControllerRepresentableContext<ImagePickerView>) {
+    func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<ImagePickerView>) {
         // Do nothing
     }
 }

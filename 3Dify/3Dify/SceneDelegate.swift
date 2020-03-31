@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftUI
+import MetalKit
 
 class HostingController: UIHostingController<HomeView> {
     override var preferredStatusBarStyle: UIStatusBarStyle {

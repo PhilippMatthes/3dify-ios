@@ -4,12 +4,10 @@
 <dict>
 	<key>passes</key>
 	<dict>
-		<key>passParallaxOcclusionMapping</key>
+		<key>ParallaxOcclusionMappingPass</key>
 		<dict>
 			<key>draw</key>
-			<string>DRAW_QUAD</string>
-			<key>program</key>
-			<string>Using Metal</string>
+			<string>DRAW_SCENE</string>
 			<key>metalVertexShader</key>
 			<string>parallaxOcclusionMappingVertexShader</string>
 			<key>metalFragmentShader</key>
@@ -17,11 +15,19 @@
 			<key>inputs</key>
 			<dict>
 				<key>diffuseTexture</key>
-				<string>diffuseTextureSymbol</string>
+				<dict>
+					<key>target</key>
+					<string>diffuseTextureSymbol</string>
+				</dict>
 				<key>depthTexture</key>
-				<string>depthTextureSymbol</string>
-				<key>offset</key>
-				<string>offsetSymbol</string>
+				<dict>
+					<key>target</key>
+					<string>depthTextureSymbol</string>
+				</dict>
+				<key>offsetX</key>
+				<string>offsetXSymbol</string>
+				<key>offsetY</key>
+				<string>offsetYSymbol</string>
 				<key>selectedFocalPoint</key>
 				<string>selectedFocalPointSymbol</string>
 			</dict>
@@ -34,18 +40,23 @@
 	</dict>
 	<key>sequence</key>
 	<array>
-		<string>passParallaxOcclusionMapping</string>
+		<string>ParallaxOcclusionMappingPass</string>
 	</array>
 	<key>symbols</key>
 	<dict>
+		<key>offsetYSymbol</key>
+		<dict>
+			<key>type</key>
+			<string>float</string>
+		</dict>
 		<key>diffuseTextureSymbol</key>
 		<dict>
-			<key>semantic</key>
+			<key>type</key>
 			<string>sampler2D</string>
 		</dict>
 		<key>depthTextureSymbol</key>
 		<dict>
-			<key>semantic</key>
+			<key>type</key>
 			<string>sampler2D</string>
 		</dict>
 		<key>selectedFocalPointSymbol</key>
@@ -53,24 +64,10 @@
 			<key>type</key>
 			<string>float</string>
 		</dict>
-		<key>offsetSymbol</key>
+		<key>offsetXSymbol</key>
 		<dict>
 			<key>type</key>
-			<string>vec2</string>
-		</dict>
-	</dict>
-	<key>targets</key>
-	<dict>
-		<key>ParallaxOcclusionTarget</key>
-		<dict>
-			<key>type</key>
-			<string>color</string>
-			<key>format</key>
-			<string>rgb</string>
-			<key>size</key>
-			<string>2048x2048</string>
-			<key>scaleFactor</key>
-			<integer>1</integer>
+			<string>float</string>
 		</dict>
 	</dict>
 </dict>

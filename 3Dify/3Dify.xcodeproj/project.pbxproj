@@ -28,9 +28,7 @@
 		BE2688AF242B5B8700F165C5 /* Photos+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2688A0242B5B1100F165C5 /* Photos+Utils.swift */; };
 		BE2688B0242B5B8700F165C5 /* UIImage+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2688A2242B5B1100F165C5 /* UIImage+Utils.swift */; };
 		BE2688B1242B5B8700F165C5 /* PHAsset+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26887C242B581600F165C5 /* PHAsset+Utils.swift */; };
-		BE31A119242A383A00019FE1 /* ImageParallax.metal in Sources */ = {isa = PBXBuildFile; fileRef = BE31A118242A383A00019FE1 /* ImageParallax.metal */; };
 		BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A11A242A7C7300019FE1 /* DepthImage.swift */; };
-		BE7581922431F2A900A47FE3 /* ImageParallaxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7581912431F2A900A47FE3 /* ImageParallaxView.swift */; };
 		BE75819624324FD700A47FE3 /* ImageParallaxTechnique.plist in Resources */ = {isa = PBXBuildFile; fileRef = BE75819524324FD700A47FE3 /* ImageParallaxTechnique.plist */; };
 		BE8535262430F15600557392 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8535252430F15600557392 /* ControlView.swift */; };
 		BE8B3FDB242FE86E0075F6EA /* VideoConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8B3FDA242FE86E0075F6EA /* VideoConverter.swift */; };
@@ -41,6 +39,8 @@
 		BEBF3340242F9907008EEDAD /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF333F242F9907008EEDAD /* CameraView.swift */; };
 		BEBF3342242F9B09008EEDAD /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF3341242F9B09008EEDAD /* CameraPreviewView.swift */; };
 		BEBF3344242FA8D9008EEDAD /* Color+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF3343242FA8D9008EEDAD /* Color+Tools.swift */; };
+		BECDE37F24338E0C00939DBA /* MetalParallaxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BECDE37E24338E0C00939DBA /* MetalParallaxView.swift */; };
+		BECDE38124338E2300939DBA /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = BECDE38024338E2300939DBA /* Shaders.metal */; };
 		BED5F75F24310A2F001A2667 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5F75E24310A2F001A2667 /* LoadingView.swift */; };
 		BEEA81B0242C9AA10074BBAE /* OptimizedPydnet.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = BEEA81AF242C9AA10074BBAE /* OptimizedPydnet.mlmodel */; };
 		BEFDCA34242B5CBB002AF520 /* Gradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFDCA33242B5CBB002AF520 /* Gradients.swift */; };
@@ -85,6 +85,8 @@
 		BEBF333F242F9907008EEDAD /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		BEBF3341242F9B09008EEDAD /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
 		BEBF3343242FA8D9008EEDAD /* Color+Tools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Tools.swift"; sourceTree = "<group>"; };
+		BECDE37E24338E0C00939DBA /* MetalParallaxView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalParallaxView.swift; sourceTree = "<group>"; };
+		BECDE38024338E2300939DBA /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Shaders.metal; path = ../../../../../Downloads/Shaders.metal; sourceTree = "<group>"; };
 		BED5F75E24310A2F001A2667 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		BEEA81AF242C9AA10074BBAE /* OptimizedPydnet.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = OptimizedPydnet.mlmodel; sourceTree = "<group>"; };
 		BEFDCA33242B5CBB002AF520 /* Gradients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gradients.swift; sourceTree = "<group>"; };
@@ -222,6 +224,8 @@
 				BE8535252430F15600557392 /* ControlView.swift */,
 				BE8B3FDA242FE86E0075F6EA /* VideoConverter.swift */,
 				BE7581912431F2A900A47FE3 /* ImageParallaxView.swift */,
+				BECDE37E24338E0C00939DBA /* MetalParallaxView.swift */,
+				BECDE38024338E2300939DBA /* Shaders.metal */,
 			);
 			path = Parallax;
 			sourceTree = "<group>";
@@ -348,6 +352,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE8B3FDB242FE86E0075F6EA /* VideoConverter.swift in Sources */,
+				BECDE37F24338E0C00939DBA /* MetalParallaxView.swift in Sources */,
 				BE1C24F92426150900276024 /* AppDelegate.swift in Sources */,
 				BE268898242B5AF000F165C5 /* AnimatableDataSimilarShape.swift in Sources */,
 				BEBF3344242FA8D9008EEDAD /* Color+Tools.swift in Sources */,
@@ -360,7 +365,7 @@
 				BE268899242B5AF000F165C5 /* Path+VectorArithmetic.swift in Sources */,
 				BE26887B242B57CC00F165C5 /* TabBar.swift in Sources */,
 				BEFDCA36242B9907002AF520 /* SlideOverCard.swift in Sources */,
-				BE7581922431F2A900A47FE3 /* ImageParallaxView.swift in Sources */,
+				BECDE38124338E2300939DBA /* Shaders.metal in Sources */,
 				BEABE6EB242CD4860071C556 /* FilterRenderer.swift in Sources */,
 				BE268896242B5AF000F165C5 /* Array+VectorArithmetic.swift in Sources */,
 				BEEA81B0242C9AA10074BBAE /* OptimizedPydnet.mlmodel in Sources */,
@@ -379,7 +384,6 @@
 				BEABE6E9242CD4860071C556 /* DepthToColorMap.metal in Sources */,
 				BE2688AB242B5B8700F165C5 /* AVDepthData+Utils.swift in Sources */,
 				BE268897242B5AF000F165C5 /* InterpolatedShape.swift in Sources */,
-				BE31A119242A383A00019FE1 /* ImageParallax.metal in Sources */,
 				BED5F75F24310A2F001A2667 /* LoadingView.swift in Sources */,
 				BE1C24FD2426150900276024 /* HomeView.swift in Sources */,
 			);
@@ -451,7 +455,7 @@
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -507,7 +511,7 @@
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

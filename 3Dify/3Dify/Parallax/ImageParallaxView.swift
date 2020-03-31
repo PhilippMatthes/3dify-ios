@@ -10,6 +10,7 @@ import SwiftUI
 import SceneKit
 import SpriteKit
 import Photos
+import MetalKit
 
 
 enum ImageParallaxAnimationType: Int {
@@ -43,11 +44,25 @@ class ImageParallaxView: SCNView {
     private static let fov: CGFloat = 90
     private static let cameraPosition: SCNVector3 = .init(0, 0, 1)
     
+    let gpuLock = DispatchSemaphore(value: 1)
+    
     var depthImage: DepthImage? {
         didSet {
-            guard let depthImage = depthImage else {return}
-            let imageProperty = SCNMaterialProperty(contents: depthImage.diffuse)
-            let imageDepthProperty = SCNMaterialProperty(contents: depthImage.trueDepth ?? depthImage.predictedDepth!)
+            guard
+                let depthImage = depthImage,
+                let device = MTLCreateSystemDefaultDevice()
+            else {return}
+            let textureLoader = MTKTextureLoader(device: device)
+            
+            guard
+                let diffuseData = depthImage.diffuse.pngData(),
+                let depthData = depthImage.trueDepth?.pngData() ?? depthImage.predictedDepth?.pngData(),
+                let diffuseTexture = try? textureLoader.newTexture(data: diffuseData),
+                let depthTexture = try? textureLoader.newTexture(data: depthData)
+            else {return}
+            
+            let imageProperty = SCNMaterialProperty(contents: diffuseTexture)
+            let imageDepthProperty = SCNMaterialProperty(contents: depthTexture)
             for property in [imageProperty, imageDepthProperty] {
                 property.wrapT = .mirror
                 property.wrapS = .mirror
@@ -67,18 +82,18 @@ class ImageParallaxView: SCNView {
     
     var selectedAnimationType: ImageParallaxAnimationType?
     
-    private var offset: SIMD2<Float>? {
+    private var offset: CGPoint? {
         didSet {
-            guard var offset = offset else {return}
-            technique?.setValue(NSValue(cgPoint: CGPoint(x: CGFloat(offset.x), y: CGFloat(offset.y))), forKeyPath: "offsetSymbol")
+            guard let offset = offset else {return}
+            technique?.setObject(NSNumber(value: Float(offset.x)), forKeyedSubscript: "offsetXSymbol" as NSCopying)
+            technique?.setObject(NSNumber(value: Float(offset.y)), forKeyedSubscript: "offsetYSymbol" as NSCopying)
         }
     }
        
     public var selectedFocalPoint: Float? {
         didSet {
-            guard var selectedFocalPoint = selectedFocalPoint else {return}
-            let data = NSData(bytes: &selectedFocalPoint, length: MemoryLayout.size(ofValue: selectedFocalPoint))
-            technique?.setValue(data, forKeyPath: "selectedFocalPointSymbol")
+            guard let selectedFocalPoint = selectedFocalPoint else {return}
+            technique?.setObject(NSNumber(value: selectedFocalPoint), forKeyedSubscript: "selectedFocalPointSymbol" as NSCopying)
         }
     }
     
@@ -92,7 +107,6 @@ class ImageParallaxView: SCNView {
     
     init() {
         super.init(frame: .zero, options: nil)
-        delegate = self
     }
     
     func prepareScene() {
@@ -141,10 +155,10 @@ class ImageParallaxView: SCNView {
         overlaySKScene?.addChild(textNode!)
         overlaySKScene?.scaleMode = .resizeFill
         
-        offset = .zero
-        selectedFocalPoint = 0.0
-        
+        preferredFramesPerSecond = 60
+                
         isPlaying = true
+        delegate = self
     }
     
     func prepareGestureRecognizers() {
@@ -163,18 +177,13 @@ class ImageParallaxView: SCNView {
         let frustumHeight = 2 * CGFloat(Self.cameraPosition.z) * tan(Self.fov * 0.5 * .pi / 180)
         let frustumWidth = frustumHeight / viewAspectRatio
         
-        print(frame.size.height, frame.size.width, viewAspectRatio)
-        print(depthImage.diffuse.size.height, depthImage.diffuse.size.width, imageAspectRatio)
-        
         let bestFitHeight: CGFloat
         let bestFitWidth: CGFloat
         
         if imageAspectRatio > viewAspectRatio {
-            print("Scale along y axis")
             bestFitWidth = frustumWidth
             bestFitHeight = frustumWidth * imageAspectRatio
         } else {
-            print("Scale along x axis")
             bestFitWidth = frustumHeight / imageAspectRatio
             bestFitHeight = frustumHeight
         }
@@ -208,9 +217,9 @@ extension ImageParallaxView {
         default:
             break
         }
-        offset = .init(
-            x: max(min(Float(translation.x / frame.width) * 0.3, 0.06), -0.06),
-            y: max(min(Float(translation.y / frame.height) * 0.3, 0.06), -0.06)
+        offset = CGPoint(
+            x: max(min(translation.x / frame.width * 0.3, 0.06), -0.06),
+            y: max(min(translation.y / frame.height * 0.3, 0.06), -0.06)
         )
     }
     
@@ -238,9 +247,8 @@ extension ImageParallaxView {
                 renderQueue.async {
                     let progress = (Double(frameIndex) / Double(frames))
                     update(.rendering(100 * progress))
-                    let offset = self.computeOffset(at: progress, withAnimationType: selectedAnimationType)
+                    self.offset = self.computeOffset(at: progress, withAnimationType: selectedAnimationType)
                         .scaled(by: Double(selectedAnimationIntensity))
-                    self.offset = .init(x: Float(offset.x), y: Float(offset.y))
                     autoreleasepool {
                         screenShots.append(self.snapshot())
                     }
@@ -270,6 +278,10 @@ extension ImageParallaxView {
 }
 
 extension ImageParallaxView: SCNSceneRendererDelegate {
+    func renderer(_ renderer: SCNSceneRenderer, willRenderScene scene: SCNScene, atTime time: TimeInterval) {
+        
+    }
+    
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         guard
             let selectedAnimationInterval = self.selectedAnimationInterval,
@@ -279,10 +291,11 @@ extension ImageParallaxView: SCNSceneRendererDelegate {
         else {return}
         
         let progress = 0.5 + (time.remainder(dividingBy: selectedAnimationInterval)) / selectedAnimationInterval
-        let offset = self.computeOffset(at: progress, withAnimationType: selectedAnimationType)
+        self.offset = self.computeOffset(at: progress, withAnimationType: selectedAnimationType)
             .scaled(by: Double(selectedAnimationIntensity))
-        
-        self.offset = .init(x: Float(offset.x), y: Float(offset.y))
+    }
+    
+    func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
     }
     
     func computeOffset(

@@ -42,7 +42,7 @@ struct HomeView: View {
     @State var selectedAnimationRepeatCount: Int = 5
     @State var selectedAnimationIntensity: Float = 0.05
     @State var selectedAnimationInterval: TimeInterval = 2
-    @State var selectedFocalPoint: Float = 1.0
+    @State var selectedFocalPoint: Float = 0.4
     @State var selectedAnimationTypeRawValue = ImageParallaxAnimationType.horizontalSwitch.rawValue
     
     @State var activeSheet: Sheet?
@@ -86,41 +86,48 @@ struct HomeView: View {
             ) {
                 GeometryReader { geometry in
                     ZStack {
-                        ImageParallaxViewRepresentable(
-                            isSaving: self.$isSaving,
+                        MetalParallaxViewRepresentable(
                             selectedAnimationInterval: self.$selectedAnimationInterval,
                             selectedAnimationIntensity: self.$selectedAnimationIntensity,
                             selectedFocalPoint: self.$selectedFocalPoint,
                             selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
                             depthImage: self.$depthImage
-                        ) { saveState in
-                            switch saveState {
-                            case .failed:
-                                UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                self.loadingText = "Error"
-                                self.loadingState = .failed
-                                self.isSaving = false
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                    withAnimation(self.springAnimation) {
-                                        self.loadingState = .hidden
-                                    }
-                                }
-                            case .rendering(let progress):
-                                self.loadingText = "Rendering... \(Int(progress))%"
-                            case .saving:
-                                self.loadingText = "Saving to camera roll..."
-                            case .finished:
-                                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                self.loadingText = "Finished"
-                                self.loadingState = .finished
-                                self.isSaving = false
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                    withAnimation(self.springAnimation) {
-                                        self.loadingState = .hidden
-                                    }
-                                }
-                            }
-                        }
+                        )
+//                        ImageParallaxViewRepresentable(
+//                            isSaving: self.$isSaving,
+//                            selectedAnimationInterval: self.$selectedAnimationInterval,
+//                            selectedAnimationIntensity: self.$selectedAnimationIntensity,
+//                            selectedFocalPoint: self.$selectedFocalPoint,
+//                            selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
+//                            depthImage: self.$depthImage
+//                        ) { saveState in
+//                            switch saveState {
+//                            case .failed:
+//                                UINotificationFeedbackGenerator().notificationOccurred(.error)
+//                                self.loadingText = "Error"
+//                                self.loadingState = .failed
+//                                self.isSaving = false
+//                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                                    withAnimation(self.springAnimation) {
+//                                        self.loadingState = .hidden
+//                                    }
+//                                }
+//                            case .rendering(let progress):
+//                                self.loadingText = "Rendering... \(Int(progress))%"
+//                            case .saving:
+//                                self.loadingText = "Saving to camera roll..."
+//                            case .finished:
+//                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+//                                self.loadingText = "Finished"
+//                                self.loadingState = .finished
+//                                self.isSaving = false
+//                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                                    withAnimation(self.springAnimation) {
+//                                        self.loadingState = .hidden
+//                                    }
+//                                }
+//                            }
+//                        }
                         
                         if !self.isShowingControls {
                             VStack {

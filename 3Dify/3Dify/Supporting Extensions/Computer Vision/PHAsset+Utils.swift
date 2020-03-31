@@ -18,7 +18,7 @@ extension PHAsset {
                 return true
             }
             self.requestContentEditingInput(with: options, completionHandler: {(contentEditingInput: PHContentEditingInput?, info: [AnyHashable : Any]) -> Void in
-                completionHandler(contentEditingInput!.fullSizeImageURL as URL?)
+                completionHandler(contentEditingInput?.fullSizeImageURL)
             })
         } else if self.mediaType == .video {
             let options: PHVideoRequestOptions = PHVideoRequestOptions()
@@ -36,37 +36,42 @@ extension PHAsset {
     
     func requestDepthImage(completion: @escaping (DepthImage?) -> Void) {
         self.getURL() {url in
-            guard
-                let url = url,
-                let image = UIImage(contentsOfFile: url.path),
-                let rotatedImage = image.rotate(radians: 0),
-                let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil)
-            else {
+            guard let url = url else {
                 completion(nil)
                 return
             }
             
-            
-            guard let disparityPixelBuffer = imageSource.getDisparityData()?
-                .converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32)
-                .depthDataMap else {
-                completion(DepthImage(diffuse: rotatedImage, trueDepth: nil))
-                return
-            }
-            
-            disparityPixelBuffer.normalize()
-            
-            guard
-                let depthMapImage = UIImage(pixelBuffer: disparityPixelBuffer),
-                let depthCGImage = depthMapImage.cgImage,
-                let rotatedDepthImage = UIImage(cgImage: depthCGImage, scale: 1.0, orientation: image.imageOrientation)
-                    .rotate(radians: 0)
-            else {
-                completion(DepthImage(diffuse: rotatedImage, trueDepth: nil))
-                return
-            }
-            
-            completion(DepthImage(diffuse: rotatedImage, trueDepth: rotatedDepthImage))
+            completion(PHAsset.requestDepthImage(forUrl: url))
         }
+    }
+    
+    static func requestDepthImage(forUrl url: URL) -> DepthImage? {
+        guard
+            let image = UIImage(contentsOfFile: url.path),
+            let rotatedImage = image.rotate(radians: 0),
+            let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil)
+        else {
+            return nil
+        }
+        
+        
+        guard let disparityPixelBuffer = imageSource.getDisparityData()?
+            .converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32)
+            .depthDataMap else {
+            return DepthImage(diffuse: rotatedImage, trueDepth: nil)
+        }
+        
+        disparityPixelBuffer.normalize()
+        
+        guard
+            let depthMapImage = UIImage(pixelBuffer: disparityPixelBuffer),
+            let depthCGImage = depthMapImage.cgImage,
+            let rotatedDepthImage = UIImage(cgImage: depthCGImage, scale: 1.0, orientation: image.imageOrientation)
+                .rotate(radians: 0)
+        else {
+            return DepthImage(diffuse: rotatedImage, trueDepth: nil)
+        }
+        
+        return DepthImage(diffuse: rotatedImage, trueDepth: rotatedDepthImage)
     }
 }

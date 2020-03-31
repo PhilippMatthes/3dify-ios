@@ -116,7 +116,8 @@ float2 parallaxOcclusionMapping(
 
 
 typedef struct {
-    float2 offset;
+    float offsetX;
+    float offsetY;
     float selectedFocalPoint;
 } ParallaxOcclusionMappingFragmentInput;
 
@@ -130,9 +131,9 @@ fragment half4 parallaxOcclusionMappingFragmentShader(
 {
     constexpr sampler sampler2d(coord::normalized, filter::linear, address::repeat);
     
-    float2 parallaxUv = parallaxOcclusionMapping(inputs.offset, in.texCoords, inputs.selectedFocalPoint, depthTexture);
+    float2 parallaxUv = parallaxOcclusionMapping(float2(inputs.offsetX, inputs.offsetY), in.texCoords, inputs.selectedFocalPoint, depthTexture);
     
     float4 diffuseColor = diffuseTexture.sample(sampler2d, parallaxUv);
     // float depthColor = depthTexture.sample(sampler2d, parallaxUv).r;
-    return half4(diffuseColor);
+    return half4(float4(diffuseColor));
 }
