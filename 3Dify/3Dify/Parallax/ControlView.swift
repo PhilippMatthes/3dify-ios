@@ -97,9 +97,9 @@ struct ControlView<Content: View>: View {
                         Slider(value: self.$selectedFocalPoint, in: 0...1)
                         .padding(.bottom, 24)
                         HStack {
-                            Text("Near").font(.footnote)
-                            Spacer()
                             Text("Far").font(.footnote)
+                            Spacer()
+                            Text("Near").font(.footnote)
                         }
                         Text("Focal Point").font(.footnote)
                     }

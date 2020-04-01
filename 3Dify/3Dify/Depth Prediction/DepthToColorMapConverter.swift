@@ -72,7 +72,7 @@ class DepthToColorMapConverter: FilterRenderer {
             return nil
         }
         
-        guard let outputTexture = texture(pixelFormat: .bgra8Unorm, width: image.width, height: image.height),
+        guard let outputTexture = texture(pixelFormat: .rgba16Float, width: image.width, height: image.height),
             let inputTexture = texture(from: image) else {
                 return nil
         }
