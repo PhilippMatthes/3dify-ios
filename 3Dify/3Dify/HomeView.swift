@@ -48,7 +48,7 @@ struct HomeView: View {
     
     @State var activeSheet: Sheet?
     @State var isShowingSheet = false
-    @State var isShowingControls = false
+    @State var isShowingControls = true
     
     @State var loadingState: LoadingState = .hidden
     @State var isSaving = false

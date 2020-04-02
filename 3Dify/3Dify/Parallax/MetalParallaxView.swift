@@ -342,6 +342,17 @@ enum SaveState {
 
 
 extension MetalParallaxView {
+    func snapshot() -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(bounds.size, isOpaque, 0.0)
+        if UIGraphicsGetCurrentContext() != nil {
+            drawHierarchy(in: bounds, afterScreenUpdates: true)
+            let screenshot = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            return screenshot
+        }
+        return nil
+    }
+    
     public func renderVideo(update: @escaping (SaveState) -> ()) {
         guard
             let selectedAnimationInterval = self.selectedAnimationInterval,
@@ -358,7 +369,7 @@ extension MetalParallaxView {
         renderQueue.async {
             video.startWriting()
         
-            let loops = 3
+            let loops = 5
             let fps = 60
             let frames = Int(selectedAnimationInterval) * fps * loops
             var offsetsToRender = (0..<frames).reversed().map { frameIndex -> (Double, CGPoint) in
@@ -399,11 +410,8 @@ extension MetalParallaxView {
             
             self.onAfterRenderFrame = { texture in
                 autoreleasepool {
-                    let context = CIContext()
-                    
                     guard
-                        let ciImage = CIImage(mtlTexture: texture, options: nil)?.oriented(.downMirrored),
-                        let cgImage = context.createCGImage(ciImage, from: ciImage.extent)
+                        let snapshot = self.snapshot()?.cgImage
                     else {
                         // Rendering failed
                         update(.failed)
@@ -412,37 +420,11 @@ extension MetalParallaxView {
                         return
                     }
                     renderQueue.async {
-                        video.append(cgImage: cgImage)
+                        video.append(cgImage: snapshot)
                     }
                 }
             }
         }
-    }
-}
-
-
-extension UIView {
-    func scale(by scale: CGFloat) {
-        self.contentScaleFactor = scale
-        for subview in self.subviews {
-            subview.scale(by: scale)
-        }
-    }
-
-    func getImage(scale: CGFloat? = nil) -> UIImage {
-        let newScale = scale ?? UIScreen.main.scale
-        self.scale(by: newScale)
-
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = newScale
-
-        let renderer = UIGraphicsImageRenderer(size: self.bounds.size, format: format)
-
-        let image = renderer.image { rendererContext in
-            self.layer.render(in: rendererContext.cgContext)
-        }
-
-        return image
     }
 }
 
