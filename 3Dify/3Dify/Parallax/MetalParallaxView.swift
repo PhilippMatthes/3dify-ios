@@ -49,6 +49,7 @@ struct MetalParallaxViewBestFitContainer: View {
     @Binding var selectedAnimationTypeRawValue: Int
     @Binding var depthImage: DepthImage
     
+    @Binding var isPaused: Bool
     @Binding var isSaving: Bool
     var onSaveVideoUpdate: (SaveState) -> ()
     
@@ -88,6 +89,7 @@ struct MetalParallaxViewBestFitContainer: View {
                     selectedBlurIntensity: self.$selectedBlurIntensity,
                     selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
                     depthImage: self.$depthImage,
+                    isPaused: self.$isPaused,
                     isSaving: self.$isSaving,
                     onSaveVideoUpdate: self.onSaveVideoUpdate
                 )
@@ -106,6 +108,7 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
     @Binding var selectedAnimationTypeRawValue: Int
     @Binding var depthImage: DepthImage
     
+    @Binding var isPaused: Bool
     @Binding var isSaving: Bool
     var onSaveVideoUpdate: (SaveState) -> ()
     
@@ -117,6 +120,7 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
         view.selectedAnimationType = ImageParallaxAnimationType(rawValue: selectedAnimationTypeRawValue)!
         view.selectedAnimationInterval = selectedAnimationInterval
         view.selectedAnimationIntensity = selectedAnimationIntensity
+        view.isPaused = isPaused
         return view
     }
     
@@ -140,7 +144,9 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
         if view.selectedAnimationIntensity != selectedAnimationIntensity {
             view.selectedAnimationIntensity = selectedAnimationIntensity
         }
-        
+        if view.isPaused != isPaused {
+            view.isPaused = isPaused
+        }
         if isSaving {
             view.renderVideo(update: self.onSaveVideoUpdate)
         }
@@ -178,6 +184,7 @@ class MetalParallaxView: MTKView {
     var focalPoint: Float? {
         didSet {
             guard let focalPoint = focalPoint else {return}
+            parallaxOcclusionPassEncoder.updateFocalPoint(focalPoint)
             vBlurPassEncoder.updateFocalPoint(focalPoint)
             hBlurPassEncoder.updateFocalPoint(focalPoint)
         }
@@ -351,7 +358,7 @@ extension MetalParallaxView {
         renderQueue.async {
             video.startWriting()
         
-            let loops = 5
+            let loops = 3
             let fps = 60
             let frames = Int(selectedAnimationInterval) * fps * loops
             var offsetsToRender = (0..<frames).reversed().map { frameIndex -> (Double, CGPoint) in
@@ -391,10 +398,11 @@ extension MetalParallaxView {
             }
             
             self.onAfterRenderFrame = { texture in
-                let context = CIContext()
                 autoreleasepool {
+                    let context = CIContext()
+                    
                     guard
-                        let ciImage = CIImage(mtlTexture: texture, options: nil),
+                        let ciImage = CIImage(mtlTexture: texture, options: nil)?.oriented(.downMirrored),
                         let cgImage = context.createCGImage(ciImage, from: ciImage.extent)
                     else {
                         // Rendering failed
@@ -409,6 +417,32 @@ extension MetalParallaxView {
                 }
             }
         }
+    }
+}
+
+
+extension UIView {
+    func scale(by scale: CGFloat) {
+        self.contentScaleFactor = scale
+        for subview in self.subviews {
+            subview.scale(by: scale)
+        }
+    }
+
+    func getImage(scale: CGFloat? = nil) -> UIImage {
+        let newScale = scale ?? UIScreen.main.scale
+        self.scale(by: newScale)
+
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = newScale
+
+        let renderer = UIGraphicsImageRenderer(size: self.bounds.size, format: format)
+
+        let image = renderer.image { rendererContext in
+            self.layer.render(in: rendererContext.cgContext)
+        }
+
+        return image
     }
 }
 

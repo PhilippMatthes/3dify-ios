@@ -41,7 +41,7 @@ struct HomeView: View {
     
     @State var selectedAnimationRepeatCount: Int = 5
     @State var selectedAnimationIntensity: Float = 0.05
-    @State var selectedBlurIntensity: Float = 0.5
+    @State var selectedBlurIntensity: Float = 0
     @State var selectedAnimationInterval: TimeInterval = 2
     @State var selectedFocalPoint: Float = 0
     @State var selectedAnimationTypeRawValue = ImageParallaxAnimationType.horizontalSwitch.rawValue
@@ -95,6 +95,7 @@ struct HomeView: View {
                             selectedBlurIntensity: self.$selectedBlurIntensity,
                             selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
                             depthImage: self.$depthImage,
+                            isPaused: self.$isShowingSheet,
                             isSaving: self.$isSaving
                         ) { saveState in
                             switch saveState {

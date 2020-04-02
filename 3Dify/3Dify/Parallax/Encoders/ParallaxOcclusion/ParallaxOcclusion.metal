@@ -116,8 +116,6 @@ fragment ParallaxPassOutput parallax_occlusion(
     
     output.diffuse = diffuseColor;
     output.depth = float4(float3(depthColor.r), 1.0);
-    
-    output.diffuse = output.depth;
-    
+        
     return output;
 }

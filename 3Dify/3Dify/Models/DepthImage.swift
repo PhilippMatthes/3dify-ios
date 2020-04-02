@@ -34,7 +34,8 @@ struct DepthImage {
         guard
             let displayImage = context.createCGImage(predictionCIImage, from: predictionCIImage.extent),
             let converted = DepthImage.photoDepthConverter.render(image: displayImage),
-            let predictedDepth = UIImage(cgImage: converted, scale: 1, orientation: .up).rotate(radians: 0)
+            let predictedDepth = UIImage(cgImage: converted, scale: 1, orientation: .up)
+                .rotate(radians: 0)?.blurred(radius: 3).normalize()
         else {
             return nil
         }
