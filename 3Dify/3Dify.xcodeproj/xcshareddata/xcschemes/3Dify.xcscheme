@@ -42,7 +42,8 @@
       debugServiceExtension = "internal"
       enableGPUFrameCaptureMode = "1"
       enableGPUValidationMode = "1"
-      allowLocationSimulation = "YES">
+      allowLocationSimulation = "YES"
+      viewDebuggingEnabled = "No">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference

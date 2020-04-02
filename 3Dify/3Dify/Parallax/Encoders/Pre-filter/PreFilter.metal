@@ -10,7 +10,7 @@
 using namespace metal;
 #include "../TextureMappingVertex.h"
 
-constexpr sampler texSampler(address::clamp_to_zero, filter::linear, coord::normalized);
+constexpr sampler texSampler(address::clamp_to_edge, filter::linear, coord::normalized);
 
 typedef struct {
     half4 color [[color(0)]];

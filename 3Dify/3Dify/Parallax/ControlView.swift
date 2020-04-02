@@ -9,10 +9,21 @@
 import SwiftUI
 
 
+struct ControlViewDivider: View {
+    var body: some View {
+        RoundedRectangle(cornerRadius: 1)
+        .frame(height: 1)
+        .padding(.vertical, 12)
+        .foregroundColor(Color.gray.opacity(0.1))
+    }
+}
+
+
 struct ControlView<Content: View>: View {
     @Binding var isShowingControls: Bool
     @Binding var selectedAnimationInterval: TimeInterval
     @Binding var selectedAnimationIntensity: Float
+    @Binding var selectedBokehIntensity: Float
     @Binding var selectedAnimationTypeRawValue: Int
     @Binding var selectedFocalPoint: Float
     
@@ -58,11 +69,9 @@ struct ControlView<Content: View>: View {
             }
             
             if isShowingSettings {
-                VStack(alignment: .center) {
-                    RoundedRectangle(cornerRadius: 1)
-                    .frame(height: 1)
-                    .padding(.vertical, 12)
-                    .foregroundColor(Color.gray.opacity(0.1))
+                ScrollView {
+                    ControlViewDivider()
+                    
                     ZStack(alignment: .bottom) {
                         Slider(value: self.$selectedAnimationInterval, in: 0.5...30)
                         .padding(.bottom, 24)
@@ -74,10 +83,9 @@ struct ControlView<Content: View>: View {
                         Text("Interval").font(.footnote)
                     }
                     .padding(.horizontal, 24)
-                    RoundedRectangle(cornerRadius: 1)
-                    .frame(height: 1)
-                    .padding(.vertical, 12)
-                    .foregroundColor(Color.gray.opacity(0.1))
+                    
+                    ControlViewDivider()
+                    
                     ZStack(alignment: .bottom) {
                         Slider(value: self.$selectedAnimationIntensity, in: 0...0.1)
                         .padding(.bottom, 24)
@@ -89,10 +97,9 @@ struct ControlView<Content: View>: View {
                         Text("Intensity").font(.footnote)
                     }
                     .padding(.horizontal, 24)
-                    RoundedRectangle(cornerRadius: 1)
-                    .frame(height: 1)
-                    .padding(.vertical, 12)
-                    .foregroundColor(Color.gray.opacity(0.1))
+                    
+                    ControlViewDivider()
+                    
                     ZStack(alignment: .bottom) {
                         Slider(value: self.$selectedFocalPoint, in: 0...1)
                         .padding(.bottom, 24)
@@ -104,10 +111,23 @@ struct ControlView<Content: View>: View {
                         Text("Focal Point").font(.footnote)
                     }
                     .padding(.horizontal, 24)
-                    RoundedRectangle(cornerRadius: 1)
-                        .frame(height: 1)
-                        .padding(.vertical, 12)
-                        .foregroundColor(Color.gray.opacity(0.1))
+                    
+                    ControlViewDivider()
+                    
+                    ZStack(alignment: .bottom) {
+                        Slider(value: self.$selectedBokehIntensity, in: 0...50)
+                        .padding(.bottom, 24)
+                        HStack {
+                            Text("Far").font(.footnote)
+                            Spacer()
+                            Text("Near").font(.footnote)
+                        }
+                        Text("Focal Point").font(.footnote)
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    ControlViewDivider()
+                    
                     Picker(selection: self.$selectedAnimationTypeRawValue, label: Text("Animation")) {
                         ForEach(ImageParallaxAnimationType.all, id: \.rawValue) {animationType in
                             Text(animationType.description)
@@ -119,12 +139,6 @@ struct ControlView<Content: View>: View {
                     .background(Color.yellow)
                     .cornerRadius(8)
                     .padding(.horizontal, 24)
-                    Text("Animation")
-                    .font(.footnote)
-                    RoundedRectangle(cornerRadius: 1)
-                    .frame(height: 1)
-                    .padding(.vertical, 12)
-                    .foregroundColor(Color.gray.opacity(0.1))
                 }
                 .padding(.vertical, 12)
                 .background(Color(hex: "#111"))
@@ -162,6 +176,7 @@ struct ControlView_Previews: PreviewProvider {
         ControlView(isShowingControls: .constant(true),
                     selectedAnimationInterval: .constant(2),
                     selectedAnimationIntensity: .constant(0.05),
+                    selectedBokehIntensity: .constant(5),
                     selectedAnimationTypeRawValue: .constant(0),
                     selectedFocalPoint: .constant(0),
                     isShowingSettings: true,

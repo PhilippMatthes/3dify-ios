@@ -41,15 +41,15 @@ struct HomeView: View {
     
     @State var selectedAnimationRepeatCount: Int = 5
     @State var selectedAnimationIntensity: Float = 0.05
+    @State var selectedBokehIntensity: Float = 10
     @State var selectedAnimationInterval: TimeInterval = 2
     @State var selectedFocalPoint: Float = 0
     @State var selectedFocalRange: Float = 5
-    @State var selectedBokehRadius: Float = 10
     @State var selectedAnimationTypeRawValue = ImageParallaxAnimationType.horizontalSwitch.rawValue
     
     @State var activeSheet: Sheet?
     @State var isShowingSheet = false
-    @State var isShowingControls = false
+    @State var isShowingControls = true
     
     @State var loadingState: LoadingState = .hidden
     @State var isSaving = false
@@ -67,6 +67,7 @@ struct HomeView: View {
                 isShowingControls: self.$isShowingControls,
                 selectedAnimationInterval: self.$selectedAnimationInterval,
                 selectedAnimationIntensity: self.$selectedAnimationIntensity,
+                selectedBokehIntensity: self.$selectedBokehIntensity,
                 selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
                 selectedFocalPoint: self.$selectedFocalPoint,
                 onShowPicker: {
@@ -88,12 +89,12 @@ struct HomeView: View {
             ) {
                 GeometryReader { geometry in
                     ZStack {
-                        MetalParallaxViewRepresentable(
+                        MetalParallaxViewBestFitContainer(
                             selectedAnimationInterval: self.$selectedAnimationInterval,
                             selectedAnimationIntensity: self.$selectedAnimationIntensity,
                             selectedFocalPoint: self.$selectedFocalPoint,
                             selectedFocalRange: self.$selectedFocalRange,
-                            selectedBokehRadius: self.$selectedBokehRadius,
+                            selectedBokehIntensity: self.$selectedBokehIntensity,
                             selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
                             depthImage: self.$depthImage,
                             isSaving: self.$isSaving

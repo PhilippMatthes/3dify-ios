@@ -10,7 +10,7 @@
 using namespace metal;
 #include "../TextureMappingVertex.h"
 
-constexpr sampler texSampler(address::clamp_to_zero, filter::linear, coord::normalized);
+constexpr sampler texSampler(address::clamp_to_edge, filter::linear, coord::normalized);
 
 half3 lerp(half3 a, half3 b, half w)
 {

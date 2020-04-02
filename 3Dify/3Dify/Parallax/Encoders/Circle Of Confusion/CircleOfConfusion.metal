@@ -14,7 +14,7 @@ typedef struct {
     float focusDist, focusRange, bokehRadius;
 } CoCUniforms;
 
-constexpr sampler texSampler(address::clamp_to_zero, filter::linear, coord::normalized);
+constexpr sampler texSampler(address::clamp_to_edge, filter::linear, coord::normalized);
 
 fragment half
 circle_of_confusion_pass(TextureMappingVertex vert [[stage_in]],

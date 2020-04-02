@@ -10,6 +10,7 @@ import UIKit
 import MetalKit
 import SwiftUI
 import Photos
+import SpriteKit
 
 
 enum ImageParallaxAnimationType: Int {
@@ -31,12 +32,80 @@ enum ImageParallaxAnimationType: Int {
 }
 
 
+internal extension View {
+    func frame(rect: CGRect) -> some View {
+        self
+            .frame(width: rect.size.width, height: rect.size.height)
+            .offset(x: rect.origin.x, y: rect.origin.y)
+    }
+}
+
+
+struct MetalParallaxViewBestFitContainer: View {
+    @Binding var selectedAnimationInterval: TimeInterval
+    @Binding var selectedAnimationIntensity: Float
+    @Binding var selectedFocalPoint: Float
+    @Binding var selectedFocalRange: Float
+    @Binding var selectedBokehIntensity: Float
+    @Binding var selectedAnimationTypeRawValue: Int
+    @Binding var depthImage: DepthImage
+    
+    @Binding var isSaving: Bool
+    var onSaveVideoUpdate: (SaveState) -> ()
+    
+    func bestFitLayout(for frame: CGRect) -> CGRect {
+        let viewAspectRatio = frame.size.height / frame.size.width
+        let imageAspectRatio = depthImage.diffuse.size.height / depthImage.diffuse.size.width
+        
+        let bestFitHeight: CGFloat
+        let bestFitWidth: CGFloat
+        
+        if imageAspectRatio > viewAspectRatio {
+            bestFitWidth = frame.width
+            bestFitHeight = frame.width * imageAspectRatio
+        } else {
+            bestFitWidth = frame.height / imageAspectRatio
+            bestFitHeight = frame.height
+        }
+        
+        let widthPadding = CGFloat(selectedAnimationIntensity) * (1 / 0.05) * 0.1
+        let heightPadding = CGFloat(selectedAnimationIntensity) * (1 / 0.05) * 0.1
+        
+        return CGRect(
+            x: -widthPadding,
+            y: -heightPadding,
+            width: bestFitWidth + 2 * widthPadding,
+            height: bestFitHeight + 2 * heightPadding
+        )
+    }
+    
+    var body: some View {
+        GeometryReader { outerGeometry in
+            GeometryReader { innerGeometry in
+                MetalParallaxViewRepresentable(
+                    selectedAnimationInterval: self.$selectedAnimationInterval,
+                    selectedAnimationIntensity: self.$selectedAnimationIntensity,
+                    selectedFocalPoint: self.$selectedFocalPoint,
+                    selectedFocalRange: self.$selectedFocalRange,
+                    selectedBokehIntensity: self.$selectedBokehIntensity,
+                    selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
+                    depthImage: self.$depthImage,
+                    isSaving: self.$isSaving,
+                    onSaveVideoUpdate: self.onSaveVideoUpdate
+                )
+                .frame(rect: self.bestFitLayout(for: innerGeometry.frame(in: .local)))
+            }.frame(rect: outerGeometry.frame(in: .local))
+        }
+    }
+}
+
+
 struct MetalParallaxViewRepresentable: UIViewRepresentable {
     @Binding var selectedAnimationInterval: TimeInterval
     @Binding var selectedAnimationIntensity: Float
     @Binding var selectedFocalPoint: Float
     @Binding var selectedFocalRange: Float
-    @Binding var selectedBokehRadius: Float
+    @Binding var selectedBokehIntensity: Float
     @Binding var selectedAnimationTypeRawValue: Int
     @Binding var depthImage: DepthImage
     
@@ -46,7 +115,7 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
     func makeUIView(context: UIViewRepresentableContext<MetalParallaxViewRepresentable>) -> MetalParallaxView {
         let view = MetalParallaxView(frame: .zero)
         view.depthImage = depthImage
-        view.bokehRadius = selectedBokehRadius
+        view.bokehRadius = selectedBokehIntensity
         view.focalDistance = selectedFocalPoint
         view.focalRange = selectedFocalRange
         view.selectedAnimationType = ImageParallaxAnimationType(rawValue: selectedAnimationTypeRawValue)!
@@ -59,8 +128,8 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
         if view.depthImage != depthImage {
             view.depthImage = depthImage
         }
-        if view.bokehRadius != selectedBokehRadius {
-            view.bokehRadius = selectedBokehRadius
+        if view.bokehRadius != selectedBokehIntensity {
+            view.bokehRadius = selectedBokehIntensity
         }
         if view.focalDistance != selectedFocalPoint {
             view.focalDistance = selectedFocalPoint
@@ -80,13 +149,16 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
         }
         
         if isSaving {
-            view.saveVideo(update: self.onSaveVideoUpdate)
+            view.renderVideo(update: self.onSaveVideoUpdate)
         }
     }
 }
 
 
 class MetalParallaxView: MTKView {
+    var onBeforeRenderFrame: (() -> ())?
+    var onAfterRenderFrame: ((MTLTexture) -> ())?
+    
     var depthImage: DepthImage? {
         didSet {
             guard let depthImage = depthImage, let device = device else {return}
@@ -133,13 +205,16 @@ class MetalParallaxView: MTKView {
             )
         }
     }
-    
+        
     var selectedAnimationInterval: TimeInterval?
     var selectedAnimationIntensity: Float?
     var selectedAnimationType: ImageParallaxAnimationType?
     
     var inputDiffuseTexture: MTLTexture?
     var inputDepthTexture: MTLTexture?
+    
+    var overlaySKView: SKView?
+    var overlayTextNode: SKNode?
     
     let startDate = Date()
     
@@ -189,7 +264,38 @@ class MetalParallaxView: MTKView {
         colorPixelFormat = .rgba16Float
         preferredFramesPerSecond = 60
         
+        overlaySKView = SKView()
+        let overlaySKScene = SKScene()
+        overlaySKScene.backgroundColor = .clear
+        overlayTextNode = SKNode()
+        let madeWith = SKLabelNode(fontNamed: "AppleSDGothicNeo-Regular")
+        madeWith.text = "Made with"
+        madeWith.fontSize = 24
+        madeWith.horizontalAlignmentMode = .left
+        madeWith.fontColor = SKColor.white
+        madeWith.position = .zero
+        overlayTextNode!.addChild(madeWith)
+        let threeDeeIfy = SKLabelNode(fontNamed: "AppleSDGothicNeo-Bold")
+        threeDeeIfy.text = "3Dify"
+        threeDeeIfy.fontSize = 24
+        threeDeeIfy.horizontalAlignmentMode = .left
+        threeDeeIfy.fontColor = SKColor.white
+        threeDeeIfy.position = .init(x: 110, y: 0)
+        overlayTextNode!.addChild(threeDeeIfy)
+        overlaySKScene.addChild(overlayTextNode!)
+        overlaySKScene.scaleMode = .resizeFill
+        overlaySKView?.presentScene(overlaySKScene)
+        overlaySKView?.allowsTransparency = true
+        overlaySKView?.backgroundColor = .clear
+        addSubview(overlaySKView!)
+        overlaySKView!.frame = bounds
+        
         addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(userDidPanView(_:))))
+    }
+    
+    override func layoutSubviews() {
+        overlaySKView?.frame = bounds
+        overlayTextNode?.position = .init(x: frame.midX - 86, y: 64)
     }
     
     @objc func userDidPanView(_ gestureRecognizer: UIPanGestureRecognizer) {
@@ -250,59 +356,76 @@ enum SaveState {
 
 
 extension MetalParallaxView {
-    func snapshot() -> UIImage {
-        let context = CIContext()
-        let texture = self.currentDrawable!.texture
-        let cImg = CIImage(mtlTexture: texture, options: nil)!
-        let cgImg = context.createCGImage(cImg, from: cImg.extent)!
-        return UIImage(cgImage: cgImg)
-    }
-    
-    public func saveVideo(update: @escaping (SaveState) -> ()) {
+    public func renderVideo(update: @escaping (SaveState) -> ()) {
+        guard
+            let selectedAnimationInterval = self.selectedAnimationInterval,
+            let selectedAnimationType = self.selectedAnimationType,
+            let selectedAnimationIntensity = self.selectedAnimationIntensity,
+            let video = CameraRollVideo(width: Int(drawableSize.width), height: Int(drawableSize.height), frameRate: 60)
+        else {
+            update(.failed)
+            return
+        }
+        
         let renderQueue = DispatchQueue(label: "Render Queue", qos: .background)
+        
         renderQueue.async {
-            guard
-                let selectedAnimationInterval = self.selectedAnimationInterval,
-                let selectedAnimationType = self.selectedAnimationType,
-                let selectedAnimationIntensity = self.selectedAnimationIntensity
-            else {
-                update(.failed)
-                return
+            video.startWriting()
+        
+            let loops = 5
+            let fps = 60
+            let frames = Int(selectedAnimationInterval) * fps * loops
+            var offsetsToRender = (0..<frames).reversed().map { frameIndex -> (Double, CGPoint) in
+                let animationProgress = (Double(frameIndex) / Double(frames / loops))
+                    .truncatingRemainder(dividingBy: 1)
+                let progressToDisplay = Double(frameIndex) / Double(frames)
+                return (progressToDisplay, self.computeOffset(at: animationProgress, withAnimationType: selectedAnimationType).scaled(by: Double(selectedAnimationIntensity)))
             }
-
-            self.animatorShouldAnimate = false
-            var screenShots = [UIImage]()
-            let frames = Int(selectedAnimationInterval * 30)
             
-            let dispatchGroup = DispatchGroup()
-            for frameIndex in (0..<frames) {
-                dispatchGroup.enter()
-                renderQueue.async {
-                    let progress = (Double(frameIndex) / Double(frames))
-                    update(.rendering(100 * progress))
-                    self.offset = self.computeOffset(at: progress, withAnimationType: selectedAnimationType)
-                        .scaled(by: Double(selectedAnimationIntensity))
-                    autoreleasepool {
-                        screenShots.append(self.snapshot())
+            self.onBeforeRenderFrame = {
+                if let (progress, offsetToRender) = offsetsToRender.popLast() {
+                    // Render next offset
+                    update(.rendering(progress * 100))
+                    self.offset = offsetToRender
+                } else {
+                    // Rendering finished, save to video
+                    update(.saving)
+                    self.onBeforeRenderFrame = nil
+                    self.onAfterRenderFrame = nil
+                    
+                    renderQueue.async {
+                        video.finishWriting() { url in
+                            DispatchQueue.main.async {
+                                PHPhotoLibrary.shared().performChanges({
+                                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+                                }) { saved, error in
+                                    if error != nil || !saved {
+                                        update(.failed)
+                                    } else {
+                                        update(.finished)
+                                    }
+                                }
+                            }
+                        }
                     }
-                    dispatchGroup.leave()
                 }
             }
             
-            dispatchGroup.notify(queue: renderQueue) {
-                self.animatorShouldAnimate = true
-                
-                update(.saving)
-                let videoConverter = VideoConverter(width: Int(screenShots.first!.size.width), height: Int(screenShots.first!.size.height))
-                videoConverter.createMovieFrom(images: screenShots) { url in
-                    PHPhotoLibrary.shared().performChanges({
-                        PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
-                    }) { saved, error in
-                        if error != nil || !saved {
-                            update(.failed)
-                        } else {
-                            update(.finished)
-                        }
+            self.onAfterRenderFrame = { texture in
+                let context = CIContext()
+                autoreleasepool {
+                    guard
+                        let ciImage = CIImage(mtlTexture: texture, options: nil),
+                        let cgImage = context.createCGImage(ciImage, from: ciImage.extent)
+                    else {
+                        // Rendering failed
+                        update(.failed)
+                        self.onBeforeRenderFrame = nil
+                        self.onAfterRenderFrame = nil
+                        return
+                    }
+                    renderQueue.async {
+                        video.append(cgImage: cgImage)
                     }
                 }
             }
@@ -313,7 +436,6 @@ extension MetalParallaxView {
 
 extension MetalParallaxView: MTKViewDelegate {
     public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        NSLog("MetalParallaxViewController drawable size will change to \(size)")
         parallaxOcclusionPassOutputDiffuseTexture = readAndRender(targetTextureOfSize: size, andFormat: .rgba16Float)
         parallaxOcclusionPassOutputDepthTexture = readAndRender(targetTextureOfSize: size, andFormat: .rgba16Float)
         circleOfConfusionTexture = readAndRender(targetTextureOfSize: size, andFormat: .r32Float)
@@ -381,6 +503,8 @@ extension MetalParallaxView: MTKViewDelegate {
         device: MTLDevice,
         atTime time: TimeInterval
     ) {
+        onBeforeRenderFrame?()
+        
         let scope = MTLCaptureManager.shared().makeCaptureScope(device: device)
         scope.label = "Capture Scope"
         scope.begin()
@@ -444,5 +568,6 @@ extension MetalParallaxView: MTKViewDelegate {
         
         commandBuffer.commit()
         
+        onAfterRenderFrame?(currentDrawable!.texture)
     }
 }

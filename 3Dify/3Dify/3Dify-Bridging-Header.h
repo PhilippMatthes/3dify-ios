@@ -18,3 +18,4 @@
 #import "CircleOfConfusionPassEncoder.h"
 #import "ComposePassEncoder.h"
 #import "PostFilterPassEncoder.h"
+#import "BlurPassEncoder.h"
