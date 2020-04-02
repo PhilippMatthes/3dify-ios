@@ -16,9 +16,6 @@ using namespace metal;
 #include "../TextureMappingVertex.h"
 
 
-
-// MARK: - Parallax Pass
-
 float2 parallaxOcclusionMapping(
     float2 offset,
     float2 texCoords,
@@ -119,6 +116,8 @@ fragment ParallaxPassOutput parallax_occlusion(
     
     output.diffuse = diffuseColor;
     output.depth = float4(float3(depthColor.r), 1.0);
+    
+    output.diffuse = output.depth;
     
     return output;
 }

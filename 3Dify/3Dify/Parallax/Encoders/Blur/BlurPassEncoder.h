@@ -13,7 +13,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface BlurPassEncoder : NSObject
--(instancetype)initWithDevice:(id<MTLDevice>)device;
+-(instancetype)initWithDevice:(id<MTLDevice>)device
+                   isVertical:(bool)isVertical;
 -(void)  encodeIn:(id<MTLCommandBuffer>)commandBuffer
 inputColorTexture:(id<MTLTexture>)inputColorTexture
 inputDepthTexture:(id<MTLTexture>)inputDepthTexture

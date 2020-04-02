@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 
 struct ControlViewDivider: View {
@@ -19,11 +20,12 @@ struct ControlViewDivider: View {
 }
 
 
+
 struct ControlView<Content: View>: View {
     @Binding var isShowingControls: Bool
     @Binding var selectedAnimationInterval: TimeInterval
     @Binding var selectedAnimationIntensity: Float
-    @Binding var selectedBokehIntensity: Float
+    @Binding var selectedBlurIntensity: Float
     @Binding var selectedAnimationTypeRawValue: Int
     @Binding var selectedFocalPoint: Float
     
@@ -68,86 +70,89 @@ struct ControlView<Content: View>: View {
                 .transition(.opacity)
             }
             
-            if isShowingSettings {
-                ScrollView {
-                    ControlViewDivider()
-                    
-                    ZStack(alignment: .bottom) {
-                        Slider(value: self.$selectedAnimationInterval, in: 0.5...30)
+            ZStack(alignment: .top) {
+                self.content()
+                    .padding(.top, self.isShowingSettings ? UIScreen.main.bounds.height / 2 : 0)
+                
+                if isShowingSettings {
+                    ScrollView(showsIndicators: false) {
+                        ControlViewDivider()
+                        
+                        ZStack(alignment: .bottom) {
+                            Slider(value: self.$selectedAnimationInterval, in: 0.5...10)
+                            .padding(.bottom, 24)
+                            HStack {
+                                Text("0.5s").font(.footnote)
+                                Spacer()
+                                Text("5s").font(.footnote)
+                            }
+                            Text("Animation Interval").font(.footnote)
+                        }
+                        .padding(.horizontal, 24)
+                        
+                        ControlViewDivider()
+                        
+                        ZStack(alignment: .bottom) {
+                            Slider(value: self.$selectedAnimationIntensity, in: 0...0.1)
+                            .padding(.bottom, 24)
+                            HStack {
+                                Text("Weak").font(.footnote)
+                                Spacer()
+                                Text("Strong").font(.footnote)
+                            }
+                            Text("Animation Intensity").font(.footnote)
+                        }
+                        .padding(.horizontal, 24)
+                        
+                        ControlViewDivider()
+                        
+                        ZStack(alignment: .bottom) {
+                            Slider(value: self.$selectedFocalPoint, in: 0...1)
+                            .padding(.bottom, 24)
+                            HStack {
+                                Text("Far").font(.footnote)
+                                Spacer()
+                                Text("Near").font(.footnote)
+                            }
+                            Text("Focal Point").font(.footnote)
+                        }
+                        .padding(.horizontal, 24)
+                        
+                        ControlViewDivider()
+                        
+                        ZStack(alignment: .bottom) {
+                            Slider(value: self.$selectedBlurIntensity, in: 0...3)
+                            .padding(.bottom, 24)
+                            HStack {
+                                Text("None").font(.footnote)
+                                Spacer()
+                                Text("Strong").font(.footnote)
+                            }
+                            Text("Blur Intensity").font(.footnote)
+                        }
+                        .padding(.horizontal, 24)
+                        
+                        ControlViewDivider()
+                        
+                        Picker(selection: self.$selectedAnimationTypeRawValue, label: Text("Animation")) {
+                            ForEach(ImageParallaxAnimationType.all, id: \.rawValue) {animationType in
+                                Text(animationType.description)
+                                .tag(animationType.rawValue)
+                            }
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        .padding(2)
+                        .background(Color.yellow)
+                        .cornerRadius(8)
+                        .padding(.horizontal, 24)
                         .padding(.bottom, 24)
-                        HStack {
-                            Text("0.5s").font(.footnote)
-                            Spacer()
-                            Text("5s").font(.footnote)
-                        }
-                        Text("Interval").font(.footnote)
                     }
-                    .padding(.horizontal, 24)
-                    
-                    ControlViewDivider()
-                    
-                    ZStack(alignment: .bottom) {
-                        Slider(value: self.$selectedAnimationIntensity, in: 0...0.1)
-                        .padding(.bottom, 24)
-                        HStack {
-                            Text("Weak").font(.footnote)
-                            Spacer()
-                            Text("Strong").font(.footnote)
-                        }
-                        Text("Intensity").font(.footnote)
-                    }
-                    .padding(.horizontal, 24)
-                    
-                    ControlViewDivider()
-                    
-                    ZStack(alignment: .bottom) {
-                        Slider(value: self.$selectedFocalPoint, in: 0...1)
-                        .padding(.bottom, 24)
-                        HStack {
-                            Text("Far").font(.footnote)
-                            Spacer()
-                            Text("Near").font(.footnote)
-                        }
-                        Text("Focal Point").font(.footnote)
-                    }
-                    .padding(.horizontal, 24)
-                    
-                    ControlViewDivider()
-                    
-                    ZStack(alignment: .bottom) {
-                        Slider(value: self.$selectedBokehIntensity, in: 0...50)
-                        .padding(.bottom, 24)
-                        HStack {
-                            Text("Far").font(.footnote)
-                            Spacer()
-                            Text("Near").font(.footnote)
-                        }
-                        Text("Focal Point").font(.footnote)
-                    }
-                    .padding(.horizontal, 24)
-                    
-                    ControlViewDivider()
-                    
-                    Picker(selection: self.$selectedAnimationTypeRawValue, label: Text("Animation")) {
-                        ForEach(ImageParallaxAnimationType.all, id: \.rawValue) {animationType in
-                            Text(animationType.description)
-                            .tag(animationType.rawValue)
-                        }
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                    .padding(2)
-                    .background(Color.yellow)
-                    .cornerRadius(8)
-                    .padding(.horizontal, 24)
+                    .background(Color(hex: "#222"))
+                    .foregroundColor(Color.white)
+                    .accentColor(Color.yellow)
+                    .frame(height: self.isShowingControls ? UIScreen.main.bounds.height / 2 : 0)
                 }
-                .padding(.vertical, 12)
-                .background(Color(hex: "#111"))
-                .foregroundColor(Color.white)
-                .accentColor(Color.yellow)
-                .transition(.opacity)
             }
-
-            self.content()
             
             if self.isShowingControls && !self.isShowingSettings {
                 HStack {
@@ -165,7 +170,7 @@ struct ControlView<Content: View>: View {
                 .background(Color.black)
                 .accentColor(Color.yellow)
                 .foregroundColor(Color.white)
-                .transition(.opacity)
+                .transition(.move(edge: .bottom))
             }
         }
     }
@@ -176,7 +181,7 @@ struct ControlView_Previews: PreviewProvider {
         ControlView(isShowingControls: .constant(true),
                     selectedAnimationInterval: .constant(2),
                     selectedAnimationIntensity: .constant(0.05),
-                    selectedBokehIntensity: .constant(5),
+                    selectedBlurIntensity: .constant(5),
                     selectedAnimationTypeRawValue: .constant(0),
                     selectedFocalPoint: .constant(0),
                     isShowingSettings: true,

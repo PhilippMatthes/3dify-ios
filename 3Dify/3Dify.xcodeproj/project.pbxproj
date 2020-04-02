@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		BE124EC32435D9D70004A66E /* BlurPassEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = BE124EC22435D9D70004A66E /* BlurPassEncoder.m */; };
+		BE124EC62435DE6C0004A66E /* Blur.metal in Sources */ = {isa = PBXBuildFile; fileRef = BE124EC52435DE6C0004A66E /* Blur.metal */; };
 		BE1C24F92426150900276024 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C24F82426150900276024 /* AppDelegate.swift */; };
 		BE1C24FB2426150900276024 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C24FA2426150900276024 /* SceneDelegate.swift */; };
 		BE1C24FD2426150900276024 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C24FC2426150900276024 /* HomeView.swift */; };
@@ -38,17 +39,7 @@
 		BEBF3342242F9B09008EEDAD /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF3341242F9B09008EEDAD /* CameraPreviewView.swift */; };
 		BEBF3344242FA8D9008EEDAD /* Color+Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF3343242FA8D9008EEDAD /* Color+Tools.swift */; };
 		BECDE37F24338E0C00939DBA /* MetalParallaxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BECDE37E24338E0C00939DBA /* MetalParallaxView.swift */; };
-		BECDE3CF2434805B00939DBA /* BokehPassEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3B42434805B00939DBA /* BokehPassEncoder.m */; };
-		BECDE3D02434805B00939DBA /* Bokeh.metal in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3B52434805B00939DBA /* Bokeh.metal */; };
 		BECDE3D12434805B00939DBA /* ProjectTexture.metal in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3B62434805B00939DBA /* ProjectTexture.metal */; };
-		BECDE3D22434805B00939DBA /* PreFilter.metal in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3B82434805B00939DBA /* PreFilter.metal */; };
-		BECDE3D32434805B00939DBA /* PreFilterPassEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3BA2434805B00939DBA /* PreFilterPassEncoder.m */; };
-		BECDE3D42434805B00939DBA /* CircleOfConfusionPassEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3BD2434805B00939DBA /* CircleOfConfusionPassEncoder.m */; };
-		BECDE3D52434805B00939DBA /* CircleOfConfusion.metal in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3BE2434805B00939DBA /* CircleOfConfusion.metal */; };
-		BECDE3D62434805B00939DBA /* Compose.metal in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3C22434805B00939DBA /* Compose.metal */; };
-		BECDE3D72434805B00939DBA /* ComposePassEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3C32434805B00939DBA /* ComposePassEncoder.m */; };
-		BECDE3D82434805B00939DBA /* PostFilterPassEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3C52434805B00939DBA /* PostFilterPassEncoder.m */; };
-		BECDE3D92434805B00939DBA /* PostFilter.metal in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3C62434805B00939DBA /* PostFilter.metal */; };
 		BECDE3E424348EFF00939DBA /* ParallaxOcclusionPassEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3E12434879600939DBA /* ParallaxOcclusionPassEncoder.m */; };
 		BECDE3E72434AB7300939DBA /* ParallaxOcclusion.metal in Sources */ = {isa = PBXBuildFile; fileRef = BECDE3DE2434842B00939DBA /* ParallaxOcclusion.metal */; };
 		BED5F75F24310A2F001A2667 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5F75E24310A2F001A2667 /* LoadingView.swift */; };
@@ -59,6 +50,7 @@
 /* Begin PBXFileReference section */
 		BE124EC22435D9D70004A66E /* BlurPassEncoder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlurPassEncoder.m; sourceTree = "<group>"; };
 		BE124EC42435DC7B0004A66E /* BlurPassEncoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlurPassEncoder.h; sourceTree = "<group>"; };
+		BE124EC52435DE6C0004A66E /* Blur.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Blur.metal; sourceTree = "<group>"; };
 		BE1C24F52426150900276024 /* 3Dify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = 3Dify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE1C24F82426150900276024 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BE1C24FA2426150900276024 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -91,23 +83,7 @@
 		BEBF3341242F9B09008EEDAD /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
 		BEBF3343242FA8D9008EEDAD /* Color+Tools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Tools.swift"; sourceTree = "<group>"; };
 		BECDE37E24338E0C00939DBA /* MetalParallaxView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalParallaxView.swift; sourceTree = "<group>"; };
-		BECDE3B32434805B00939DBA /* BokehPassEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BokehPassEncoder.h; sourceTree = "<group>"; };
-		BECDE3B42434805B00939DBA /* BokehPassEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BokehPassEncoder.m; sourceTree = "<group>"; };
-		BECDE3B52434805B00939DBA /* Bokeh.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Bokeh.metal; sourceTree = "<group>"; };
 		BECDE3B62434805B00939DBA /* ProjectTexture.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = ProjectTexture.metal; sourceTree = "<group>"; };
-		BECDE3B82434805B00939DBA /* PreFilter.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = PreFilter.metal; sourceTree = "<group>"; };
-		BECDE3B92434805B00939DBA /* PreFilterPassEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreFilterPassEncoder.h; sourceTree = "<group>"; };
-		BECDE3BA2434805B00939DBA /* PreFilterPassEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreFilterPassEncoder.m; sourceTree = "<group>"; };
-		BECDE3BC2434805B00939DBA /* CircleOfConfusionPassEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CircleOfConfusionPassEncoder.h; sourceTree = "<group>"; };
-		BECDE3BD2434805B00939DBA /* CircleOfConfusionPassEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CircleOfConfusionPassEncoder.m; sourceTree = "<group>"; };
-		BECDE3BE2434805B00939DBA /* CircleOfConfusion.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = CircleOfConfusion.metal; sourceTree = "<group>"; };
-		BECDE3BF2434805B00939DBA /* CoCUniforms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoCUniforms.h; sourceTree = "<group>"; };
-		BECDE3C12434805B00939DBA /* ComposePassEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComposePassEncoder.h; sourceTree = "<group>"; };
-		BECDE3C22434805B00939DBA /* Compose.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Compose.metal; sourceTree = "<group>"; };
-		BECDE3C32434805B00939DBA /* ComposePassEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ComposePassEncoder.m; sourceTree = "<group>"; };
-		BECDE3C52434805B00939DBA /* PostFilterPassEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PostFilterPassEncoder.m; sourceTree = "<group>"; };
-		BECDE3C62434805B00939DBA /* PostFilter.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = PostFilter.metal; sourceTree = "<group>"; };
-		BECDE3C72434805B00939DBA /* PostFilterPassEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PostFilterPassEncoder.h; sourceTree = "<group>"; };
 		BECDE3CE2434805B00939DBA /* TextureMappingVertex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureMappingVertex.h; sourceTree = "<group>"; };
 		BECDE3DC243480DE00939DBA /* 3Dify-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "3Dify-Bridging-Header.h"; sourceTree = "<group>"; };
 		BECDE3DE2434842B00939DBA /* ParallaxOcclusion.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ParallaxOcclusion.metal; sourceTree = "<group>"; };
@@ -132,6 +108,7 @@
 		BE124EC12435D9A60004A66E /* Blur */ = {
 			isa = PBXGroup;
 			children = (
+				BE124EC52435DE6C0004A66E /* Blur.metal */,
 				BE124EC22435D9D70004A66E /* BlurPassEncoder.m */,
 				BE124EC42435DC7B0004A66E /* BlurPassEncoder.h */,
 			);
@@ -280,65 +257,9 @@
 				BECDE3B62434805B00939DBA /* ProjectTexture.metal */,
 				BECDE3DD2434841800939DBA /* ParallaxOcclusion */,
 				BE124EC12435D9A60004A66E /* Blur */,
-				BECDE3B22434805B00939DBA /* Bokeh */,
-				BECDE3B72434805B00939DBA /* Pre-filter */,
-				BECDE3BB2434805B00939DBA /* Circle Of Confusion */,
-				BECDE3C02434805B00939DBA /* Compose */,
-				BECDE3C42434805B00939DBA /* Post-filter */,
 				BECDE3CE2434805B00939DBA /* TextureMappingVertex.h */,
 			);
 			path = Encoders;
-			sourceTree = "<group>";
-		};
-		BECDE3B22434805B00939DBA /* Bokeh */ = {
-			isa = PBXGroup;
-			children = (
-				BECDE3B32434805B00939DBA /* BokehPassEncoder.h */,
-				BECDE3B42434805B00939DBA /* BokehPassEncoder.m */,
-				BECDE3B52434805B00939DBA /* Bokeh.metal */,
-			);
-			path = Bokeh;
-			sourceTree = "<group>";
-		};
-		BECDE3B72434805B00939DBA /* Pre-filter */ = {
-			isa = PBXGroup;
-			children = (
-				BECDE3B82434805B00939DBA /* PreFilter.metal */,
-				BECDE3B92434805B00939DBA /* PreFilterPassEncoder.h */,
-				BECDE3BA2434805B00939DBA /* PreFilterPassEncoder.m */,
-			);
-			path = "Pre-filter";
-			sourceTree = "<group>";
-		};
-		BECDE3BB2434805B00939DBA /* Circle Of Confusion */ = {
-			isa = PBXGroup;
-			children = (
-				BECDE3BC2434805B00939DBA /* CircleOfConfusionPassEncoder.h */,
-				BECDE3BD2434805B00939DBA /* CircleOfConfusionPassEncoder.m */,
-				BECDE3BE2434805B00939DBA /* CircleOfConfusion.metal */,
-				BECDE3BF2434805B00939DBA /* CoCUniforms.h */,
-			);
-			path = "Circle Of Confusion";
-			sourceTree = "<group>";
-		};
-		BECDE3C02434805B00939DBA /* Compose */ = {
-			isa = PBXGroup;
-			children = (
-				BECDE3C12434805B00939DBA /* ComposePassEncoder.h */,
-				BECDE3C22434805B00939DBA /* Compose.metal */,
-				BECDE3C32434805B00939DBA /* ComposePassEncoder.m */,
-			);
-			path = Compose;
-			sourceTree = "<group>";
-		};
-		BECDE3C42434805B00939DBA /* Post-filter */ = {
-			isa = PBXGroup;
-			children = (
-				BECDE3C52434805B00939DBA /* PostFilterPassEncoder.m */,
-				BECDE3C62434805B00939DBA /* PostFilter.metal */,
-				BECDE3C72434805B00939DBA /* PostFilterPassEncoder.h */,
-			);
-			path = "Post-filter";
 			sourceTree = "<group>";
 		};
 		BECDE3DD2434841800939DBA /* ParallaxOcclusion */ = {
@@ -455,27 +376,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE8B3FDB242FE86E0075F6EA /* CameraRollVideo.swift in Sources */,
-				BECDE3CF2434805B00939DBA /* BokehPassEncoder.m in Sources */,
-				BECDE3D42434805B00939DBA /* CircleOfConfusionPassEncoder.m in Sources */,
-				BECDE3D62434805B00939DBA /* Compose.metal in Sources */,
 				BECDE37F24338E0C00939DBA /* MetalParallaxView.swift in Sources */,
 				BE1C24F92426150900276024 /* AppDelegate.swift in Sources */,
 				BE268898242B5AF000F165C5 /* AnimatableDataSimilarShape.swift in Sources */,
-				BECDE3D32434805B00939DBA /* PreFilterPassEncoder.m in Sources */,
 				BEBF3344242FA8D9008EEDAD /* Color+Tools.swift in Sources */,
-				BECDE3D02434805B00939DBA /* Bokeh.metal in Sources */,
 				BE2688AD242B5B8700F165C5 /* CIImage+Utils.swift in Sources */,
 				BEBF333E242F9342008EEDAD /* ImagePickerView.swift in Sources */,
 				BE2688AF242B5B8700F165C5 /* Photos+Utils.swift in Sources */,
-				BECDE3D52434805B00939DBA /* CircleOfConfusion.metal in Sources */,
 				BE2688B1242B5B8700F165C5 /* PHAsset+Utils.swift in Sources */,
 				BEABE6EA242CD4860071C556 /* DepthToColorMapConverter.swift in Sources */,
 				BE268899242B5AF000F165C5 /* Path+VectorArithmetic.swift in Sources */,
-				BECDE3D72434805B00939DBA /* ComposePassEncoder.m in Sources */,
 				BECDE3D12434805B00939DBA /* ProjectTexture.metal in Sources */,
 				BEABE6EB242CD4860071C556 /* FilterRenderer.swift in Sources */,
 				BE268896242B5AF000F165C5 /* Array+VectorArithmetic.swift in Sources */,
-				BECDE3D92434805B00939DBA /* PostFilter.metal in Sources */,
 				BEEA81B0242C9AA10074BBAE /* OptimizedPydnet.mlmodel in Sources */,
 				BE26889A242B5AF000F165C5 /* SimilarShape.swift in Sources */,
 				BE268895242B5AF000F165C5 /* Path+Length.swift in Sources */,
@@ -489,12 +402,11 @@
 				BE1C24FB2426150900276024 /* SceneDelegate.swift in Sources */,
 				BE124EC32435D9D70004A66E /* BlurPassEncoder.m in Sources */,
 				BEBF3342242F9B09008EEDAD /* CameraPreviewView.swift in Sources */,
+				BE124EC62435DE6C0004A66E /* Blur.metal in Sources */,
 				BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */,
 				BEABE6E9242CD4860071C556 /* DepthToColorMap.metal in Sources */,
 				BE2688AB242B5B8700F165C5 /* AVDepthData+Utils.swift in Sources */,
 				BE268897242B5AF000F165C5 /* InterpolatedShape.swift in Sources */,
-				BECDE3D22434805B00939DBA /* PreFilter.metal in Sources */,
-				BECDE3D82434805B00939DBA /* PostFilterPassEncoder.m in Sources */,
 				BED5F75F24310A2F001A2667 /* LoadingView.swift in Sources */,
 				BE1C24FD2426150900276024 /* HomeView.swift in Sources */,
 				BECDE3E424348EFF00939DBA /* ParallaxOcclusionPassEncoder.m in Sources */,

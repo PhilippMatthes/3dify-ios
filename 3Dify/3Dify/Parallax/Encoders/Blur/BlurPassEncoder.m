@@ -11,6 +11,7 @@
 #import <simd/simd.h>
 
 typedef struct {
+    simd_bool isVertical;
     simd_float1 blurIntensity;
     simd_float1 focalPoint;
 } BlurUniforms;
@@ -19,6 +20,7 @@ typedef struct {
 @property (nonatomic, strong) id<MTLDevice> device;
 @property (nonatomic, strong) id<MTLRenderPipelineState> pipelineState;
 @property (nonatomic, strong) id<MTLBuffer> blurUniformsBuffer;
+@property (nonatomic) simd_bool isVertical;
 @property (nonatomic) simd_float1 blurIntensity;
 @property (nonatomic) simd_float1 focalPoint;
 @end
@@ -26,12 +28,14 @@ typedef struct {
 @implementation BlurPassEncoder
 
 -(instancetype)initWithDevice:(id<MTLDevice>)device
+                   isVertical:(simd_bool)isVertical
 {
     self = [super init];
     if (self) {
         self.device = device;
         self.pipelineState = [self blurPipelineStateOnDevice:device];
         self.blurUniformsBuffer = [self makeBlurUniformsBuffer];
+        self.isVertical = isVertical;
         self.blurIntensity = 5.0f;
         self.focalPoint = 0.0f;
     }
@@ -67,7 +71,7 @@ typedef struct {
 -(void)  encodeIn:(id<MTLCommandBuffer>)commandBuffer
 inputColorTexture:(id<MTLTexture>)inputColorTexture
 inputDepthTexture:(id<MTLTexture>)inputDepthTexture
-blurredTexture:(id<MTLTexture>)blurredTexture
+   blurredTexture:(id<MTLTexture>)blurredTexture
      drawableSize:(CGSize)drawableSize
        clearColor:(MTLClearColor)clearColor
 {
@@ -99,6 +103,7 @@ blurredTexture:(id<MTLTexture>)blurredTexture
 -(void)updateBlurUniforms
 {
     BlurUniforms uniforms = (BlurUniforms) {
+        .isVertical = self.isVertical,
         .blurIntensity = self.blurIntensity,
         .focalPoint = self.focalPoint
     };

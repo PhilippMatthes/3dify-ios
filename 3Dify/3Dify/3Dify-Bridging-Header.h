@@ -13,9 +13,4 @@
 #endif /* _Dify_Bridging_Header_h */
 
 #import "ParallaxOcclusionPassEncoder.h"
-#import "BokehPassEncoder.h"
-#import "PreFilterPassEncoder.h"
-#import "CircleOfConfusionPassEncoder.h"
-#import "ComposePassEncoder.h"
-#import "PostFilterPassEncoder.h"
 #import "BlurPassEncoder.h"

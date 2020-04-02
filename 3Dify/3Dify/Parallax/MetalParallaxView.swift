@@ -45,8 +45,7 @@ struct MetalParallaxViewBestFitContainer: View {
     @Binding var selectedAnimationInterval: TimeInterval
     @Binding var selectedAnimationIntensity: Float
     @Binding var selectedFocalPoint: Float
-    @Binding var selectedFocalRange: Float
-    @Binding var selectedBokehIntensity: Float
+    @Binding var selectedBlurIntensity: Float
     @Binding var selectedAnimationTypeRawValue: Int
     @Binding var depthImage: DepthImage
     
@@ -86,8 +85,7 @@ struct MetalParallaxViewBestFitContainer: View {
                     selectedAnimationInterval: self.$selectedAnimationInterval,
                     selectedAnimationIntensity: self.$selectedAnimationIntensity,
                     selectedFocalPoint: self.$selectedFocalPoint,
-                    selectedFocalRange: self.$selectedFocalRange,
-                    selectedBokehIntensity: self.$selectedBokehIntensity,
+                    selectedBlurIntensity: self.$selectedBlurIntensity,
                     selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
                     depthImage: self.$depthImage,
                     isSaving: self.$isSaving,
@@ -104,8 +102,7 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
     @Binding var selectedAnimationInterval: TimeInterval
     @Binding var selectedAnimationIntensity: Float
     @Binding var selectedFocalPoint: Float
-    @Binding var selectedFocalRange: Float
-    @Binding var selectedBokehIntensity: Float
+    @Binding var selectedBlurIntensity: Float
     @Binding var selectedAnimationTypeRawValue: Int
     @Binding var depthImage: DepthImage
     
@@ -115,9 +112,8 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
     func makeUIView(context: UIViewRepresentableContext<MetalParallaxViewRepresentable>) -> MetalParallaxView {
         let view = MetalParallaxView(frame: .zero)
         view.depthImage = depthImage
-        view.bokehRadius = selectedBokehIntensity
-        view.focalDistance = selectedFocalPoint
-        view.focalRange = selectedFocalRange
+        view.blurIntensity = selectedBlurIntensity
+        view.focalPoint = selectedFocalPoint
         view.selectedAnimationType = ImageParallaxAnimationType(rawValue: selectedAnimationTypeRawValue)!
         view.selectedAnimationInterval = selectedAnimationInterval
         view.selectedAnimationIntensity = selectedAnimationIntensity
@@ -128,14 +124,11 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
         if view.depthImage != depthImage {
             view.depthImage = depthImage
         }
-        if view.bokehRadius != selectedBokehIntensity {
-            view.bokehRadius = selectedBokehIntensity
+        if view.blurIntensity != selectedBlurIntensity {
+            view.blurIntensity = selectedBlurIntensity
         }
-        if view.focalDistance != selectedFocalPoint {
-            view.focalDistance = selectedFocalPoint
-        }
-        if view.focalRange != selectedFocalRange {
-            view.focalRange = selectedFocalRange
+        if view.focalPoint != selectedFocalPoint {
+            view.focalPoint = selectedFocalPoint
         }
         let selectedAnimationType = ImageParallaxAnimationType(rawValue: selectedAnimationTypeRawValue)!
         if view.selectedAnimationType != selectedAnimationType {
@@ -174,25 +167,19 @@ class MetalParallaxView: MTKView {
         }
     }
     
-    var bokehRadius: Float? {
+    var blurIntensity: Float? {
         didSet {
-            guard let bokehRadius = bokehRadius else {return}
-            bokehPassEncoder.updateBokehRadius(bokehRadius)
-            circleOfConfusionPassEncoder.updateUniforms(withBokehRadius: bokehRadius)
+            guard let blurIntensity = blurIntensity else {return}
+            vBlurPassEncoder.updateBlurIntensity(blurIntensity)
+            hBlurPassEncoder.updateBlurIntensity(blurIntensity)
         }
     }
     
-    var focalDistance: Float? {
+    var focalPoint: Float? {
         didSet {
-            guard let focalDistance = focalDistance, let focalRange = focalRange else {return}
-            circleOfConfusionPassEncoder.updateUniforms(withFocusDistance: focalDistance, focusRange: focalRange)
-        }
-    }
-    
-    var focalRange: Float? {
-        didSet {
-            guard let focalDistance = focalDistance, let focalRange = focalRange else {return}
-            circleOfConfusionPassEncoder.updateUniforms(withFocusDistance: focalDistance, focusRange: focalRange)
+            guard let focalPoint = focalPoint else {return}
+            vBlurPassEncoder.updateFocalPoint(focalPoint)
+            hBlurPassEncoder.updateFocalPoint(focalPoint)
         }
     }
     
@@ -223,19 +210,14 @@ class MetalParallaxView: MTKView {
     var commandQueue: MTLCommandQueue
 
     var parallaxOcclusionPassEncoder: ParallaxOcclusionPassEncoder
-    var circleOfConfusionPassEncoder: CircleOfConfusionPassEncoder
-    var preFilterPassEncoder: PreFilterPassEncoder
-    var bokehPassEncoder: BokehPassEncoder
-    var postFilterPassEncoder: PostFilterPassEncoder
-    var composePassEncoder: ComposePassEncoder
+    var vBlurPassEncoder: BlurPassEncoder
+    var hBlurPassEncoder: BlurPassEncoder
     
     var parallaxOcclusionPassOutputDiffuseTexture: MTLTexture!
     var parallaxOcclusionPassOutputDepthTexture: MTLTexture!
-    var circleOfConfusionTexture: MTLTexture!
-    var preFilteredColorTexture: MTLTexture!
-    var preFilteredCircleOfConfusionTexture: MTLTexture!
-    var depthOfFieldTexture: MTLTexture!
-    var postFilterTexture: MTLTexture!
+    var vBlurPassOutputTexture: MTLTexture!
+    var hBlurPassOutputTexture: MTLTexture!
+
     
     let semaphore = DispatchSemaphore(value: 1)
     
@@ -248,11 +230,8 @@ class MetalParallaxView: MTKView {
         
         commandQueue = device.makeCommandQueue()!
         parallaxOcclusionPassEncoder = ParallaxOcclusionPassEncoder(device: device)
-        circleOfConfusionPassEncoder = CircleOfConfusionPassEncoder(device: device)
-        preFilterPassEncoder = PreFilterPassEncoder(device: device)
-        bokehPassEncoder = BokehPassEncoder(device: device)
-        postFilterPassEncoder = PostFilterPassEncoder(device: device)
-        composePassEncoder = ComposePassEncoder(device: device)
+        vBlurPassEncoder = BlurPassEncoder(device: device, isVertical: true)
+        hBlurPassEncoder = BlurPassEncoder(device: device, isVertical: false)
         
         super.init(frame: frame, device: device)
         
@@ -438,11 +417,7 @@ extension MetalParallaxView: MTKViewDelegate {
     public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         parallaxOcclusionPassOutputDiffuseTexture = readAndRender(targetTextureOfSize: size, andFormat: .rgba16Float)
         parallaxOcclusionPassOutputDepthTexture = readAndRender(targetTextureOfSize: size, andFormat: .rgba16Float)
-        circleOfConfusionTexture = readAndRender(targetTextureOfSize: size, andFormat: .r32Float)
-        preFilteredColorTexture = readAndRender(targetTextureOfSize: size, andFormat: .rgba16Float)
-        preFilteredCircleOfConfusionTexture = readAndRender(targetTextureOfSize: size, andFormat: .r32Float)
-        depthOfFieldTexture = readAndRender(targetTextureOfSize: size, andFormat: .rgba16Float)
-        postFilterTexture = readAndRender(targetTextureOfSize: size, andFormat: .rgba16Float)
+        vBlurPassOutputTexture = readAndRender(targetTextureOfSize: size, andFormat: .rgba16Float)
     }
     
     func readAndRender(targetTextureOfSize size: CGSize, andFormat format: MTLPixelFormat) -> MTLTexture {
@@ -518,43 +493,21 @@ extension MetalParallaxView: MTKViewDelegate {
             drawableSize: drawableSize,
             clearColor: clearColor
         )
-        self.circleOfConfusionPassEncoder.encode(
+        
+        self.vBlurPassEncoder.encode(
             in: commandBuffer,
+            inputColorTexture: parallaxOcclusionPassOutputDiffuseTexture,
             inputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
-            outputTexture: circleOfConfusionTexture,
+            blurredTexture: vBlurPassOutputTexture,
             drawableSize: drawableSize,
             clearColor: clearColor
         )
-        self.preFilterPassEncoder.encode(
+        
+        self.hBlurPassEncoder.encode(
             in: commandBuffer,
-            inputColorTexture: parallaxOcclusionPassOutputDiffuseTexture,
-            inputCoCTexture: circleOfConfusionTexture,
-            outputColorTexture: preFilteredColorTexture,
-            outputCoCTexture: preFilteredCircleOfConfusionTexture,
-            drawableSize: drawableSize,
-            clearColor: clearColor
-        )
-        self.bokehPassEncoder.encode(
-            in: commandBuffer,
-            inputColorTexture: preFilteredColorTexture,
-            inputCoCTexture: preFilteredCircleOfConfusionTexture,
-            outputTexture: depthOfFieldTexture,
-            drawableSize: drawableSize,
-            clearColor: clearColor
-        )
-        self.postFilterPassEncoder.encode(
-            in: commandBuffer,
-            inputColorTexture: depthOfFieldTexture,
-            outputTexture: postFilterTexture,
-            drawableSize: drawableSize,
-            clearColor: clearColor
-        )
-        self.composePassEncoder.encode(
-            in: commandBuffer,
-            inputColorTexture: parallaxOcclusionPassOutputDiffuseTexture,
-            inputDoFTexture: postFilterTexture,
-            inputCoCTexture: preFilteredCircleOfConfusionTexture,
-            outputTexture: currentDrawable!.texture,
+            inputColorTexture: vBlurPassOutputTexture,
+            inputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
+            blurredTexture: currentDrawable!.texture,
             drawableSize: drawableSize,
             clearColor: clearColor
         )

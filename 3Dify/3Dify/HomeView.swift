@@ -41,15 +41,14 @@ struct HomeView: View {
     
     @State var selectedAnimationRepeatCount: Int = 5
     @State var selectedAnimationIntensity: Float = 0.05
-    @State var selectedBokehIntensity: Float = 10
+    @State var selectedBlurIntensity: Float = 0.5
     @State var selectedAnimationInterval: TimeInterval = 2
     @State var selectedFocalPoint: Float = 0
-    @State var selectedFocalRange: Float = 5
     @State var selectedAnimationTypeRawValue = ImageParallaxAnimationType.horizontalSwitch.rawValue
     
     @State var activeSheet: Sheet?
     @State var isShowingSheet = false
-    @State var isShowingControls = true
+    @State var isShowingControls = false
     
     @State var loadingState: LoadingState = .hidden
     @State var isSaving = false
@@ -67,7 +66,7 @@ struct HomeView: View {
                 isShowingControls: self.$isShowingControls,
                 selectedAnimationInterval: self.$selectedAnimationInterval,
                 selectedAnimationIntensity: self.$selectedAnimationIntensity,
-                selectedBokehIntensity: self.$selectedBokehIntensity,
+                selectedBlurIntensity: self.$selectedBlurIntensity,
                 selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
                 selectedFocalPoint: self.$selectedFocalPoint,
                 onShowPicker: {
@@ -93,8 +92,7 @@ struct HomeView: View {
                             selectedAnimationInterval: self.$selectedAnimationInterval,
                             selectedAnimationIntensity: self.$selectedAnimationIntensity,
                             selectedFocalPoint: self.$selectedFocalPoint,
-                            selectedFocalRange: self.$selectedFocalRange,
-                            selectedBokehIntensity: self.$selectedBokehIntensity,
+                            selectedBlurIntensity: self.$selectedBlurIntensity,
                             selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
                             depthImage: self.$depthImage,
                             isSaving: self.$isSaving
