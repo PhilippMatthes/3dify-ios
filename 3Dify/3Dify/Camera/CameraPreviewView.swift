@@ -12,24 +12,24 @@ import AVFoundation
 struct CameraPreviewView: UIViewRepresentable {
     typealias UIViewType = UIView
     
-    public var captureSession: AVCaptureSession
+    @EnvironmentObject var orchestrator: CameraViewOrchestrator
     
     private let previewLayer = AVCaptureVideoPreviewLayer()
     
     func makeUIView(context: UIViewRepresentableContext<CameraPreviewView>) -> CameraPreviewView.UIViewType {
         let view = UIView()
             
-        previewLayer.session = captureSession
+        previewLayer.session = orchestrator.captureSession
         previewLayer.videoGravity = .resizeAspectFill
         previewLayer.connection?.videoOrientation = .portrait
         previewLayer.frame = view.frame
         
-        view.layer.insertSublayer(previewLayer, at: 0)
+        view.layer.addSublayer(previewLayer)
         
         return view
     }
     
-    func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<CameraPreviewView>) {
-        previewLayer.frame = uiView.frame
+    func updateUIView(_ view: UIView, context: UIViewRepresentableContext<CameraPreviewView>) {
+        previewLayer.frame = view.frame
     }
 }

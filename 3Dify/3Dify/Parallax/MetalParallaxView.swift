@@ -165,7 +165,7 @@ class MetalParallaxView: MTKView {
             
             guard
                 let diffuseData = depthImage.diffuse.pngData(),
-                let depthData = depthImage.trueDepth?.pngData() ?? depthImage.predictedDepth?.pngData()
+                let depthData = depthImage.depth.pngData()
             else {return}
             
             inputDiffuseTexture = try? textureLoader.newTexture(data: diffuseData)
@@ -320,13 +320,13 @@ extension MetalParallaxView {
             )
         case .horizontalSwitch:
             return CGPoint(
-                x: progress < 0.5 ? (4 * progress - 1) : (-4 * progress + 3),
+                x: sin(progress * 2 * .pi),
                 y: 0
             )
         case .verticalSwitch:
             return CGPoint(
                 x: 0,
-                y: progress < 0.5 ? (4 * progress - 1) : (-4 * progress + 3)
+                y: sin(progress * 2 * .pi)
             )
         }
     }

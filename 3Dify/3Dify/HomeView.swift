@@ -37,6 +37,7 @@ struct HomeView: View {
     enum Sheet {
         case picker
         case camera
+        case aiExplanation
     }
     
     @State var selectedAnimationRepeatCount: Int = 5
@@ -48,7 +49,8 @@ struct HomeView: View {
     
     @State var activeSheet: Sheet?
     @State var isShowingSheet = false
-    @State var isShowingControls = true
+    @State var isShowingControls = false
+    @State var isShowingArtificialDepth = false
     
     @State var loadingState: LoadingState = .hidden
     @State var isSaving = false
@@ -63,6 +65,8 @@ struct HomeView: View {
     var body: some View {
         LoadingView(text: self.$loadingText, loadingState: self.$loadingState) {
             ControlView(
+                depthImage: self.$depthImage,
+                isShowingArtificialDepth: self.$isShowingArtificialDepth,
                 isShowingControls: self.$isShowingControls,
                 selectedAnimationInterval: self.$selectedAnimationInterval,
                 selectedAnimationIntensity: self.$selectedAnimationIntensity,
@@ -84,6 +88,10 @@ struct HomeView: View {
                     withAnimation(self.springAnimation) {
                         self.loadingState = .loading
                     }
+                },
+                onShowAIExplanation: {
+                    self.activeSheet = .aiExplanation
+                    self.isShowingSheet = true
                 }
             ) {
                 GeometryReader { geometry in
@@ -143,7 +151,7 @@ struct HomeView: View {
                                     }
                                 }
                                 .foregroundColor(Color.black)
-                                .padding(.horizontal, 48)
+                                .padding(.horizontal, 32)
                                 .buttonStyle(FatButtonStyle())
                                 Button(action: {
                                     self.activeSheet = .picker
@@ -157,7 +165,7 @@ struct HomeView: View {
                                     }
                                 }
                                 .foregroundColor(Color.black)
-                                .padding(.horizontal, 48)
+                                .padding(.horizontal, 32)
                                 .buttonStyle(FatButtonStyle())
                                 Button(action: {
                                     self.activeSheet = .camera
@@ -171,7 +179,7 @@ struct HomeView: View {
                                     }
                                 }
                                 .foregroundColor(Color.white)
-                                .padding(.horizontal, 48)
+                                .padding(.horizontal, 32)
                                 .padding(.bottom, 108)
                                 .buttonStyle(OutlinedFatButtonStyle())
                             }
@@ -192,28 +200,31 @@ struct HomeView: View {
                     self.depthImage = depthImage
                     self.isShowingSheet = false
                     withAnimation {
+                        self.isShowingArtificialDepth = depthImage.isArtificial
                         self.isShowingControls = true
                     }
                 })
-            } else {
+            } else if self.activeSheet == .camera {
                 CameraView().environmentObject(CameraViewOrchestrator() {
                     depthImage in
                     guard let depthImage = depthImage else {return}
                     self.depthImage = depthImage
                     self.isShowingSheet = false
                     withAnimation {
+                        self.isShowingArtificialDepth = depthImage.isArtificial
                         self.isShowingControls = true
                     }
                 })
+            } else {
+                AIDepthExplanationView(depthImage: self.$depthImage)
             }
         }
         .background(Color.black)
-        .edgesIgnoringSafeArea(.vertical)
     }
 }
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView(isShowingControls: false, depthImage: DepthImage(diffuse: UIImage(named: "mango-image")!, trueDepth: UIImage(named: "mango-depth")!))
+        HomeView(isShowingControls: false, depthImage: DepthImage(diffuse: UIImage(named: "mango-image")!, depth: UIImage(named: "mango-depth")!, isArtificial: false))
     }
 }

@@ -41,24 +41,32 @@ extension PHAsset {
                 return
             }
             
-            completion(PHAsset.requestDepthImage(forUrl: url))
+            PHAsset.requestDepthImage(forUrl: url, completion: completion)
         }
     }
     
-    static func requestDepthImage(forUrl url: URL) -> DepthImage? {
+    static func requestDepthImage(forUrl url: URL, completion: @escaping (DepthImage?) -> ()) {
         guard
             let image = UIImage(contentsOfFile: url.path),
             let rotatedImage = image.rotate(radians: 0),
             let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil)
         else {
-            return nil
+            completion(nil)
+            return
         }
         
         
         guard let disparityPixelBuffer = imageSource.getDisparityData()?
             .converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32)
             .depthDataMap else {
-            return DepthImage(diffuse: rotatedImage, trueDepth: nil)
+            rotatedImage.getPredictedDepthAsync() { aiDepth in
+                if let aiDepth = aiDepth {
+                    completion(DepthImage(diffuse: rotatedImage, depth: aiDepth, isArtificial: true))
+                } else {
+                    completion(nil)
+                }
+            }
+            return
         }
         
         disparityPixelBuffer.normalize()
@@ -69,9 +77,16 @@ extension PHAsset {
             let rotatedDepthImage = UIImage(cgImage: depthCGImage, scale: 1.0, orientation: image.imageOrientation)
                 .rotate(radians: 0)
         else {
-            return DepthImage(diffuse: rotatedImage, trueDepth: nil)
+            rotatedImage.getPredictedDepthAsync() { aiDepth in
+                if let aiDepth = aiDepth {
+                    completion(DepthImage(diffuse: rotatedImage, depth: aiDepth, isArtificial: true))
+                } else {
+                    completion(nil)
+                }
+            }
+            return
         }
         
-        return DepthImage(diffuse: rotatedImage, trueDepth: rotatedDepthImage)
+        completion(DepthImage(diffuse: rotatedImage, depth: rotatedDepthImage, isArtificial: false))
     }
 }

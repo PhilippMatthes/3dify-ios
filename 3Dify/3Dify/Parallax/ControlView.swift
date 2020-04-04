@@ -14,7 +14,6 @@ struct ControlViewDivider: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 1)
         .frame(height: 1)
-        .padding(.vertical, 12)
         .foregroundColor(Color.gray.opacity(0.1))
     }
 }
@@ -22,6 +21,8 @@ struct ControlViewDivider: View {
 
 
 struct ControlView<Content: View>: View {
+    @Binding var depthImage: DepthImage
+    @Binding var isShowingArtificialDepth: Bool
     @Binding var isShowingControls: Bool
     @Binding var selectedAnimationInterval: TimeInterval
     @Binding var selectedAnimationIntensity: Float
@@ -29,12 +30,12 @@ struct ControlView<Content: View>: View {
     @Binding var selectedAnimationTypeRawValue: Int
     @Binding var selectedFocalPoint: Float
     
-    @State var hourglassAngle: Double = 0.0
     @State var isShowingSettings = false
     
     var onShowPicker: () -> Void
     var onShowCamera: () -> Void
     var onSaveVideo: () -> Void
+    var onShowAIExplanation: () -> Void
     
     var springAnimation: Animation {
         .interpolatingSpring(stiffness: 300.0, damping: 20.0, initialVelocity: 10.0)
@@ -43,157 +44,187 @@ struct ControlView<Content: View>: View {
     var content: () -> Content
     
     var body: some View {
-        VStack(spacing: 0) {
-            if self.isShowingControls {
-                HStack {
-                    Button(action: self.onShowPicker) {
-                        Image(systemName: "cube.box.fill")
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                if self.isShowingControls {
+                    VStack {
+                        HStack {
+                            Button(action: self.onShowPicker) {
+                                Image(systemName: "cube.box.fill")
+                            }
+                            Spacer()
+                            Button(action: self.onShowCamera) {
+                                Image(systemName: "camera.fill")
+                            }
+                            Spacer()
+                            Button(action: {
+                                withAnimation {
+                                    self.isShowingSettings.toggle()
+                                }
+                            }) {
+                                Image(systemName: "slider.horizontal.3")
+                                    .foregroundColor(self.isShowingSettings ? Color.yellow : Color.white)
+                            }
+                        }
                     }
-                    Spacer()
-                    Button(action: self.onShowCamera) {
-                        Image(systemName: "camera.fill")
-                    }
-                    Spacer()
-                    Button(action: {
-                        withAnimation {
-                            self.isShowingSettings.toggle()
-                        }
-                    }) {
-                        Image(systemName: "slider.horizontal.3")
-                            .foregroundColor(self.isShowingSettings ? Color.yellow : Color.white)
-                    }
-                }
-                .padding(24)
-                .padding(.top, 48)
-                .background(Color.black)
-                .foregroundColor(Color.white)
-                .transition(.opacity)
-            }
-            
-            ZStack(alignment: .top) {
-                self.content()
-                    .padding(.top, self.isShowingSettings ? UIScreen.main.bounds.height / 2 : 0)
-                
-                if isShowingSettings {
-                    ScrollView(showsIndicators: false) {
-                        ControlViewDivider()
-                        
-                        ZStack(alignment: .bottom) {
-                            Slider(value: self.$selectedAnimationInterval, in: 0.5...10)
-                            .padding(.bottom, 24)
-                            HStack {
-                                Text("0.5s").font(.footnote)
-                                Spacer()
-                                Text("5s").font(.footnote)
-                            }
-                            Text("Animation Interval").font(.footnote)
-                        }
-                        .padding(.horizontal, 24)
-                        
-                        ControlViewDivider()
-                        
-                        ZStack(alignment: .bottom) {
-                            Slider(value: self.$selectedAnimationIntensity, in: 0...0.1)
-                            .padding(.bottom, 24)
-                            HStack {
-                                Text("Weak").font(.footnote)
-                                Spacer()
-                                Text("Strong").font(.footnote)
-                            }
-                            Text("Animation Intensity").font(.footnote)
-                        }
-                        .padding(.horizontal, 24)
-                        
-                        ControlViewDivider()
-                        
-                        ZStack(alignment: .bottom) {
-                            Slider(value: self.$selectedFocalPoint, in: 0...1)
-                            .padding(.bottom, 24)
-                            HStack {
-                                Text("Far").font(.footnote)
-                                Spacer()
-                                Text("Near").font(.footnote)
-                            }
-                            Text("Focal Point").font(.footnote)
-                        }
-                        .padding(.horizontal, 24)
-                        
-                        ControlViewDivider()
-                        
-                        ZStack(alignment: .bottom) {
-                            Slider(value: self.$selectedBlurIntensity, in: 0...3)
-                            .padding(.bottom, 24)
-                            HStack {
-                                Text("None").font(.footnote)
-                                Spacer()
-                                Text("Strong").font(.footnote)
-                            }
-                            Text("Blur Intensity").font(.footnote)
-                        }
-                        .padding(.horizontal, 24)
-                        
-                        ControlViewDivider()
-                        
-                        Picker(selection: self.$selectedAnimationTypeRawValue, label: Text("Animation")) {
-                            ForEach(ImageParallaxAnimationType.all, id: \.rawValue) {animationType in
-                                Text(animationType.description)
-                                .tag(animationType.rawValue)
-                            }
-                        }
-                        .pickerStyle(SegmentedPickerStyle())
-                        .padding(2)
-                        .background(Color.yellow)
-                        .cornerRadius(8)
-                        .padding(.horizontal, 24)
-                        .padding(.bottom, 24)
-                    }
-                    .background(Color(hex: "#222"))
+                    .padding(.top, geometry.safeAreaInsets.top + 12)
+                    .padding(.bottom, 24)
+                    .padding(.horizontal, 24)
+                    .background(Color.black)
                     .foregroundColor(Color.white)
-                    .accentColor(Color.yellow)
-                    .frame(height: self.isShowingControls ? UIScreen.main.bounds.height / 2 : 0)
+                    .transition(.opacity)
                 }
-            }
-            
-            if self.isShowingControls && !self.isShowingSettings {
-                HStack {
-                    Spacer()
-                    Button(action: self.onSaveVideo) {
-                        Image(systemName: "film")
-                            .foregroundColor(Color.black)
+                
+                ZStack(alignment: .top) {
+                    
+                    self.content()
+                        .padding(.top, self.isShowingSettings ? (UIScreen.main.bounds.height / 2)  - geometry.safeAreaInsets.top - geometry.safeAreaInsets.bottom : 0)
+                    
+                    if self.isShowingArtificialDepth {
+                        Button(action: self.onShowAIExplanation) {
+                            HStack {
+                                Image(systemName: "wand.and.rays")
+                                    .resizable()
+                                    .frame(width: 12, height: 12)
+                                Text("Artificial Depth")
+                                    .font(.footnote)
+                            }
+                            .foregroundColor(Color.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 4)
+                            .background(Capsule().fill(Color.yellow))
+                            .padding(.vertical, 8)
+                        }
                     }
-                    .buttonStyle(CameraButtonStyle())
-                    Spacer()
+                    
+                    if self.isShowingSettings {
+                        ScrollView(showsIndicators: false) {
+                            ControlViewDivider()
+                            
+                            ZStack(alignment: .bottom) {
+                                Slider(value: self.$selectedAnimationInterval, in: 0.5...10)
+                                .padding(.bottom, 24)
+                                HStack {
+                                    Text("0.5s").font(.footnote)
+                                    Spacer()
+                                    Text("5s").font(.footnote)
+                                }
+                                Text("Animation Interval").font(.footnote)
+                            }
+                            .padding(.horizontal, 24)
+                            
+                            ControlViewDivider()
+                            
+                            ZStack(alignment: .bottom) {
+                                Slider(value: self.$selectedAnimationIntensity, in: 0...0.1)
+                                .padding(.bottom, 24)
+                                HStack {
+                                    Text("Weak").font(.footnote)
+                                    Spacer()
+                                    Text("Strong").font(.footnote)
+                                }
+                                Text("Animation Intensity").font(.footnote)
+                            }
+                            .padding(.horizontal, 24)
+                            
+                            ControlViewDivider()
+                            
+                            ZStack(alignment: .bottom) {
+                                Slider(value: self.$selectedFocalPoint, in: 0...1)
+                                .padding(.bottom, 24)
+                                HStack {
+                                    Text("Far").font(.footnote)
+                                    Spacer()
+                                    Text("Near").font(.footnote)
+                                }
+                                Text("Focal Point").font(.footnote)
+                            }
+                            .padding(.horizontal, 24)
+                            
+                            ControlViewDivider()
+                            
+                            ZStack(alignment: .bottom) {
+                                Slider(value: self.$selectedBlurIntensity, in: 0...3)
+                                .padding(.bottom, 24)
+                                HStack {
+                                    Text("None").font(.footnote)
+                                    Spacer()
+                                    Text("Strong").font(.footnote)
+                                }
+                                Text("Blur Intensity").font(.footnote)
+                            }
+                            .padding(.horizontal, 24)
+                            
+                            ControlViewDivider()
+                            
+                            Picker(selection: self.$selectedAnimationTypeRawValue, label: Text("Animation")) {
+                                ForEach(ImageParallaxAnimationType.all, id: \.rawValue) {animationType in
+                                    Text(animationType.description)
+                                    .tag(animationType.rawValue)
+                                }
+                            }
+                            .pickerStyle(SegmentedPickerStyle())
+                            .padding(2)
+                            .background(Color.yellow)
+                            .cornerRadius(8)
+                            .padding(.horizontal, 24)
+                            .padding(.bottom, 24)
+                        }
+                        .background(Color(hex: "#222"))
+                        .foregroundColor(Color.white)
+                        .accentColor(Color.yellow)
+                        .frame(height: self.isShowingControls ? (UIScreen.main.bounds.height / 2) : 0)
+                    }
                 }
-                .padding(.bottom, 64)
-                .padding(.top, 32)
-                .padding(12)
-                .background(Color.black)
-                .accentColor(Color.yellow)
-                .foregroundColor(Color.white)
-                .transition(.move(edge: .bottom))
+                
+                if self.isShowingControls && !self.isShowingSettings {
+                    HStack {
+                        Spacer()
+                        Button(action: self.onSaveVideo) {
+                            Image(systemName: "film")
+                                .foregroundColor(Color.black)
+                        }
+                        .buttonStyle(CameraButtonStyle())
+                        Spacer()
+                    }
+                    .padding(.bottom, 32 + geometry.safeAreaInsets.bottom)
+                    .padding(.top, 32)
+                    .padding(12)
+                    .background(Color.black)
+                    .accentColor(Color.yellow)
+                    .foregroundColor(Color.white)
+                    .transition(.move(edge: .bottom))
+                }
             }
         }
+        .edgesIgnoringSafeArea(.vertical)
     }
 }
 
 struct ControlView_Previews: PreviewProvider {
     static var previews: some View {
-        ControlView(isShowingControls: .constant(true),
+        ControlView(depthImage: .constant(DepthImage(diffuse: UIImage(named: "mango-image")!, depth: UIImage(named: "mango-depth")!, isArtificial: false)),
+                    isShowingArtificialDepth: .constant(true),
+                    isShowingControls: .constant(true),
                     selectedAnimationInterval: .constant(2),
                     selectedAnimationIntensity: .constant(0.05),
                     selectedBlurIntensity: .constant(5),
                     selectedAnimationTypeRawValue: .constant(0),
                     selectedFocalPoint: .constant(0),
-                    isShowingSettings: true,
+                    isShowingSettings: false,
                     onShowPicker: {},
                     onShowCamera: {},
-                    onSaveVideo: {}) {
+                    onSaveVideo: {},
+                    onShowAIExplanation: {}
+        ) {
             VStack {
                 HStack {
                     Spacer()
                 }
                 Spacer()
-            }.background(Color.yellow)
-        }.edgesIgnoringSafeArea(.vertical)
+            }
+            .background(Color.yellow)
+        }
+        .previewDevice(.init(rawValue: "iPhone SE"))
     }
 }

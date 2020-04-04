@@ -31,6 +31,7 @@
 		BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A11A242A7C7300019FE1 /* DepthImage.swift */; };
 		BE8535262430F15600557392 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8535252430F15600557392 /* ControlView.swift */; };
 		BE8B3FDB242FE86E0075F6EA /* CameraRollVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8B3FDA242FE86E0075F6EA /* CameraRollVideo.swift */; };
+		BE96188F2438902A00CDD442 /* AIDepthExplanationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE96188E2438902A00CDD442 /* AIDepthExplanationView.swift */; };
 		BEABE6E9242CD4860071C556 /* DepthToColorMap.metal in Sources */ = {isa = PBXBuildFile; fileRef = BEABE6E6242CD4830071C556 /* DepthToColorMap.metal */; };
 		BEABE6EA242CD4860071C556 /* DepthToColorMapConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEABE6E7242CD4840071C556 /* DepthToColorMapConverter.swift */; };
 		BEABE6EB242CD4860071C556 /* FilterRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEABE6E8242CD4860071C556 /* FilterRenderer.swift */; };
@@ -75,6 +76,7 @@
 		BE31A11A242A7C7300019FE1 /* DepthImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthImage.swift; sourceTree = "<group>"; };
 		BE8535252430F15600557392 /* ControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlView.swift; sourceTree = "<group>"; };
 		BE8B3FDA242FE86E0075F6EA /* CameraRollVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraRollVideo.swift; sourceTree = "<group>"; };
+		BE96188E2438902A00CDD442 /* AIDepthExplanationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIDepthExplanationView.swift; sourceTree = "<group>"; };
 		BEABE6E6242CD4830071C556 /* DepthToColorMap.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = DepthToColorMap.metal; sourceTree = "<group>"; };
 		BEABE6E7242CD4840071C556 /* DepthToColorMapConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DepthToColorMapConverter.swift; sourceTree = "<group>"; };
 		BEABE6E8242CD4860071C556 /* FilterRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterRenderer.swift; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 				BE31A11F242A815000019FE1 /* Picker */,
 				BE31A11D242A7F7100019FE1 /* Camera */,
 				BE31A11E242A7F7C00019FE1 /* Parallax */,
+				BE96188D2438900900CDD442 /* Explanation */,
 				BE1C24F82426150900276024 /* AppDelegate.swift */,
 				BEFDCA33242B5CBB002AF520 /* Gradients.swift */,
 				BE1C24FC2426150900276024 /* HomeView.swift */,
@@ -249,6 +252,14 @@
 				BEBF3343242FA8D9008EEDAD /* Color+Tools.swift */,
 			);
 			path = "Supporting Extensions";
+			sourceTree = "<group>";
+		};
+		BE96188D2438900900CDD442 /* Explanation */ = {
+			isa = PBXGroup;
+			children = (
+				BE96188E2438902A00CDD442 /* AIDepthExplanationView.swift */,
+			);
+			path = Explanation;
 			sourceTree = "<group>";
 		};
 		BECDE3B12434805B00939DBA /* Encoders */ = {
@@ -401,6 +412,7 @@
 				BE2688AC242B5B8700F165C5 /* CGImageSource+Utils.swift in Sources */,
 				BE1C24FB2426150900276024 /* SceneDelegate.swift in Sources */,
 				BE124EC32435D9D70004A66E /* BlurPassEncoder.m in Sources */,
+				BE96188F2438902A00CDD442 /* AIDepthExplanationView.swift in Sources */,
 				BEBF3342242F9B09008EEDAD /* CameraPreviewView.swift in Sources */,
 				BE124EC62435DE6C0004A66E /* Blur.metal in Sources */,
 				BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */,
