@@ -16,6 +16,8 @@ constant float offset[] = { 0.0, 1.0, 2.0, 3.0, 4.0 };
 constant float weight[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
 constant float bufferSize = 512.0;
 
+constexpr sampler s = sampler(coord::normalized, r_address::clamp_to_edge, t_address::repeat, filter::linear);
+
 struct BlurPassOutput {
     float4 blurred [[color(0)]];
 };
@@ -34,8 +36,6 @@ float4 blur_fragment(bool isVertical,
                      texture2d<float, access::sample> diffuse,
                      texture2d<float, access::sample> depth)
 {
-    constexpr sampler s = sampler(coord::normalized, r_address::clamp_to_edge, t_address::repeat, filter::linear);
-    
     float4 color = diffuse.sample(s, uv) * weight[0];
     float depthIntensity = abs(depth.sample(s, uv).r - focalPoint) * intensity;
     
@@ -61,12 +61,16 @@ fragment BlurPassOutput blur(
 ) {
     
     BlurPassOutput output;
-    output.blurred = blur_fragment(uniforms->isVertical,
-                                   vert.uv,
-                                   uniforms->blurIntensity,
-                                   uniforms->focalPoint,
-                                   diffuseTexture,
-                                   depthTexture);
+    if (uniforms->blurIntensity == 0) {
+        output.blurred = diffuseTexture.sample(s, vert.uv);
+    } else {
+        output.blurred = blur_fragment(uniforms->isVertical,
+                                       vert.uv,
+                                       uniforms->blurIntensity,
+                                       uniforms->focalPoint,
+                                       diffuseTexture,
+                                       depthTexture);
+    }
     return output;
 }
 

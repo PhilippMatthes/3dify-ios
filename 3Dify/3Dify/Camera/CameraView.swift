@@ -89,7 +89,7 @@ class CameraViewOrchestrator: NSObject, ObservableObject, AVCapturePhotoCaptureD
                     guard let cameraDevice = AVCaptureDevice.default(
                         deviceType,
                         for: .video,
-                        position: .back
+                        position: .front
                     ) else {continue}
                     return cameraDevice
                 }
