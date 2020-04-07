@@ -13,9 +13,9 @@ import Photos
 
 
 class ImagePickerViewOrchestrator: NSObject, ObservableObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    public let onCapture: (DepthImage?) -> ()
+    public let onCapture: (DepthImageConvertible?) -> ()
     
-    init(onCapture: @escaping (DepthImage?) -> ()) {
+    init(onCapture: @escaping (DepthImageConvertible?) -> ()) {
         self.onCapture = onCapture
     }
     
@@ -25,10 +25,7 @@ class ImagePickerViewOrchestrator: NSObject, ObservableObject, UIImagePickerCont
             return
         }
         
-        asset.requestDepthImage() {
-            depthImage in
-            self.onCapture(depthImage)
-        }
+        onCapture(asset)
     }
 }
 
@@ -38,15 +35,25 @@ struct ImagePickerView: UIViewControllerRepresentable {
     @Environment(\.presentationMode) var presentationMode
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePickerView>) -> UIViewController {
-        let status = PHPhotoLibrary.authorizationStatus()
-        if status != .authorized {
-            PHPhotoLibrary.requestAuthorization() {status in}
-        }
-        
         let picker = UIImagePickerController()
         picker.sourceType = .photoLibrary
         picker.allowsEditing = false
         picker.delegate = orchestrator
+        
+        let status = PHPhotoLibrary.authorizationStatus()
+        if status != .authorized {
+            PHPhotoLibrary.requestAuthorization() {status in
+                if status != .authorized {
+                    let alertController = UIAlertController(title: "Photo library access denied.", message: "Please enable photo library access in the device settings.", preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+                        picker.dismiss(animated: true)
+                    })
+                    DispatchQueue.main.async {
+                        picker.present(alertController, animated: true)
+                    }
+                }
+            }
+        }
         return picker
     }
 

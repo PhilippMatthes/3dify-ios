@@ -10,34 +10,12 @@ import SwiftUI
 import AVFoundation
 
 
-struct FatButtonStyle: ButtonStyle {
-    func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 24)
-                .fill(Color.white.opacity(configuration.isPressed ? 0.5 : 0.9))
-        )
-        .animation(.interpolatingSpring(stiffness: 300.0, damping: 20.0, initialVelocity: 10.0))
-    }
-}
-
-struct OutlinedFatButtonStyle: ButtonStyle {
-    func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-        .padding(14)
-        .overlay(RoundedRectangle(cornerRadius: 24)
-        .stroke(Color.white.opacity(configuration.isPressed ? 0.5 : 0.9), lineWidth: 2))
-        .animation(.interpolatingSpring(stiffness: 300.0, damping: 20.0, initialVelocity: 10.0))
-    }
-}
-
-
 struct HomeView: View {
     enum Sheet {
         case picker
         case camera
         case aiExplanation
+        case inAppPurchase
     }
     
     @State var selectedAnimationRepeatCount: Int = 5
@@ -49,8 +27,13 @@ struct HomeView: View {
     
     @State var activeSheet: Sheet?
     @State var isShowingSheet = false
+    @State var alertTitle: String = "There was an unexpected error."
+    @State var alertMessage: String = "Please try again later."
+    @State var willShowAlert = false
+    @State var isShowingAlert = false
     @State var isShowingControls = false
     @State var isShowingArtificialDepth = false
+    @State var shouldShowWatermark = !InAppPurchaseOrchestrator.isProductUnlocked
     
     @State var loadingState: LoadingState = .hidden
     @State var isSaving = false
@@ -60,6 +43,32 @@ struct HomeView: View {
     
     var springAnimation: Animation {
         .interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0)
+    }
+    
+    func handleReceive(of depthImageConvertible: DepthImageConvertible) {
+        self.isShowingSheet = false
+        self.loadingText = "Loading Photo..."
+        self.loadingState = .loading
+        DispatchQueue(label: "Fetch Image Queue").async {
+            depthImageConvertible.toDepthImage() { depthImage in
+                self.loadingState = .hidden
+                guard let depthImage = depthImage else {
+                    self.loadingText = "Error. Please try again"
+                    self.loadingState = .failed
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        withAnimation(self.springAnimation) {
+                            self.loadingState = .hidden
+                        }
+                    }
+                    return
+                }
+                self.depthImage = depthImage
+                withAnimation {
+                    self.isShowingArtificialDepth = depthImage.isArtificial
+                    self.isShowingControls = true
+                }
+            }
+        }
     }
     
     var body: some View {
@@ -97,6 +106,7 @@ struct HomeView: View {
                 GeometryReader { geometry in
                     ZStack {
                         MetalParallaxViewBestFitContainer(
+                            shouldShowWatermark: self.$shouldShowWatermark,
                             selectedAnimationInterval: self.$selectedAnimationInterval,
                             selectedAnimationIntensity: self.$selectedAnimationIntensity,
                             selectedFocalPoint: self.$selectedFocalPoint,
@@ -109,10 +119,10 @@ struct HomeView: View {
                             switch saveState {
                             case .failed:
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                self.loadingText = "Error"
+                                self.loadingText = "Error. Please try again"
                                 self.loadingState = .failed
                                 self.isSaving = false
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                     withAnimation(self.springAnimation) {
                                         self.loadingState = .hidden
                                     }
@@ -140,19 +150,22 @@ struct HomeView: View {
                                 Text("3Dify")
                                     .font(.system(size: 100))
                                     .foregroundColor(Color.white)
-                                Button(action: {
-                                    print("Remove watermark")
-                                }) {
-                                    HStack {
-                                        Spacer()
-                                        Image(systemName: "eye.slash.fill")
-                                        Text("Remove watermark")
-                                        Spacer()
+                                if self.shouldShowWatermark {
+                                    Button(action: {
+                                        self.activeSheet = .inAppPurchase
+                                        self.isShowingSheet = true
+                                    }) {
+                                        HStack {
+                                            Spacer()
+                                            Image(systemName: "eye.slash.fill")
+                                            Text("Remove watermark")
+                                            Spacer()
+                                        }
                                     }
+                                    .foregroundColor(Color.black)
+                                    .padding(.horizontal, 32)
+                                    .buttonStyle(FatButtonStyle())
                                 }
-                                .foregroundColor(Color.black)
-                                .padding(.horizontal, 32)
-                                .buttonStyle(FatButtonStyle())
                                 Button(action: {
                                     self.activeSheet = .picker
                                     self.isShowingSheet = true
@@ -192,34 +205,54 @@ struct HomeView: View {
                 }
             }
         }
-        .sheet(isPresented: self.$isShowingSheet) {
+        .sheet(isPresented: self.$isShowingSheet, onDismiss: {
+            if self.willShowAlert {
+                self.isShowingAlert = true
+            }
+        }) {
             if self.activeSheet == .picker {
                 ImagePickerView().environmentObject(ImagePickerViewOrchestrator() {
-                    depthImage in
-                    guard let depthImage = depthImage else {return}
-                    self.depthImage = depthImage
-                    self.isShowingSheet = false
-                    withAnimation {
-                        self.isShowingArtificialDepth = depthImage.isArtificial
-                        self.isShowingControls = true
-                    }
+                    depthImageConvertible in
+                    guard let depthImageConvertible = depthImageConvertible else {return}
+                    self.handleReceive(of: depthImageConvertible)
                 })
             } else if self.activeSheet == .camera {
                 CameraView().environmentObject(CameraViewOrchestrator() {
-                    depthImage in
-                    guard let depthImage = depthImage else {return}
-                    self.depthImage = depthImage
-                    self.isShowingSheet = false
-                    withAnimation {
-                        self.isShowingArtificialDepth = depthImage.isArtificial
-                        self.isShowingControls = true
-                    }
+                    depthImageConvertible in
+                    guard let depthImageConvertible = depthImageConvertible else {return}
+                    self.handleReceive(of: depthImageConvertible)
                 })
-            } else {
+            } else if self.activeSheet == .aiExplanation {
                 AIDepthExplanationView(depthImage: self.$depthImage)
+            } else {
+                InAppPurchaseView().environmentObject(InAppPurchaseOrchestrator(onUnlocked: {
+                    self.shouldShowWatermark = false
+                    self.willShowAlert = true
+                    self.isShowingSheet = false
+                    self.alertTitle = "Watermark removed!"
+                    self.alertMessage = "Thank you!"
+                }, onFailed: { error in
+                    self.willShowAlert = true
+                    self.isShowingSheet = false
+                    switch error {
+                    case .loadProductFailed:
+                        self.alertTitle = "There was an error loading the corresponding product."
+                        self.alertMessage = "Please try again later!"
+                    case .transactionFailed:
+                        self.alertTitle = "Your Purchase was canceled."
+                        self.alertMessage = "It seems like you canceled the purchase or we were not able to complete your purchase. Please try again later!"
+                    case .unknown:
+                        self.alertTitle = "An unexpected error occurred."
+                        self.alertMessage = "Please try again later."
+                    }
+                }))
             }
         }
-        .background(Color.black)
+        .alert(isPresented: self.$isShowingAlert) {
+            Alert(title: Text(self.alertTitle), message: Text(self.alertMessage), dismissButton: .default(Text("OK")) {
+                self.willShowAlert = false
+            })
+        }
     }
 }
 

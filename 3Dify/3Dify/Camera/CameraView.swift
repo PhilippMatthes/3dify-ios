@@ -34,6 +34,7 @@ struct CameraButtonStyle: ButtonStyle {
 enum CameraCaptureFailure {
     case cameraNotFound
     case captureSetupFailed
+    case accessDenied
 }
 
 
@@ -45,7 +46,7 @@ enum DepthCameraPriority {
 
 
 class CameraViewOrchestrator: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
-    public let onCapture: (DepthImage?) -> ()
+    public let onCapture: (DepthImageConvertible?) -> ()
         
     public let captureSession: AVCaptureSession
     
@@ -53,7 +54,7 @@ class CameraViewOrchestrator: NSObject, ObservableObject, AVCapturePhotoCaptureD
     private var cameraInput: AVCaptureDeviceInput?
     private var cameraOutput: AVCapturePhotoOutput?
 
-    init(onCapture: @escaping (DepthImage?) -> ()) {
+    init(onCapture: @escaping (DepthImageConvertible?) -> ()) {
         self.onCapture = onCapture
         self.captureSession = AVCaptureSession()
         super.init()
@@ -103,11 +104,35 @@ class CameraViewOrchestrator: NSObject, ObservableObject, AVCapturePhotoCaptureD
         useDepthCamera: Bool,
         completion: @escaping (CameraCaptureFailure?) -> ()
     ) {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            self.setupCaptureSession(useFrontFacingCamera: useFrontFacingCamera, useDepthCamera: useDepthCamera, completion: completion)
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                if granted {
+                    self.setupCaptureSession(useFrontFacingCamera: useFrontFacingCamera, useDepthCamera: useDepthCamera, completion: completion)
+                } else {
+                    completion(.accessDenied)
+                }
+            }
+        case .denied:
+            completion(.accessDenied)
+        default:
+            // Try anyways
+            self.setupCaptureSession(useFrontFacingCamera: useFrontFacingCamera, useDepthCamera: useDepthCamera, completion: completion)
+        }
+    }
+    
+    internal func setupCaptureSession(
+        useFrontFacingCamera: Bool,
+        useDepthCamera: Bool,
+        completion: @escaping (CameraCaptureFailure?) -> ()
+    ) {
         captureSession.beginConfiguration()
         captureSession.sessionPreset = .photo
-        
+
         let devicePosition: AVCaptureDevice.Position = useFrontFacingCamera ? .front : .back
-        
+
         guard
             let cameraDevice = getDevice(
                 withPosition: devicePosition,
@@ -119,7 +144,7 @@ class CameraViewOrchestrator: NSObject, ObservableObject, AVCapturePhotoCaptureD
             return
         }
         self.cameraDevice = cameraDevice
-        
+
         guard
             let cameraInput = try? AVCaptureDeviceInput(device: cameraDevice)
         else {
@@ -127,13 +152,13 @@ class CameraViewOrchestrator: NSObject, ObservableObject, AVCapturePhotoCaptureD
             completion(.captureSetupFailed)
             return
         }
-        
+
         if let oldCameraInput = self.cameraInput {
             captureSession.removeInput(oldCameraInput)
         }
-        
+
         self.cameraInput = cameraInput
-        
+
         guard
             captureSession.canAddInput(cameraInput)
         else {
@@ -142,21 +167,21 @@ class CameraViewOrchestrator: NSObject, ObservableObject, AVCapturePhotoCaptureD
             return
         }
         captureSession.addInput(cameraInput)
-        
+
         if let oldCameraOutput = self.cameraOutput {
             captureSession.removeOutput(oldCameraOutput)
         }
-        
+
         let cameraOutput = AVCapturePhotoOutput()
-        
+
         guard captureSession.canAddOutput(cameraOutput) else {
             captureSession.commitConfiguration()
             completion(.captureSetupFailed)
             return
         }
-        
+
         captureSession.addOutput(cameraOutput)
-        
+
         if useDepthCamera && !cameraOutput.isDepthDataDeliverySupported {
             captureSession.commitConfiguration()
             completion(.cameraNotFound)
@@ -165,7 +190,7 @@ class CameraViewOrchestrator: NSObject, ObservableObject, AVCapturePhotoCaptureD
 
         cameraOutput.isDepthDataDeliveryEnabled = cameraOutput.isDepthDataDeliverySupported
         self.cameraOutput = cameraOutput
-        
+
         captureSession.commitConfiguration()
         captureSession.startRunning()
         completion(nil)
@@ -213,9 +238,7 @@ class CameraViewOrchestrator: NSObject, ObservableObject, AVCapturePhotoCaptureD
             
             onCapture(depthImage)
         } else {
-            guard let depth = image.getPredictedDepth() else {return}
-            let depthImage = DepthImage(diffuse: rotatedImage, depth: depth, isArtificial: true)
-            onCapture(depthImage)
+            onCapture(rotatedImage)
         }
     }
 }
@@ -223,12 +246,44 @@ class CameraViewOrchestrator: NSObject, ObservableObject, AVCapturePhotoCaptureD
 
 
 struct CameraView: View {
-    @GestureState private var cameraButtonIsPressed = false
-    
+    @Environment(\.presentationMode) var presentationMode
+        
     @State private var isCapturingDepth = true
     @State private var isUsingFrontfacingCamera = false
     
+    @State var isShowingAlert = false
+    @State var alertTitle = "An unexpected Error occurred."
+    @State var alertMessage = "Please try again later."
+    @State var alertShouldDismissSheet = false
+    
     @EnvironmentObject var orchestrator: CameraViewOrchestrator
+    
+    func handle(failure: CameraCaptureFailure) {
+        let shouldCaptureDepthAfterwards = !isCapturingDepth
+        switch failure {
+        case .cameraNotFound:
+            if shouldCaptureDepthAfterwards && self.isUsingFrontfacingCamera {
+                self.alertTitle = "No front facing depth camera available."
+            } else if shouldCaptureDepthAfterwards && !self.isUsingFrontfacingCamera {
+                self.alertTitle = "No back facing depth camera available."
+            } else if self.isUsingFrontfacingCamera {
+                self.alertTitle = "No front facing camera available."
+            } else {
+                self.alertTitle = "No back facing camera available."
+            }
+            self.alertMessage = "Please check your device settings and try again later."
+            self.alertShouldDismissSheet = false
+        case .captureSetupFailed:
+            self.alertTitle = "Capture could not be started."
+            self.alertMessage = "Please check your device settings and try again later."
+            self.alertShouldDismissSheet = true
+        case .accessDenied:
+            self.alertTitle = "Camera access denied."
+            self.alertMessage = "Please enable camera access in the device settings."
+            self.alertShouldDismissSheet = true
+        }
+        self.isShowingAlert = true
+    }
 
     var body: some View {
         ZStack {
@@ -249,8 +304,7 @@ struct CameraView: View {
                             useDepthCamera: !isCapturingDepth
                         ) { (failure) in
                             if let failure = failure {
-                                // Notify user of error
-                                print(failure)
+                                self.handle(failure: failure)
                             } else {
                                 // Successfully switched depth preference
                                 self.isCapturingDepth = !isCapturingDepth
@@ -258,7 +312,7 @@ struct CameraView: View {
                         }
                     }) {
                         Image(systemName: "rectangle.stack.person.crop.fill")
-//                        .foregroundColor(self.isCapturingDepth ? .yellow : .white)
+                        //.foregroundColor(self.isCapturingDepth ? .yellow : .white)
                     }
                     Spacer()
                     Button(action: {
@@ -278,8 +332,7 @@ struct CameraView: View {
                             useDepthCamera: self.isCapturingDepth
                         ) { (failure) in
                             if let failure = failure {
-                                // Notify user of error
-                                print(failure)
+                                self.handle(failure: failure)
                             } else {
                                 // Successfully switched camera
                                 self.isUsingFrontfacingCamera = !isUsingFrontfacingCamera
@@ -287,13 +340,25 @@ struct CameraView: View {
                         }
                     }) {
                         Image(systemName: "camera.rotate.fill")
-//                        .foregroundColor(self.isCapturingDepth ? .yellow : .white)
+                        //.foregroundColor(self.isCapturingDepth ? .yellow : .white)
                     }
                 }
                 .padding(24)
                 .foregroundColor(Color.white)
             }
-        }.onAppear() {
+        }
+        .alert(isPresented: self.$isShowingAlert) {
+            Alert(
+                title: Text(self.alertTitle),
+                message: Text(self.alertMessage),
+                dismissButton: .default(Text("OK")) {
+                    if self.alertShouldDismissSheet {
+                        self.presentationMode.wrappedValue.dismiss()
+                    }
+                }
+            )
+        }
+        .onAppear() {
             self.orchestrator.startCapturing(
                 useFrontFacingCamera: false,
                 useDepthCamera: true
@@ -310,7 +375,7 @@ struct CameraView: View {
                             ) { failure in
                                 if let failure = failure {
                                     // Unexpected error
-                                    print(failure)
+                                    self.handle(failure: failure)
                                 } else {
                                     // Successfully chose non depth front facing camera
                                     self.isCapturingDepth = false

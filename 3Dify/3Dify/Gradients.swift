@@ -34,5 +34,9 @@ class Gradients {
     static let royal = Gradient(colors: [
         Color(hex: "#141E30"), Color(hex: "#243B55")
     ])
+    
+    static let lush = Gradient(colors: [
+        Color(hex: "#56ab2f"), Color(hex: "#a8e063")
+    ])
 }
 

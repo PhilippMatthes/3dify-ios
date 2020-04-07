@@ -21,9 +21,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Gib daten</string>
+	<string>Allow camera access to shoot photos with 3Dify.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Gib bilder</string>
+	<string>Allow photo library access to pick photos with 3Dify.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

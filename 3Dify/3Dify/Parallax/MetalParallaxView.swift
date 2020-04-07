@@ -42,6 +42,7 @@ internal extension View {
 
 
 struct MetalParallaxViewBestFitContainer: View {
+    @Binding var shouldShowWatermark: Bool
     @Binding var selectedAnimationInterval: TimeInterval
     @Binding var selectedAnimationIntensity: Float
     @Binding var selectedFocalPoint: Float
@@ -83,6 +84,7 @@ struct MetalParallaxViewBestFitContainer: View {
         GeometryReader { outerGeometry in
             GeometryReader { innerGeometry in
                 MetalParallaxViewRepresentable(
+                    shouldShowWatermark: self.$shouldShowWatermark,
                     selectedAnimationInterval: self.$selectedAnimationInterval,
                     selectedAnimationIntensity: self.$selectedAnimationIntensity,
                     selectedFocalPoint: self.$selectedFocalPoint,
@@ -101,6 +103,7 @@ struct MetalParallaxViewBestFitContainer: View {
 
 
 struct MetalParallaxViewRepresentable: UIViewRepresentable {
+    @Binding var shouldShowWatermark: Bool
     @Binding var selectedAnimationInterval: TimeInterval
     @Binding var selectedAnimationIntensity: Float
     @Binding var selectedFocalPoint: Float
@@ -113,7 +116,7 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
     var onSaveVideoUpdate: (SaveState) -> ()
     
     func makeUIView(context: UIViewRepresentableContext<MetalParallaxViewRepresentable>) -> MetalParallaxView {
-        let view = MetalParallaxView(frame: .zero)
+        let view = MetalParallaxView(frame: .zero, shouldShowWatermark: shouldShowWatermark)
         view.depthImage = depthImage
         view.blurIntensity = selectedBlurIntensity
         view.focalPoint = selectedFocalPoint
@@ -125,6 +128,15 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ view: MetalParallaxView, context: Context) {
+        if view.shouldShowWatermark != shouldShowWatermark {
+            view.shouldShowWatermark = shouldShowWatermark
+            
+            if shouldShowWatermark {
+                view.layoutAndShowWatermark()
+            } else {
+                view.removeWatermark()
+            }
+        }
         if view.depthImage != depthImage {
             view.depthImage = depthImage
         }
@@ -200,6 +212,8 @@ class MetalParallaxView: MTKView {
         }
     }
         
+    var shouldShowWatermark: Bool?
+    
     var selectedAnimationInterval: TimeInterval?
     var selectedAnimationIntensity: Float?
     var selectedAnimationType: ImageParallaxAnimationType?
@@ -228,12 +242,14 @@ class MetalParallaxView: MTKView {
     
     let semaphore = DispatchSemaphore(value: 1)
     
-    init(frame: CGRect) {
+    init(frame: CGRect, shouldShowWatermark: Bool) {
         guard
             let device = MTLCreateSystemDefaultDevice()
         else {
             fatalError("Failed creating a default system Metal device / default library. Please, make sure Metal is available on your hardware.")
         }
+        
+        self.shouldShowWatermark = shouldShowWatermark
         
         commandQueue = device.makeCommandQueue()!
         parallaxOcclusionPassEncoder = ParallaxOcclusionPassEncoder(device: device)
@@ -250,6 +266,14 @@ class MetalParallaxView: MTKView {
         colorPixelFormat = .rgba16Float
         preferredFramesPerSecond = 60
         
+        addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(userDidPanView(_:))))
+        
+        if shouldShowWatermark {
+            layoutAndShowWatermark()
+        }
+    }
+    
+    public func layoutAndShowWatermark() {
         overlaySKView = SKView()
         let overlaySKScene = SKScene()
         overlaySKScene.backgroundColor = .clear
@@ -260,23 +284,26 @@ class MetalParallaxView: MTKView {
         madeWith.horizontalAlignmentMode = .left
         madeWith.fontColor = SKColor.white
         madeWith.position = .zero
-        overlayTextNode!.addChild(madeWith)
+        overlayTextNode?.addChild(madeWith)
         let threeDeeIfy = SKLabelNode(fontNamed: "AppleSDGothicNeo-Bold")
         threeDeeIfy.text = "3Dify"
         threeDeeIfy.fontSize = 24
         threeDeeIfy.horizontalAlignmentMode = .left
         threeDeeIfy.fontColor = SKColor.white
         threeDeeIfy.position = .init(x: 110, y: 0)
-        overlayTextNode!.addChild(threeDeeIfy)
+        overlayTextNode?.addChild(threeDeeIfy)
         overlaySKScene.addChild(overlayTextNode!)
         overlaySKScene.scaleMode = .resizeFill
         overlaySKView?.presentScene(overlaySKScene)
         overlaySKView?.allowsTransparency = true
         overlaySKView?.backgroundColor = .clear
-        addSubview(overlaySKView!)
-        overlaySKView!.frame = bounds
+        overlaySKView?.frame = bounds
         
-        addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(userDidPanView(_:))))
+        addSubview(overlaySKView!)
+    }
+    
+    public func removeWatermark() {
+        overlaySKView?.removeFromSuperview()
     }
     
     override func layoutSubviews() {
