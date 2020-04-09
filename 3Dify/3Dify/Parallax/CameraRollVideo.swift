@@ -1,9 +1,3 @@
-
-
-//
-//  VideoConverter.swift
-//
-
 import Foundation
 import AVFoundation
 import UIKit

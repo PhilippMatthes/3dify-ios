@@ -22,11 +22,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 
-        let contentView = HomeView(depthImage: DepthImage(diffuse: UIImage(named: "city-image")!, depth: UIImage(named: "city-depth")!, isArtificial: true))
+        let contentView = HomeView(depthImage: DepthImage(diffuse: UIImage(named: "image-banner")!, depth: UIImage(named: "depth-banner")!, isArtificial: true))
 
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
-            window.rootViewController = UIHostingController(rootView: contentView)
+            window.rootViewController = HostingController(rootView: contentView)
             self.window = window
             window.makeKeyAndVisible()
         }

@@ -29,7 +29,7 @@ extension DepthImage: DepthImageConvertible {
 
 extension UIImage: DepthImageConvertible {
     func toDepthImage(completion: @escaping (DepthImage?) -> ()) {
-        getPredictedDepthAsync() { depthImage in
+        getPredictedDepth(predictor: .fcrn) { depthImage in
             guard let depthImage = depthImage else {
                 completion(nil)
                 return

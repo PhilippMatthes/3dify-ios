@@ -172,93 +172,98 @@ struct InAppPurchaseView: View {
     }
     
     var body: some View {
-        LoadingView(text: self.$loadingText, loadingState: self.$loadingState) {
-            VStack {
-                Spacer()
-                
-                VStack(alignment: .center) {
-                    LinearGradient(
-                        gradient: Gradients.learningLeading,
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .mask(HStack {
-                        Spacer()
-                        Text("For the pros!")
-                        .font(.largeTitle)
-                        .fontWeight(.heavy)
-                        Spacer()
-                    })
-                    .frame(height: 48)
-                    Text("Buy the developer a ☕ and remove the \"Made with 3Dify\" watermark on your videos!")
-                    .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(24)
-                .multilineTextAlignment(.center)
-                
+        GeometryReader { geometry in
+            LoadingView(text: self.$loadingText, loadingState: self.$loadingState) {
                 VStack {
-                    if self.product != nil {
-                        Button(action: {
-                            guard let product = self.product as? SKProduct else {
-                                print("Purchasing with Debug Product is not possible!")
-                                return
-                            }
-                            self.loadingState = .loading
-                            self.loadingText = "Purchasing..."
-                            self.orchestrator.purchase(product: product)
-                        }) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(self.product!.localizedTitle)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    Text(self.product!.localizedDescription)
-                                    .font(.caption)
-                                    .opacity(0.5)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    Text(self.product!.localizedPrice)
-                                    .foregroundColor(Color.green)
+                    Spacer()
+                    
+                    VStack(alignment: .center) {
+                        Spacer()
+                        LinearGradient(
+                            gradient: Gradients.learningLeading,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .mask(HStack {
+                            Spacer()
+                            Text("For the pros!")
+                            .font(.largeTitle)
+                            .fontWeight(.heavy)
+                            Spacer()
+                        })
+                        .frame(height: 48)
+                        Text("Buy the developer a ☕ and remove the \"Made with 3Dify\" watermark on your videos!")
+                        .fixedSize(horizontal: false, vertical: true)
+                        Spacer()
+                    }
+                    .padding(24)
+                    .multilineTextAlignment(.center)
+                    
+                    VStack {
+                        if self.product != nil {
+                            Button(action: {
+                                guard let product = self.product as? SKProduct else {
+                                    print("Purchasing with Debug Product is not possible!")
+                                    return
                                 }
-                                .padding(.leading, 12)
-                                
-                                Spacer()
-                                
-                                Image(systemName: "chevron.right")
-                                .padding(12)
+                                self.loadingState = .loading
+                                self.loadingText = "Purchasing..."
+                                self.orchestrator.purchase(product: product)
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(self.product!.localizedTitle)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        Text(self.product!.localizedDescription)
+                                        .font(.caption)
+                                        .opacity(0.5)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        Text(self.product!.localizedPrice)
+                                        .foregroundColor(Color.green)
+                                    }
+                                    .padding(.leading, 12)
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "chevron.right")
+                                    .padding(12)
+                                }
+                                .foregroundColor(.black)
                             }
-                            .foregroundColor(.black)
-                        }
-                        .scaleEffect(self.purchaseButtonScale)
-                        .onAppear() {
-                            withAnimation(self.purchaseButtonAnimation) {
-                                self.purchaseButtonScale = 1.03
+                            .scaleEffect(self.purchaseButtonScale)
+                            .onAppear() {
+                                withAnimation(self.purchaseButtonAnimation) {
+                                    self.purchaseButtonScale = 1.03
+                                }
                             }
+                            .buttonStyle(FatButtonStyle(cornerRadius: 32))
                         }
-                        .buttonStyle(FatButtonStyle(cornerRadius: 32))
-                    }
-                    
-                    HStack {
-                        Spacer()
-                        Capsule().frame(width: 32, height: 1)
-                        Text("OR").font(.caption)
-                        Capsule().frame(width: 32, height: 1)
-                        Spacer()
-                    }
-                    .opacity(0.5)
-                    .foregroundColor(.white)
-                    
-                    Button(action: {
-                        self.loadingState = .loading
-                        self.loadingText = "Restoring..."
-                        self.orchestrator.restorePurchases()
-                    }) {
-                        Text("Restore purchases")
+                        
+                        HStack {
+                            Spacer()
+                            Capsule().frame(width: 32, height: 1)
+                            Text("OR").font(.caption)
+                            Capsule().frame(width: 32, height: 1)
+                            Spacer()
+                        }
+                        .opacity(0.5)
                         .foregroundColor(.white)
+                        
+                        Button(action: {
+                            self.loadingState = .loading
+                            self.loadingText = "Restoring..."
+                            self.orchestrator.restorePurchases()
+                        }) {
+                            Text("Restore purchases")
+                            .foregroundColor(.white)
+                        }
+                        .buttonStyle(OutlinedFatButtonStyle())
+                        .padding(.bottom, geometry.safeAreaInsets.bottom)
                     }
-                    .buttonStyle(OutlinedFatButtonStyle())
+                    .transition(.move(edge: .bottom))
+                    .padding(12)
+                    .background(LinearGradient(gradient: Gradients.learningLeading, startPoint: .topLeading, endPoint: .bottomTrailing))
                 }
-                .transition(.move(edge: .bottom))
-                .padding(12)
-                .background(LinearGradient(gradient: Gradients.learningLeading, startPoint: .topLeading, endPoint: .bottomTrailing))
             }
             .onAppear() {
                 self.orchestrator.loadProduct() { product in

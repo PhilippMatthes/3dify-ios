@@ -312,7 +312,7 @@ struct CameraView: View {
                         }
                     }) {
                         Image(systemName: "rectangle.stack.person.crop.fill")
-                        //.foregroundColor(self.isCapturingDepth ? .yellow : .white)
+                        .foregroundColor(self.isCapturingDepth ? .yellow : .white)
                     }
                     Spacer()
                     Button(action: {
@@ -340,7 +340,7 @@ struct CameraView: View {
                         }
                     }) {
                         Image(systemName: "camera.rotate.fill")
-                        //.foregroundColor(self.isCapturingDepth ? .yellow : .white)
+                        .foregroundColor(self.isUsingFrontfacingCamera ? .yellow : .white)
                     }
                 }
                 .padding(24)

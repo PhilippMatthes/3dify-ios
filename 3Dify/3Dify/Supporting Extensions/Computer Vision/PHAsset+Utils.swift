@@ -59,7 +59,7 @@ extension PHAsset {
         guard let disparityPixelBuffer = imageSource.getDisparityData()?
             .converting(toDepthDataType: kCVPixelFormatType_DisparityFloat32)
             .depthDataMap else {
-            rotatedImage.getPredictedDepthAsync() { aiDepth in
+            rotatedImage.getPredictedDepth(predictor: .fcrn) { aiDepth in
                 if let aiDepth = aiDepth {
                     completion(DepthImage(diffuse: rotatedImage, depth: aiDepth, isArtificial: true))
                 } else {
@@ -77,7 +77,7 @@ extension PHAsset {
             let rotatedDepthImage = UIImage(cgImage: depthCGImage, scale: 1.0, orientation: image.imageOrientation)
                 .rotate(radians: 0)
         else {
-            rotatedImage.getPredictedDepthAsync() { aiDepth in
+            rotatedImage.getPredictedDepth(predictor: .fcrn) { aiDepth in
                 if let aiDepth = aiDepth {
                     completion(DepthImage(diffuse: rotatedImage, depth: aiDepth, isArtificial: true))
                 } else {

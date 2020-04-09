@@ -336,24 +336,25 @@ class MetalParallaxView: MTKView {
 
 extension MetalParallaxView {
     func computeOffset(
-        at progress: Double,
-        withAnimationType animationType: ImageParallaxAnimationType
+        at progress: CGFloat,
+        withAnimationType animationType: ImageParallaxAnimationType,
+        selectedAnimationIntensity: CGFloat
     ) -> CGPoint {
         switch animationType {
         case .turnTable:
             return CGPoint(
-                x: sin(CGFloat(progress) * 2 * CGFloat.pi),
-                y: cos(CGFloat(progress) * 2 * CGFloat.pi)
+                x: sin(CGFloat(progress) * 2 * CGFloat.pi) * selectedAnimationIntensity,
+                y: cos(CGFloat(progress) * 2 * CGFloat.pi) * selectedAnimationIntensity
             )
         case .horizontalSwitch:
             return CGPoint(
-                x: sin(progress * 2 * .pi),
+                x: sin(progress * 2 * .pi) * selectedAnimationIntensity,
                 y: 0
             )
         case .verticalSwitch:
             return CGPoint(
                 x: 0,
-                y: sin(progress * 2 * .pi)
+                y: sin(progress * 2 * .pi) * selectedAnimationIntensity
             )
         }
     }
@@ -403,7 +404,14 @@ extension MetalParallaxView {
                 let animationProgress = (Double(frameIndex) / Double(frames / loops))
                     .truncatingRemainder(dividingBy: 1)
                 let progressToDisplay = Double(frameIndex) / Double(frames)
-                return (progressToDisplay, self.computeOffset(at: animationProgress, withAnimationType: selectedAnimationType).scaled(by: Double(selectedAnimationIntensity)))
+                return (
+                    progressToDisplay,
+                    self.computeOffset(
+                        at: CGFloat(animationProgress),
+                        withAnimationType: selectedAnimationType,
+                        selectedAnimationIntensity: CGFloat(selectedAnimationIntensity)
+                    )
+                )
             }
             
             self.onBeforeRenderFrame = {
@@ -489,8 +497,11 @@ extension MetalParallaxView: MTKViewDelegate {
             animatorShouldAnimate
         {
             let progress = 0.5 + (elapsedTime.remainder(dividingBy: selectedAnimationInterval)) / selectedAnimationInterval
-            self.offset = self.computeOffset(at: progress, withAnimationType: selectedAnimationType)
-                .scaled(by: Double(selectedAnimationIntensity))
+            self.offset = self.computeOffset(
+                at: CGFloat(progress),
+                withAnimationType: selectedAnimationType,
+                selectedAnimationIntensity: CGFloat(selectedAnimationIntensity)
+            )
         }
 
         guard
@@ -527,33 +538,46 @@ extension MetalParallaxView: MTKViewDelegate {
         scope.label = "Capture Scope"
         scope.begin()
         
-        self.parallaxOcclusionPassEncoder.encode(
-            in: commandBuffer,
-            inputColorTexture: inputDiffuseTexture,
-            inputDepthTexture: inputDepthTexture,
-            outputColorTexture: parallaxOcclusionPassOutputDiffuseTexture,
-            outputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
-            drawableSize: drawableSize,
-            clearColor: clearColor
-        )
-        
-        self.vBlurPassEncoder.encode(
-            in: commandBuffer,
-            inputColorTexture: parallaxOcclusionPassOutputDiffuseTexture,
-            inputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
-            blurredTexture: vBlurPassOutputTexture,
-            drawableSize: drawableSize,
-            clearColor: clearColor
-        )
-        
-        self.hBlurPassEncoder.encode(
-            in: commandBuffer,
-            inputColorTexture: vBlurPassOutputTexture,
-            inputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
-            blurredTexture: currentDrawable!.texture,
-            drawableSize: drawableSize,
-            clearColor: clearColor
-        )
+        if self.blurIntensity == 0 {
+            // Skip blur pass
+            self.parallaxOcclusionPassEncoder.encode(
+                in: commandBuffer,
+                inputColorTexture: inputDiffuseTexture,
+                inputDepthTexture: inputDepthTexture,
+                outputColorTexture: currentDrawable!.texture,
+                outputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
+                drawableSize: drawableSize,
+                clearColor: clearColor
+            )
+        } else {
+            self.parallaxOcclusionPassEncoder.encode(
+                in: commandBuffer,
+                inputColorTexture: inputDiffuseTexture,
+                inputDepthTexture: inputDepthTexture,
+                outputColorTexture: parallaxOcclusionPassOutputDiffuseTexture,
+                outputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
+                drawableSize: drawableSize,
+                clearColor: clearColor
+            )
+            
+            self.vBlurPassEncoder.encode(
+                in: commandBuffer,
+                inputColorTexture: parallaxOcclusionPassOutputDiffuseTexture,
+                inputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
+                blurredTexture: vBlurPassOutputTexture,
+                drawableSize: drawableSize,
+                clearColor: clearColor
+            )
+            
+            self.hBlurPassEncoder.encode(
+                in: commandBuffer,
+                inputColorTexture: vBlurPassOutputTexture,
+                inputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
+                blurredTexture: currentDrawable!.texture,
+                drawableSize: drawableSize,
+                clearColor: clearColor
+            )
+        }
     
         commandBuffer.addScheduledHandler { [weak self] (buffer) in
             self?.semaphore.signal()
