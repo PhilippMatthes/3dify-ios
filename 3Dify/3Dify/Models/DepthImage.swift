@@ -58,14 +58,15 @@ class HeatmapViewPistProcessor {
         return convertedHeatmap
     }
     
-    func convertToImage(from heatmaps: MLMultiArray, targetSize size: CGSize) -> UIImage? {
+    func convertToImage(from heatmaps: MLMultiArray) -> UIImage? {
         let heatmap = convertTo2DArray(from: heatmaps)
+        let realSize = CGSize(width: 304, height: 228)
         
-        return UIGraphicsImageRenderer(size: size).image { context in
+        return UIGraphicsImageRenderer(size: realSize).image { context in
             let heatmap_w = heatmap.count
             let heatmap_h = heatmap.first?.count ?? 0
-            let width = size.width / CGFloat(heatmap_w)
-            let height = size.height / CGFloat(heatmap_h)
+            let width = realSize.width / CGFloat(heatmap_w)
+            let height = realSize.height / CGFloat(heatmap_h)
             
             for j in  0 ..< heatmap_h {
                 for i in 0 ..< heatmap_w {
@@ -151,8 +152,8 @@ extension UIImage {
                 let observations = request.results as? [VNCoreMLFeatureValueObservation],
                 let heatmap = observations.first?.featureValue.multiArrayValue,
                 let image = HeatmapViewPistProcessor()
-                    .convertToImage(from: heatmap, targetSize: self.size)?
-                    .blurred(radius: 16)
+                    .convertToImage(from: heatmap)?
+                    .blurred(radius: 12)
             else {
                 completion(nil)
                 return

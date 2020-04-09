@@ -478,8 +478,6 @@ extension MetalParallaxView: MTKViewDelegate {
             height: Int(size.height),
             mipmapped: false
         )
-        descriptor.sampleCount = 1
-        descriptor.allowGPUOptimizedContents = true
         descriptor.storageMode = .private
         descriptor.usage = [.renderTarget, .shaderRead]
         return device!.makeTexture(descriptor: descriptor)!
