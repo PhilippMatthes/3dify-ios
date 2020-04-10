@@ -186,7 +186,7 @@ struct InAppPurchaseView: View {
                         )
                         .mask(HStack {
                             Spacer()
-                            Text("For the pros!")
+                            Text("Help keeping 3Dify Ad-free!")
                             .font(.largeTitle)
                             .fontWeight(.heavy)
                             Spacer()

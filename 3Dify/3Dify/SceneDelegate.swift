@@ -22,7 +22,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 
-        let contentView = HomeView(depthImage: DepthImage(diffuse: UIImage(named: "image-banner")!, depth: UIImage(named: "depth-banner")!, isArtificial: true))
+        let contentView = HomeView(
+            depthImage: DepthImage(
+                diffuse: UIImage(named: "image-banner")!,
+                depth: UIImage(named: "depth-banner")!,
+                isArtificial: true
+            )
+        )
 
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)

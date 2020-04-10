@@ -386,7 +386,7 @@ extension MetalParallaxView {
             let selectedAnimationInterval = self.selectedAnimationInterval,
             let selectedAnimationType = self.selectedAnimationType,
             let selectedAnimationIntensity = self.selectedAnimationIntensity,
-            let video = CameraRollVideo(width: Int(drawableSize.width), height: Int(drawableSize.height), frameRate: 60)
+            let video = CameraRollVideo(width: Int(drawableSize.width), height: Int(drawableSize.height), frameRate: 30)
         else {
             update(.failed)
             return
@@ -397,8 +397,8 @@ extension MetalParallaxView {
         renderQueue.async {
             video.startWriting()
         
-            let loops = 5
-            let fps = 60
+            let loops = 3
+            let fps = 30
             let frames = Int(selectedAnimationInterval) * fps * loops
             var offsetsToRender = (0..<frames).reversed().map { frameIndex -> (Double, CGPoint) in
                 let animationProgress = (Double(frameIndex) / Double(frames / loops))
@@ -428,12 +428,20 @@ extension MetalParallaxView {
                     renderQueue.async {
                         video.finishWriting() { url in
                             DispatchQueue.main.async {
-                                PHPhotoLibrary.shared().performChanges({
-                                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
-                                }) { saved, error in
-                                    if error != nil || !saved {
+                                CustomPhotoAlbum.getOrCreate(albumWithName: "3Dify Videos") { album, error in
+                                    guard
+                                        error == nil,
+                                        let album = album
+                                    else {
                                         update(.failed)
-                                    } else {
+                                        return
+                                    }
+                                    
+                                    album.saveVideo(atUrl: url) {error in
+                                        guard error == nil else {
+                                            update(.failed)
+                                            return
+                                        }
                                         update(.finished)
                                     }
                                 }
@@ -476,7 +484,7 @@ extension MetalParallaxView: MTKViewDelegate {
             pixelFormat: format,
             width: Int(size.width),
             height: Int(size.height),
-            mipmapped: false
+            mipmapped: true
         )
         descriptor.storageMode = .private
         descriptor.usage = [.renderTarget, .shaderRead]

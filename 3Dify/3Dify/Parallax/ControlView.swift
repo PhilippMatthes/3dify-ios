@@ -34,7 +34,7 @@ struct ControlView<Content: View>: View {
     
     var onShowPicker: () -> Void
     var onShowCamera: () -> Void
-    var onSaveVideo: () -> Void
+    var onSaveButtonPressed: () -> Void
     var onShowAIExplanation: () -> Void
     
     var springAnimation: Animation {
@@ -180,8 +180,8 @@ struct ControlView<Content: View>: View {
                 if self.isShowingControls && !self.isShowingSettings {
                     HStack {
                         Spacer()
-                        Button(action: self.onSaveVideo) {
-                            Image(systemName: "film")
+                        Button(action: self.onSaveButtonPressed) {
+                            Image(systemName: "square.and.arrow.down.on.square.fill")
                                 .foregroundColor(Color.black)
                         }
                         .buttonStyle(CameraButtonStyle())
@@ -214,7 +214,7 @@ struct ControlView_Previews: PreviewProvider {
                     isShowingSettings: false,
                     onShowPicker: {},
                     onShowCamera: {},
-                    onSaveVideo: {},
+                    onSaveButtonPressed: {},
                     onShowAIExplanation: {}
         ) {
             VStack {

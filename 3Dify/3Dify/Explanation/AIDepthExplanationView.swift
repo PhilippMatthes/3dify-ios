@@ -18,7 +18,7 @@ struct AIDepthExplanationView: View {
             .repeatForever(autoreverses: true)
     }
     
-    func offset(
+    internal func offset(
         forFrameWidth frameWidth: CGFloat,
         inFrameWidth contentFrameWidth: CGFloat,
         isCalculatedFromRightEdge: Bool

@@ -13,13 +13,13 @@ using namespace metal;
 
 // http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
 constant float offset[] = { 0.0, 1.0, 2.0, 3.0, 4.0 };
-constant float weight[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
+constant half weight[] = { 0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162 };
 constant float bufferSize = 512.0;
 
 constexpr sampler s = sampler(coord::normalized, r_address::clamp_to_edge, t_address::repeat, filter::linear);
 
 struct BlurPassOutput {
-    float4 blurred [[color(0)]];
+    half4 blurred [[color(0)]];
 };
 
 typedef struct {
@@ -29,14 +29,14 @@ typedef struct {
 } BlurUniforms;
 
 
-float4 blur_fragment(bool isVertical,
+half4 blur_fragment(bool isVertical,
                      float2 uv,
                      float intensity,
                      float focalPoint,
-                     texture2d<float, access::sample> diffuse,
-                     texture2d<float, access::sample> depth)
+                     texture2d<half, access::sample> diffuse,
+                     texture2d<half, access::sample> depth)
 {
-    float4 color = diffuse.sample(s, uv) * weight[0];
+    half4 color = diffuse.sample(s, uv) * weight[0];
     float depthIntensity = abs(depth.sample(s, uv).r - focalPoint) * intensity;
     
     for (int i=1; i<5; i++) {
@@ -55,8 +55,8 @@ float4 blur_fragment(bool isVertical,
 
 fragment BlurPassOutput blur(
     TextureMappingVertex vert [[stage_in]],
-    texture2d<float> diffuseTexture [[texture(0)]],
-    texture2d<float> depthTexture [[texture(1)]],
+    texture2d<half> diffuseTexture [[texture(0)]],
+    texture2d<half> depthTexture [[texture(1)]],
     constant BlurUniforms *uniforms [[buffer(0)]]
 ) {
     

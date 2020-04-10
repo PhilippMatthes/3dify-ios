@@ -17,77 +17,19 @@ enum DepthPredictor {
 }
 
 
-class HeatmapViewPistProcessor {
-    func convertTo2DArray(from heatmaps: MLMultiArray) -> Array<Array<Double>> {
-        guard heatmaps.shape.count >= 3 else {
-            print("Error: heatmap's shape is invalid. \(heatmaps.shape)")
-            return []
+extension MLMultiArray {
+    public func doubleMinMaxValue() -> (Double, Double) {
+        var minValue = Double.greatestFiniteMagnitude
+        var maxValue = -Double.greatestFiniteMagnitude
+        
+        // Slow version
+        for i in 0..<self.count {
+            let n = self[i].doubleValue
+            minValue = min(n, minValue)
+            maxValue = max(n, maxValue)
         }
         
-        let _ /*keypoint_number*/ = heatmaps.shape[0].intValue
-        let heatmap_w = heatmaps.shape[1].intValue
-        let heatmap_h = heatmaps.shape[2].intValue
-        
-        var convertedHeatmap: Array<Array<Double>> = Array(repeating: Array(repeating: 0.0, count: heatmap_w), count: heatmap_h)
-        
-        var minimumValue = Double.greatestFiniteMagnitude
-        var maximumValue = -Double.greatestFiniteMagnitude
-        
-        for i in 0 ..< heatmap_w {
-            for j in 0 ..< heatmap_h {
-                let index = i * (heatmap_h) + j
-                let confidence = heatmaps[index].doubleValue
-                guard confidence > 0 else { continue }
-                convertedHeatmap[j][i] = confidence
-                
-                if minimumValue > confidence {
-                    minimumValue = confidence
-                }
-                if maximumValue < confidence {
-                    maximumValue = confidence
-                }
-            }
-        }
-        
-        let minmaxGap = maximumValue - minimumValue
-        for i in 0 ..< heatmap_w {
-            for j in 0 ..< heatmap_h {
-                convertedHeatmap[j][i] = (convertedHeatmap[j][i] - minimumValue) / minmaxGap
-            }
-        }
-        return convertedHeatmap
-    }
-    
-    func convertToImage(from heatmaps: MLMultiArray) -> UIImage? {
-        let heatmap = convertTo2DArray(from: heatmaps)
-        let realSize = CGSize(width: 304, height: 228)
-        
-        return UIGraphicsImageRenderer(size: realSize).image { context in
-            let heatmap_w = heatmap.count
-            let heatmap_h = heatmap.first?.count ?? 0
-            let width = realSize.width / CGFloat(heatmap_w)
-            let height = realSize.height / CGFloat(heatmap_h)
-            
-            for j in  0 ..< heatmap_h {
-                for i in 0 ..< heatmap_w {
-                    let value = heatmap[i][j]
-                    var alpha = CGFloat(value)
-                    if alpha > 1 {
-                        alpha = 1
-                    } else if alpha < 0 {
-                        alpha = 0
-                    }
-                    
-                    let rect = CGRect(x: CGFloat(i) * width, y: CGFloat(j) * height, width: width, height: height)
-                    
-                    let color = UIColor(white: 1 - alpha, alpha: 1)
-                    let bpath = UIBezierPath(rect: rect)
-                    
-                    color.set()
-                    bpath.fill()
-                }
-            }
-        }
+        return (minValue, maxValue)
     }
 }
 
@@ -150,16 +92,20 @@ extension UIImage {
             guard
                 error == nil,
                 let observations = request.results as? [VNCoreMLFeatureValueObservation],
-                let heatmap = observations.first?.featureValue.multiArrayValue,
-                let image = HeatmapViewPistProcessor()
-                    .convertToImage(from: heatmap)?
-                    .blurred(radius: 12)
+                let depth = observations.first?.featureValue.multiArrayValue
             else {
                 completion(nil)
                 return
             }
             
-            completion(image)
+            let minMax = depth.doubleMinMaxValue()
+            
+            guard let image = depth.cgImage(min: minMax.0, max: minMax.1) else {
+                completion(nil)
+                return
+            }
+            
+            completion(UIImage(cgImage: image))
         }
         
         request.imageCropAndScaleOption = .scaleFill
@@ -220,6 +166,30 @@ extension UIImage {
         let img = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return img
+    }
+    
+    func resizedMaintainingAspectRatio(targetSize: CGSize) -> UIImage? {
+        let widthRatio  = targetSize.width  / size.width
+        let heightRatio = targetSize.height / size.height
+
+        // Figure out what our orientation is, and use that to form the rectangle
+        var newSize: CGSize
+        if(widthRatio > heightRatio) {
+            newSize = CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
+        } else {
+            newSize = CGSize(width: size.width * widthRatio, height: size.height * widthRatio)
+        }
+
+        // This is the rect that we've calculated out and this is what is actually used below
+        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
+
+        // Actually do the resizing to the rect using the ImageContext stuff
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        draw(in: rect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage
     }
     
     func toBuffer(pixelFormatType: OSType) -> CVPixelBuffer? {

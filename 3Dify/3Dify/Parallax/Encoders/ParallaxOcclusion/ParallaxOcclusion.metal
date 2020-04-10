@@ -19,7 +19,7 @@ using namespace metal;
 float2 parallaxOcclusionMapping(
     float2 offset,
     float2 texCoords,
-    texture2d<float, access::sample> depthTexture,
+    texture2d<half, access::sample> depthTexture,
     float minLayers,
     float maxLayers,
     float pivot,
@@ -70,7 +70,7 @@ float2 parallaxOcclusionMapping(
     float2 offset,
     float2 texCoords,
     float pivot,
-    texture2d<float, access::sample> depthTexture
+    texture2d<half, access::sample> depthTexture
 )
 {
     // number of depth layers
@@ -84,8 +84,8 @@ float2 parallaxOcclusionMapping(
 }
 
 struct ParallaxPassOutput {
-    float4 diffuse [[color(0)]];
-    float4 depth [[color(1)]];
+    half4 diffuse [[color(0)]];
+    half4 depth [[color(1)]];
 };
 
 typedef struct {
@@ -96,8 +96,8 @@ typedef struct {
 
 fragment ParallaxPassOutput parallax_occlusion(
     TextureMappingVertex vert [[stage_in]],
-    texture2d<float> diffuseTexture [[texture(0)]],
-    texture2d<float> depthTexture [[texture(1)]],
+    texture2d<half> diffuseTexture [[texture(0)]],
+    texture2d<half> depthTexture [[texture(1)]],
     constant ParallaxOcclusionUniforms *uniforms [[buffer(0)]]
 ) {
     constexpr sampler s(address::clamp_to_edge, filter::linear);
@@ -108,14 +108,10 @@ fragment ParallaxPassOutput parallax_occlusion(
         uniforms->focalPoint,
         depthTexture
     );
-    
-    float4 diffuseColor = diffuseTexture.sample(s, parallaxUv);
-    float4 depthColor = depthTexture.sample(s, parallaxUv);
-    
     ParallaxPassOutput output;
     
-    output.diffuse = diffuseColor;
-    output.depth = float4(float3(depthColor.r), 1.0);
+    output.diffuse = diffuseTexture.sample(s, parallaxUv);
+    output.depth = half4(half3(depthTexture.sample(s, parallaxUv).r), 1.0);
         
     return output;
 }
