@@ -26,12 +26,13 @@ struct FatButtonStyle: ButtonStyle {
 
 struct OutlinedFatButtonStyle: ButtonStyle {
     var cornerRadius: CGFloat = 24
+    var color: Color = .white
     
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
         .padding(14)
         .overlay(RoundedRectangle(cornerRadius: cornerRadius)
-        .stroke(Color.white.opacity(configuration.isPressed ? 0.5 : 0.9), lineWidth: 2))
+        .stroke(self.color.opacity(configuration.isPressed ? 0.5 : 0.9), lineWidth: 2))
         .animation(.interpolatingSpring(stiffness: 300.0, damping: 20.0, initialVelocity: 10.0))
     }
 }

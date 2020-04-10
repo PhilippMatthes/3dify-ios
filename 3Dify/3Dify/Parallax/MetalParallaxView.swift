@@ -42,6 +42,7 @@ internal extension View {
 
 
 struct MetalParallaxViewBestFitContainer: View {
+    @Binding var shouldShowDepth: Bool
     @Binding var shouldShowWatermark: Bool
     @Binding var selectedAnimationInterval: TimeInterval
     @Binding var selectedAnimationIntensity: Float
@@ -84,6 +85,7 @@ struct MetalParallaxViewBestFitContainer: View {
         GeometryReader { outerGeometry in
             GeometryReader { innerGeometry in
                 MetalParallaxViewRepresentable(
+                    shouldShowDepth: self.$shouldShowDepth,
                     shouldShowWatermark: self.$shouldShowWatermark,
                     selectedAnimationInterval: self.$selectedAnimationInterval,
                     selectedAnimationIntensity: self.$selectedAnimationIntensity,
@@ -103,6 +105,7 @@ struct MetalParallaxViewBestFitContainer: View {
 
 
 struct MetalParallaxViewRepresentable: UIViewRepresentable {
+    @Binding var shouldShowDepth: Bool
     @Binding var shouldShowWatermark: Bool
     @Binding var selectedAnimationInterval: TimeInterval
     @Binding var selectedAnimationIntensity: Float
@@ -117,6 +120,7 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
     
     func makeUIView(context: UIViewRepresentableContext<MetalParallaxViewRepresentable>) -> MetalParallaxView {
         let view = MetalParallaxView(frame: .zero, shouldShowWatermark: shouldShowWatermark)
+        view.shouldShowDepth = shouldShowDepth
         view.depthImage = depthImage
         view.blurIntensity = selectedBlurIntensity
         view.focalPoint = selectedFocalPoint
@@ -128,6 +132,9 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ view: MetalParallaxView, context: Context) {
+        if view.shouldShowDepth != shouldShowDepth {
+            view.shouldShowDepth = shouldShowDepth
+        }
         if view.shouldShowWatermark != shouldShowWatermark {
             view.shouldShowWatermark = shouldShowWatermark
             
@@ -212,6 +219,7 @@ class MetalParallaxView: MTKView {
         }
     }
         
+    var shouldShowDepth: Bool?
     var shouldShowWatermark: Bool?
     
     var selectedAnimationInterval: TimeInterval?
@@ -278,19 +286,26 @@ class MetalParallaxView: MTKView {
         let overlaySKScene = SKScene()
         overlaySKScene.backgroundColor = .clear
         overlayTextNode = SKNode()
+        let backgroundNode = SKShapeNode(
+            rect: .init(x: 0, y: 0, width: 183, height: 36),
+            cornerRadius: 18
+        )
+        backgroundNode.fillColor = UIColor.black.withAlphaComponent(0.1)
+        backgroundNode.strokeColor = .clear
+        overlayTextNode?.addChild(backgroundNode)
         let madeWith = SKLabelNode(fontNamed: "AppleSDGothicNeo-Regular")
         madeWith.text = "Made with"
         madeWith.fontSize = 24
         madeWith.horizontalAlignmentMode = .left
         madeWith.fontColor = SKColor.white
-        madeWith.position = .zero
+        madeWith.position = .init(x: 8, y: 8)
         overlayTextNode?.addChild(madeWith)
         let threeDeeIfy = SKLabelNode(fontNamed: "AppleSDGothicNeo-Bold")
         threeDeeIfy.text = "3Dify"
         threeDeeIfy.fontSize = 24
         threeDeeIfy.horizontalAlignmentMode = .left
         threeDeeIfy.fontColor = SKColor.white
-        threeDeeIfy.position = .init(x: 110, y: 0)
+        threeDeeIfy.position = .init(x: 118, y: 8)
         overlayTextNode?.addChild(threeDeeIfy)
         overlaySKScene.addChild(overlayTextNode!)
         overlaySKScene.scaleMode = .resizeFill
@@ -308,7 +323,7 @@ class MetalParallaxView: MTKView {
     
     override func layoutSubviews() {
         overlaySKView?.frame = bounds
-        overlayTextNode?.position = .init(x: frame.midX - 86, y: 64)
+        overlayTextNode?.position = .init(x: frame.midX - 92, y: 64)
     }
     
     @objc func userDidPanView(_ gestureRecognizer: UIPanGestureRecognizer) {
@@ -544,7 +559,45 @@ extension MetalParallaxView: MTKViewDelegate {
         scope.label = "Capture Scope"
         scope.begin()
         
-        if self.blurIntensity == 0 {
+        if self.shouldShowDepth == true && self.blurIntensity == 0 {
+            self.parallaxOcclusionPassEncoder.encode(
+                in: commandBuffer,
+                inputColorTexture: inputDiffuseTexture,
+                inputDepthTexture: inputDepthTexture,
+                outputColorTexture: parallaxOcclusionPassOutputDiffuseTexture,
+                outputDepthTexture: currentDrawable!.texture,
+                drawableSize: drawableSize,
+                clearColor: clearColor
+            )
+        } else if self.shouldShowDepth == true {
+            self.parallaxOcclusionPassEncoder.encode(
+                in: commandBuffer,
+                inputColorTexture: inputDiffuseTexture,
+                inputDepthTexture: inputDepthTexture,
+                outputColorTexture: parallaxOcclusionPassOutputDiffuseTexture,
+                outputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
+                drawableSize: drawableSize,
+                clearColor: clearColor
+            )
+            
+            self.vBlurPassEncoder.encode(
+                in: commandBuffer,
+                inputColorTexture: parallaxOcclusionPassOutputDepthTexture,
+                inputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
+                blurredTexture: vBlurPassOutputTexture,
+                drawableSize: drawableSize,
+                clearColor: clearColor
+            )
+            
+            self.hBlurPassEncoder.encode(
+                in: commandBuffer,
+                inputColorTexture: vBlurPassOutputTexture,
+                inputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
+                blurredTexture: currentDrawable!.texture,
+                drawableSize: drawableSize,
+                clearColor: clearColor
+            )
+        } else if self.blurIntensity == 0 {
             // Skip blur pass
             self.parallaxOcclusionPassEncoder.encode(
                 in: commandBuffer,

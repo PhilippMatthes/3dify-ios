@@ -14,7 +14,6 @@ struct HomeView: View {
     enum SheetType {
         case picker
         case camera
-        case aiExplanation
         case inAppPurchase
     }
     
@@ -32,7 +31,7 @@ struct HomeView: View {
     @State internal var selectedAnimationRepeatCount: Int = 5
     @State internal var selectedAnimationIntensity: Float = 0.05
     @State internal var selectedBlurIntensity: Float = 0
-    @State internal var selectedAnimationInterval: TimeInterval = 8
+    @State internal var selectedAnimationInterval: TimeInterval = 4
     @State internal var selectedFocalPoint: Float = 0.5
     @State internal var selectedAnimationTypeRawValue = ImageParallaxAnimationType.horizontalSwitch.rawValue
     
@@ -54,6 +53,8 @@ struct HomeView: View {
     @State internal var loadingText = "Loading..."
             
     @State internal var depthImage: DepthImage
+    
+    @State internal var shouldShowDepth = false
     
     internal var springAnimation: Animation {
         .interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0)
@@ -97,6 +98,7 @@ struct HomeView: View {
     }
     
     internal func onSaveButtonPressed() {
+        self.shouldShowDepth = false
         UISelectionFeedbackGenerator().selectionChanged()
         self.activeActionSheet = .saveToCameraRoll
         self.isShowingActionSheet = true
@@ -168,12 +170,6 @@ struct HomeView: View {
         }
     }
     
-    internal func onShowAIExplanation() {
-        UISelectionFeedbackGenerator().selectionChanged()
-        self.activeSheet = .aiExplanation
-        self.isShowingSheet = true
-    }
-    
     internal func onSaveVideoUpdate(saveState: SaveState) {
         switch saveState {
         case .failed:
@@ -226,6 +222,7 @@ struct HomeView: View {
         LoadingView(text: self.$loadingText, loadingState: self.$loadingState) {
             ControlView(
                 depthImage: self.$depthImage,
+                shouldShowDepth: self.$shouldShowDepth,
                 isShowingArtificialDepth: self.$isShowingArtificialDepth,
                 isShowingControls: self.$isShowingControls,
                 selectedAnimationInterval: self.$selectedAnimationInterval,
@@ -235,12 +232,12 @@ struct HomeView: View {
                 selectedFocalPoint: self.$selectedFocalPoint,
                 onShowPicker: self.onShowPicker,
                 onShowCamera: self.onShowCamera,
-                onSaveButtonPressed: self.onSaveButtonPressed,
-                onShowAIExplanation: self.onShowAIExplanation
+                onSaveButtonPressed: self.onSaveButtonPressed
             ) {
                 GeometryReader { geometry in
                     ZStack {
                         MetalParallaxViewBestFitContainer(
+                            shouldShowDepth: self.$shouldShowDepth,
                             shouldShowWatermark: self.$shouldShowWatermark,
                             selectedAnimationInterval: self.$selectedAnimationInterval,
                             selectedAnimationIntensity: self.$selectedAnimationIntensity,
@@ -252,13 +249,35 @@ struct HomeView: View {
                             isSaving: self.$isSavingToVideo,
                             onSaveVideoUpdate: self.onSaveVideoUpdate
                         )
+                        .onTapGesture {
+                            self.shouldShowDepth.toggle()
+                        }
+                        
+//                        Image("7_diffuse").resizable().scaledToFill()
                         
                         if !self.isShowingControls {
-                            VStack {
-                                Spacer()
+                            BlurView(style: .regular)
+                                .frame(width: 76)
+                                .offset(x: -geometry.size.width / 2 + 32)
+                            
+                            VStack(alignment: .leading) {
                                 Text("3Dify")
-                                    .font(.system(size: 100))
-                                    .foregroundColor(Color.white)
+                                .font(.system(size: 64))
+                                .fontWeight(.ultraLight)
+                                .foregroundColor(Color.white)
+                                .shadow(radius: 24)
+                                Spacer()
+                                Text("Transform your Photos into awesome 3D videos")
+                                .font(.system(size: 32))
+                                .fontWeight(.semibold)
+                                .foregroundColor(Color.white)
+                                .shadow(radius: 24)
+                                Image(systemName: "arrow.down.right")
+                                .foregroundColor(.white)
+                                .padding(.leading, 4)
+                                
+                                Spacer().frame(height: 24)
+                                
                                 if self.shouldShowWatermark {
                                     Button(action: {
                                         self.activeSheet = .inAppPurchase
@@ -267,14 +286,17 @@ struct HomeView: View {
                                         HStack {
                                             Spacer()
                                             Image(systemName: "eye.slash.fill")
+                                            .frame(width: 24, height: 24)
                                             Text("Remove watermark")
                                             Spacer()
                                         }
                                     }
                                     .foregroundColor(Color.black)
-                                    .padding(.horizontal, 32)
-                                    .buttonStyle(FatButtonStyle())
+                                    .buttonStyle(OutlinedFatButtonStyle(cornerRadius: 16))
+                                    .shadow(radius: 24)
+                                    .background(BlurView(style: .extraLight).cornerRadius(16))
                                 }
+                                
                                 Button(action: {
                                     self.activeSheet = .picker
                                     self.isShowingSheet = true
@@ -282,13 +304,16 @@ struct HomeView: View {
                                     HStack {
                                         Spacer()
                                         Image(systemName: "cube.box.fill")
+                                        .frame(width: 24, height: 24)
                                         Text("Pick an existing photo")
                                         Spacer()
                                     }
                                 }
                                 .foregroundColor(Color.black)
-                                .padding(.horizontal, 32)
-                                .buttonStyle(FatButtonStyle())
+                                .buttonStyle(OutlinedFatButtonStyle(cornerRadius: 16))
+                                .shadow(radius: 24)
+                                .background(BlurView(style: .extraLight).cornerRadius(16))
+                                
                                 Button(action: {
                                     self.activeSheet = .camera
                                     self.isShowingSheet = true
@@ -296,15 +321,20 @@ struct HomeView: View {
                                     HStack {
                                         Spacer()
                                         Image(systemName: "camera.fill")
+                                        .frame(width: 24, height: 24)
                                         Text("Take a new photo")
                                         Spacer()
                                     }
                                 }
-                                .foregroundColor(Color.white)
-                                .padding(.horizontal, 32)
-                                .padding(.bottom, 108)
-                                .buttonStyle(OutlinedFatButtonStyle())
+                                .foregroundColor(Color.black)
+                                .buttonStyle(OutlinedFatButtonStyle(cornerRadius: 16))
+                                .shadow(radius: 24)
+                                .background(BlurView(style: .extraLight).cornerRadius(16))
+
+                                Spacer()
                             }
+                            .padding(.horizontal, 24)
+                            .padding(.top, 128)
                             .frame(
                                 width: geometry.frame(in: .local).width,
                                 height: geometry.frame(in: .local).height
@@ -319,8 +349,6 @@ struct HomeView: View {
                 ImagePickerView().environmentObject(ImagePickerViewOrchestrator(onCapture: self.handleReceive))
             } else if self.activeSheet == .camera {
                 CameraView().environmentObject(CameraViewOrchestrator(onCapture: self.handleReceive))
-            } else if self.activeSheet == .aiExplanation {
-                AIDepthExplanationView(depthImage: self.$depthImage)
             } else {
                 InAppPurchaseView().environmentObject(InAppPurchaseOrchestrator(onUnlocked: self.onUnlockInAppPurchase, onFailed: self.onUnlockInAppPuchaseFailed))
             }
@@ -398,6 +426,12 @@ struct HomeView: View {
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView(isShowingControls: false, depthImage: DepthImage(diffuse: UIImage(named: "mango-image")!, depth: UIImage(named: "mango-depth")!, isArtificial: false))
+        HomeView(
+            depthImage: DepthImage(
+                diffuse: UIImage(named: "0_diffuse")!,
+                depth: UIImage(named: "0_depth")!,
+                isArtificial: true
+            )
+        )
     }
 }

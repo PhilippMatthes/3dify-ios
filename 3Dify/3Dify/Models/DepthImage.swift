@@ -100,12 +100,26 @@ extension UIImage {
             
             let minMax = depth.doubleMinMaxValue()
             
-            guard let image = depth.cgImage(min: minMax.0, max: minMax.1) else {
+            guard
+                let image = depth.cgImage(min: minMax.0, max: minMax.1)
+            else {
                 completion(nil)
                 return
             }
             
-            completion(UIImage(cgImage: image))
+            // Invert grayscale depth
+            let ciImage = CIImage(cgImage: image)
+            guard let filter = CIFilter(name: "CIColorInvert") else {
+                completion(nil)
+                return
+            }
+            filter.setValue(ciImage, forKey: kCIInputImageKey)
+            guard let invertedImage = filter.outputImage else {
+                completion(nil)
+                return
+            }
+            
+            completion(UIImage(ciImage: invertedImage))
         }
         
         request.imageCropAndScaleOption = .scaleFill

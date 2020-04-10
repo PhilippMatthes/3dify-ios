@@ -22,6 +22,7 @@ struct ControlViewDivider: View {
 
 struct ControlView<Content: View>: View {
     @Binding var depthImage: DepthImage
+    @Binding var shouldShowDepth: Bool
     @Binding var isShowingArtificialDepth: Bool
     @Binding var isShowingControls: Bool
     @Binding var selectedAnimationInterval: TimeInterval
@@ -35,7 +36,6 @@ struct ControlView<Content: View>: View {
     var onShowPicker: () -> Void
     var onShowCamera: () -> Void
     var onSaveButtonPressed: () -> Void
-    var onShowAIExplanation: () -> Void
     
     var springAnimation: Animation {
         .interpolatingSpring(stiffness: 300.0, damping: 20.0, initialVelocity: 10.0)
@@ -81,20 +81,18 @@ struct ControlView<Content: View>: View {
                         .padding(.top, self.isShowingSettings ? (UIScreen.main.bounds.height / 2)  - geometry.safeAreaInsets.top - geometry.safeAreaInsets.bottom : 0)
                     
                     if self.isShowingArtificialDepth {
-                        Button(action: self.onShowAIExplanation) {
-                            HStack {
-                                Image(systemName: "wand.and.rays")
-                                    .resizable()
-                                    .frame(width: 12, height: 12)
-                                Text("Artificial Depth")
-                                    .font(.footnote)
-                            }
-                            .foregroundColor(Color.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 4)
-                            .background(Capsule().fill(Color.yellow))
-                            .padding(.vertical, 8)
+                        HStack {
+                            Image(systemName: "wand.and.rays")
+                                .resizable()
+                                .frame(width: 12, height: 12)
+                            Text("AI Depth")
+                                .font(.footnote)
                         }
+                        .foregroundColor(Color.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(Capsule().fill(Color.yellow))
+                        .padding(.vertical, 8)
                     }
                     
                     if self.isShowingSettings {
@@ -102,7 +100,7 @@ struct ControlView<Content: View>: View {
                             ControlViewDivider()
                             
                             ZStack(alignment: .bottom) {
-                                Slider(value: self.$selectedAnimationInterval, in: 0.5...10)
+                                Slider(value: self.$selectedAnimationInterval, in: 1...5)
                                 .padding(.bottom, 24)
                                 HStack {
                                     Text("0.5s").font(.footnote)
@@ -204,6 +202,7 @@ struct ControlView<Content: View>: View {
 struct ControlView_Previews: PreviewProvider {
     static var previews: some View {
         ControlView(depthImage: .constant(DepthImage(diffuse: UIImage(named: "mango-image")!, depth: UIImage(named: "mango-depth")!, isArtificial: false)),
+                    shouldShowDepth: .constant(false),
                     isShowingArtificialDepth: .constant(true),
                     isShowingControls: .constant(true),
                     selectedAnimationInterval: .constant(2),
@@ -214,8 +213,7 @@ struct ControlView_Previews: PreviewProvider {
                     isShowingSettings: false,
                     onShowPicker: {},
                     onShowCamera: {},
-                    onSaveButtonPressed: {},
-                    onShowAIExplanation: {}
+                    onSaveButtonPressed: {}
         ) {
             VStack {
                 HStack {

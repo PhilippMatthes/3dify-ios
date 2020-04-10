@@ -26,7 +26,6 @@
 		BE8535262430F15600557392 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8535252430F15600557392 /* ControlView.swift */; };
 		BE87EA1A243C552300BF1B02 /* ButtonStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE87EA19243C552300BF1B02 /* ButtonStyles.swift */; };
 		BE8B3FDB242FE86E0075F6EA /* CameraRollVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8B3FDA242FE86E0075F6EA /* CameraRollVideo.swift */; };
-		BE96188F2438902A00CDD442 /* AIDepthExplanationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE96188E2438902A00CDD442 /* AIDepthExplanationView.swift */; };
 		BEBF333E242F9342008EEDAD /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF333D242F9342008EEDAD /* ImagePickerView.swift */; };
 		BEBF3340242F9907008EEDAD /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF333F242F9907008EEDAD /* CameraView.swift */; };
 		BEBF3342242F9B09008EEDAD /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBF3341242F9B09008EEDAD /* CameraPreviewView.swift */; };
@@ -42,6 +41,7 @@
 		BEFD9CF124407B9B00880A8A /* CustomPhotoAlbum.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFD9CF024407B9B00880A8A /* CustomPhotoAlbum.swift */; };
 		BEFD9CFA2440AA8200880A8A /* MLMultiArray+Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFD9CF82440AA8200880A8A /* MLMultiArray+Image.swift */; };
 		BEFD9CFB2440AA8200880A8A /* CGImage+RawBytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFD9CF92440AA8200880A8A /* CGImage+RawBytes.swift */; };
+		BEFD9CFD2440CE1700880A8A /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFD9CFC2440CE1700880A8A /* BlurView.swift */; };
 		BEFDCA34242B5CBB002AF520 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFDCA33242B5CBB002AF520 /* Colors.swift */; };
 /* End PBXBuildFile section */
 
@@ -68,7 +68,6 @@
 		BE8535252430F15600557392 /* ControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlView.swift; sourceTree = "<group>"; };
 		BE87EA19243C552300BF1B02 /* ButtonStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyles.swift; sourceTree = "<group>"; };
 		BE8B3FDA242FE86E0075F6EA /* CameraRollVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraRollVideo.swift; sourceTree = "<group>"; };
-		BE96188E2438902A00CDD442 /* AIDepthExplanationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIDepthExplanationView.swift; sourceTree = "<group>"; };
 		BEBF333D242F9342008EEDAD /* ImagePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
 		BEBF333F242F9907008EEDAD /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		BEBF3341242F9B09008EEDAD /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
@@ -87,6 +86,7 @@
 		BEFD9CF024407B9B00880A8A /* CustomPhotoAlbum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPhotoAlbum.swift; sourceTree = "<group>"; };
 		BEFD9CF82440AA8200880A8A /* MLMultiArray+Image.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MLMultiArray+Image.swift"; sourceTree = "<group>"; };
 		BEFD9CF92440AA8200880A8A /* CGImage+RawBytes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGImage+RawBytes.swift"; sourceTree = "<group>"; };
+		BEFD9CFC2440CE1700880A8A /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
 		BEFDCA33242B5CBB002AF520 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -143,7 +143,6 @@
 				BE31A11F242A815000019FE1 /* Picker */,
 				BE31A11D242A7F7100019FE1 /* Camera */,
 				BE31A11E242A7F7C00019FE1 /* Parallax */,
-				BE96188D2438900900CDD442 /* Explanation */,
 				BE1C24F82426150900276024 /* AppDelegate.swift */,
 				BEFDCA33242B5CBB002AF520 /* Colors.swift */,
 				BE1C24FC2426150900276024 /* HomeView.swift */,
@@ -169,6 +168,7 @@
 			children = (
 				BED5F75E24310A2F001A2667 /* LoadingView.swift */,
 				BE87EA19243C552300BF1B02 /* ButtonStyles.swift */,
+				BEFD9CFC2440CE1700880A8A /* BlurView.swift */,
 			);
 			path = "Supporting Views";
 			sourceTree = "<group>";
@@ -228,14 +228,6 @@
 				BE26889E242B5B1100F165C5 /* Computer Vision */,
 			);
 			path = "Supporting Extensions";
-			sourceTree = "<group>";
-		};
-		BE96188D2438900900CDD442 /* Explanation */ = {
-			isa = PBXGroup;
-			children = (
-				BE96188E2438902A00CDD442 /* AIDepthExplanationView.swift */,
-			);
-			path = Explanation;
 			sourceTree = "<group>";
 		};
 		BECDE3B12434805B00939DBA /* Encoders */ = {
@@ -411,6 +403,7 @@
 				BEFABCC6243B7A6E007F89B2 /* InAppPurchaseView.swift in Sources */,
 				BEFDCA34242B5CBB002AF520 /* Colors.swift in Sources */,
 				BE2688AE242B5B8700F165C5 /* CVPixelBuffer+Utils.swift in Sources */,
+				BEFD9CFD2440CE1700880A8A /* BlurView.swift in Sources */,
 				BE8535262430F15600557392 /* ControlView.swift in Sources */,
 				BECDE3E72434AB7300939DBA /* ParallaxOcclusion.metal in Sources */,
 				BEFD9CFB2440AA8200880A8A /* CGImage+RawBytes.swift in Sources */,
@@ -418,7 +411,6 @@
 				BE1C24FB2426150900276024 /* SceneDelegate.swift in Sources */,
 				BEFD9CFA2440AA8200880A8A /* MLMultiArray+Image.swift in Sources */,
 				BE124EC32435D9D70004A66E /* BlurPassEncoder.m in Sources */,
-				BE96188F2438902A00CDD442 /* AIDepthExplanationView.swift in Sources */,
 				BEBF3342242F9B09008EEDAD /* CameraPreviewView.swift in Sources */,
 				BE124EC62435DE6C0004A66E /* Blur.metal in Sources */,
 				BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */,

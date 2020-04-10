@@ -66,5 +66,9 @@ class Gradients {
     static let lush = Gradient(colors: [
         Color(hex: "#56ab2f"), Color(hex: "#a8e063")
     ])
+    
+    static let lunada = Gradient(colors: [
+        Color(hex: "#5433FF"), Color(hex: "#20BDFF"), Color(hex: "#A5FECB")
+    ])
 }
 

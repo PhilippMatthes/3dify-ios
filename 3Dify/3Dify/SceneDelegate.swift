@@ -22,10 +22,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 
+        let imageIndexToPick = Int.random(in: 0...7)
+        
         let contentView = HomeView(
             depthImage: DepthImage(
-                diffuse: UIImage(named: "image-banner")!,
-                depth: UIImage(named: "depth-banner")!,
+                diffuse: UIImage(named: "\(imageIndexToPick)_diffuse")!,
+                depth: UIImage(named: "\(imageIndexToPick)_depth")!,
                 isArtificial: true
             )
         )
