@@ -52,8 +52,11 @@ struct MetalParallaxViewBestFitContainer: View {
     @Binding var depthImage: DepthImage
     
     @Binding var isPaused: Bool
-    @Binding var isSaving: Bool
+    @Binding var isSavingToVideo: Bool
+    @Binding var isSavingToPhotos: Bool
+    
     var onSaveVideoUpdate: (SaveState) -> ()
+    var onSavePhotosUpdate: (SaveState) -> ()
     
     func bestFitLayout(for frame: CGRect) -> CGRect {
         let viewAspectRatio = frame.size.height / frame.size.width
@@ -93,8 +96,10 @@ struct MetalParallaxViewBestFitContainer: View {
                 selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
                 depthImage: self.$depthImage,
                 isPaused: self.$isPaused,
-                isSaving: self.$isSaving,
-                onSaveVideoUpdate: self.onSaveVideoUpdate
+                isSavingToVideo: self.$isSavingToVideo,
+                isSavingToPhotos: self.$isSavingToPhotos,
+                onSaveVideoUpdate: self.onSaveVideoUpdate,
+                onSavePhotosUpdate: self.onSavePhotosUpdate
             )
             .frame(rect: self.bestFitLayout(for: geometry.frame(in: .local)))
         }
@@ -113,8 +118,11 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
     @Binding var depthImage: DepthImage
     
     @Binding var isPaused: Bool
-    @Binding var isSaving: Bool
+    @Binding var isSavingToVideo: Bool
+    @Binding var isSavingToPhotos: Bool
+    
     var onSaveVideoUpdate: (SaveState) -> ()
+    var onSavePhotosUpdate: (SaveState) -> ()
     
     func makeUIView(context: UIViewRepresentableContext<MetalParallaxViewRepresentable>) -> MetalParallaxView {
         let view = MetalParallaxView(frame: .zero, shouldShowWatermark: shouldShowWatermark)
@@ -164,8 +172,11 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
         if view.isPaused != isPaused {
             view.isPaused = isPaused
         }
-        if isSaving {
+        if isSavingToVideo {
             view.renderVideo(update: self.onSaveVideoUpdate)
+        }
+        if isSavingToPhotos {
+            view.renderPhotos(update: self.onSavePhotosUpdate)
         }
     }
 }
@@ -395,6 +406,90 @@ extension MetalParallaxView {
         return nil
     }
     
+    public func renderPhotos(update: @escaping (SaveState) -> ()) {
+        var diffuse: UIImage?
+        var depth: UIImage?
+        
+        let renderQueue = DispatchQueue.main
+        let shouldShowDepthAfterwards = self.shouldShowDepth
+        
+        renderQueue.async {
+            update(.rendering(0))
+            
+            self.onBeforeRenderFrame = {
+                // Step 1: Render diffuse
+                if diffuse == nil && depth == nil {
+                    self.offset = .zero
+                    self.shouldShowDepth = false
+                    update(.rendering(0.5))
+                }
+                // Step 2: Render depth
+                if diffuse != nil, depth == nil {
+                    self.offset = .zero
+                    self.shouldShowDepth = true
+                    update(.rendering(1))
+                }
+                // Step 3: Save to camera roll
+                if let diffuse = diffuse, let depth = depth {
+                    self.onBeforeRenderFrame = nil
+                    self.onAfterRenderFrame = nil
+                    
+                    update(.saving)
+                    DispatchQueue.main.async {
+                        self.shouldShowDepth = shouldShowDepthAfterwards
+                        CustomPhotoAlbum.getOrCreate(albumWithName: "3Dify Photos") { album, error in
+                            guard error == nil, let album = album else {
+                                update(.failed)
+                                return
+                            }
+                            album.save(image: diffuse) { error in
+                                guard error == nil else {
+                                    update(.failed)
+                                    return
+                                }
+                                
+                                album.save(image: depth) { error in
+                                    guard error == nil else {
+                                        update(.failed)
+                                        return
+                                    }
+                                    
+                                    update(.finished)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            self.onAfterRenderFrame = { texture in
+                autoreleasepool {
+                    guard
+                        diffuse == nil || depth == nil,
+                        let snapshot = self.snapshot()?.cgImage
+                    else {
+                        // Rendering failed
+                        update(.failed)
+                        self.onBeforeRenderFrame = nil
+                        self.onAfterRenderFrame = nil
+                        return
+                    }
+                    
+                    // Step 1: Render diffuse
+                    if diffuse == nil && depth == nil {
+                        diffuse = UIImage(cgImage: snapshot)
+                        return
+                    }
+                    // Step 2: Render depth
+                    if diffuse != nil, depth == nil {
+                        depth = UIImage(cgImage: snapshot)
+                        return
+                    }
+                }
+            }
+        }
+    }
+    
     public func renderVideo(update: @escaping (SaveState) -> ()) {
         guard
             let selectedAnimationInterval = self.selectedAnimationInterval,
@@ -406,7 +501,7 @@ extension MetalParallaxView {
             return
         }
         
-        let renderQueue = DispatchQueue(label: "Render Queue", qos: .background)
+        let renderQueue = DispatchQueue.main
         
         renderQueue.async {
             video.startWriting()
@@ -442,6 +537,10 @@ extension MetalParallaxView {
                     
                     renderQueue.async {
                         video.finishWriting() { url in
+                            guard let url = url else {
+                                update(.failed)
+                                return
+                            }
                             DispatchQueue.main.async {
                                 CustomPhotoAlbum.getOrCreate(albumWithName: "3Dify Videos") { album, error in
                                     guard

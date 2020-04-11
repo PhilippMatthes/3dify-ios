@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2CD9F38FA9AA0258E72447B6 /* Pods_3Dify.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B6282E6A907A1F89B32F01D /* Pods_3Dify.framework */; };
 		BE09D4EE243C89B900CFCF4D /* DepthImageConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE09D4ED243C89B900CFCF4D /* DepthImageConvertible.swift */; };
 		BE124EC32435D9D70004A66E /* BlurPassEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = BE124EC22435D9D70004A66E /* BlurPassEncoder.m */; };
 		BE124EC62435DE6C0004A66E /* Blur.metal in Sources */ = {isa = PBXBuildFile; fileRef = BE124EC52435DE6C0004A66E /* Blur.metal */; };
@@ -46,6 +47,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0B6282E6A907A1F89B32F01D /* Pods_3Dify.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_3Dify.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5035609665D29C54E09A49C4 /* Pods-3Dify.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-3Dify.debug.xcconfig"; path = "Pods/Target Support Files/Pods-3Dify/Pods-3Dify.debug.xcconfig"; sourceTree = "<group>"; };
+		66433675B1DBDD5FA195B763 /* Pods-3Dify.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-3Dify.release.xcconfig"; path = "Pods/Target Support Files/Pods-3Dify/Pods-3Dify.release.xcconfig"; sourceTree = "<group>"; };
 		BE09D4ED243C89B900CFCF4D /* DepthImageConvertible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthImageConvertible.swift; sourceTree = "<group>"; };
 		BE124EC22435D9D70004A66E /* BlurPassEncoder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlurPassEncoder.m; sourceTree = "<group>"; };
 		BE124EC42435DC7B0004A66E /* BlurPassEncoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlurPassEncoder.h; sourceTree = "<group>"; };
@@ -96,12 +100,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				BEFABCC3243B79D6007F89B2 /* StoreKit.framework in Frameworks */,
+				2CD9F38FA9AA0258E72447B6 /* Pods_3Dify.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8110F24E96F07FAFC57CA748 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				5035609665D29C54E09A49C4 /* Pods-3Dify.debug.xcconfig */,
+				66433675B1DBDD5FA195B763 /* Pods-3Dify.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		BE124EC12435D9A60004A66E /* Blur */ = {
 			isa = PBXGroup;
 			children = (
@@ -119,6 +133,7 @@
 				BE1C24F72426150900276024 /* 3Dify */,
 				BE1C24F62426150900276024 /* Products */,
 				BEFABCC1243B79D6007F89B2 /* Frameworks */,
+				8110F24E96F07FAFC57CA748 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -264,6 +279,7 @@
 			isa = PBXGroup;
 			children = (
 				BEFABCC2243B79D6007F89B2 /* StoreKit.framework */,
+				0B6282E6A907A1F89B32F01D /* Pods_3Dify.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -301,10 +317,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BE1C25092426150900276024 /* Build configuration list for PBXNativeTarget "3Dify" */;
 			buildPhases = (
+				723B65BC80C6EE64D7E8C660 /* [CP] Check Pods Manifest.lock */,
 				BE1C24F12426150900276024 /* Sources */,
 				BE1C24F22426150900276024 /* Frameworks */,
 				BE1C24F32426150900276024 /* Resources */,
 				BED5F7602431E433001A2667 /* ShellScript */,
+				238106E1CB6E47EDE2C36227 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -363,16 +381,48 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		238106E1CB6E47EDE2C36227 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-3Dify/Pods-3Dify-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/SwiftRater/SwiftRater.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftRater.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-3Dify/Pods-3Dify-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		723B65BC80C6EE64D7E8C660 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-3Dify-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		BED5F7602431E433001A2667 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-			);
-			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
@@ -555,6 +605,7 @@
 		};
 		BE1C250A2426150900276024 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5035609665D29C54E09A49C4 /* Pods-3Dify.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -577,6 +628,7 @@
 		};
 		BE1C250B2426150900276024 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 66433675B1DBDD5FA195B763 /* Pods-3Dify.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;

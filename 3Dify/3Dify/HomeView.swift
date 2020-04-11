@@ -50,6 +50,7 @@ struct HomeView: View {
     
     @State internal var loadingState: LoadingState = .hidden
     @State internal var isSavingToVideo = false
+    @State internal var isSavingToPhotos = false
     @State internal var loadingText = "Loading..."
             
     @State internal var depthImage: DepthImage
@@ -128,44 +129,33 @@ struct HomeView: View {
     
     internal func onSaveToSeparatedImages() {
         UISelectionFeedbackGenerator().selectionChanged()
-        self.loadingText = "Saving to camera roll..."
+        guard !self.isSavingToVideo && !self.isSavingToPhotos else {return}
+        self.isSavingToPhotos = true
         withAnimation(self.springAnimation) {
             self.loadingState = .loading
         }
-        let diffuse = depthImage.diffuse
-        guard let depth = depthImage.depth.resized(
-            height: diffuse.size.height,
-            width: diffuse.size.width
-        ) else {
+    }
+    
+    internal func onSavePhotosUpdate(saveState: SaveState) {
+        switch saveState {
+        case .failed:
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
             self.handleSaveError()
-            return
-        }
-        CustomPhotoAlbum.getOrCreate(albumWithName: "3Dify Photos") { album, error in
-            guard error == nil, let album = album else {
-                self.handleSaveError()
-                return
-            }
-            album.save(image: diffuse) { error in
-                guard error == nil else {
-                    self.handleSaveError()
-                    return
-                }
-                
-                album.save(image: depth) { error in
-                    guard error == nil else {
-                        self.handleSaveError()
-                        return
-                    }
-                    
-                    self.handleSaveSuccess()
-                }
-            }
+            self.isSavingToPhotos = false
+        case .rendering(let progress):
+            self.loadingText = "Rendering... \(Int(progress))%"
+        case .saving:
+            self.loadingText = "Saving to camera roll..."
+        case .finished:
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            self.handleSaveSuccess()
+            self.isSavingToPhotos = false
         }
     }
     
     internal func onSaveToVideo() {
         UISelectionFeedbackGenerator().selectionChanged()
-        guard !self.isSavingToVideo else {return}
+        guard !self.isSavingToVideo && !self.isSavingToPhotos else {return}
         self.isSavingToVideo = true
         withAnimation(self.springAnimation) {
             self.loadingState = .loading
@@ -219,6 +209,20 @@ struct HomeView: View {
         }
     }
     
+    internal func willOpenInAppPurchaseView() {
+        self.activeSheet = .inAppPurchase
+        self.isShowingSheet = true
+    }
+    
+    internal func willOpenImagePicker() {
+        self.activeSheet = .picker
+        self.isShowingSheet = true
+    }
+    
+    internal func willOpenCamera() {
+        self.activeSheet = .camera
+        self.isShowingSheet = true
+    }
     
     var body: some View {
         LoadingView(text: self.$loadingText, loadingState: self.$loadingState) {
@@ -232,9 +236,11 @@ struct HomeView: View {
                 selectedBlurIntensity: self.$selectedBlurIntensity,
                 selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
                 selectedFocalPoint: self.$selectedFocalPoint,
+                shouldShowWatermark: self.$shouldShowWatermark,
                 onShowPicker: self.onShowPicker,
                 onShowCamera: self.onShowCamera,
-                onSaveButtonPressed: self.onSaveButtonPressed
+                onSaveButtonPressed: self.onSaveButtonPressed,
+                willOpenInAppPurchaseView: self.willOpenInAppPurchaseView
             ) {
                 GeometryReader { geometry in
                     ZStack {
@@ -248,8 +254,10 @@ struct HomeView: View {
                             selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
                             depthImage: self.$depthImage,
                             isPaused: self.$isShowingSheet,
-                            isSaving: self.$isSavingToVideo,
-                            onSaveVideoUpdate: self.onSaveVideoUpdate
+                            isSavingToVideo: self.$isSavingToVideo,
+                            isSavingToPhotos: self.$isSavingToPhotos,
+                            onSaveVideoUpdate: self.onSaveVideoUpdate,
+                            onSavePhotosUpdate: self.onSavePhotosUpdate
                         )
                         .gesture(
                             MagnificationGesture()
@@ -279,39 +287,18 @@ struct HomeView: View {
                                 .fontWeight(.ultraLight)
                                 .foregroundColor(Color.white)
                                 .shadow(radius: 24)
+                                .fixedSize(horizontal: false, vertical: true)
                                 Spacer()
                                 Text("Transform your Photos into awesome 3D videos")
-                                .font(.system(size: 32))
+                                .font(.system(size: 16))
                                 .fontWeight(.semibold)
                                 .foregroundColor(Color.white)
                                 .shadow(radius: 24)
                                 .multilineTextAlignment(.center)
                                 
-                                Spacer().frame(height: 24)
+                                Spacer().frame(minHeight: 24)
                                 
-                                if self.shouldShowWatermark {
-                                    Button(action: {
-                                        self.activeSheet = .inAppPurchase
-                                        self.isShowingSheet = true
-                                    }) {
-                                        HStack {
-                                            Spacer()
-                                            Image(systemName: "eye.slash.fill")
-                                            .frame(width: 24, height: 24)
-                                            Text("Remove watermark")
-                                            Spacer()
-                                        }
-                                    }
-                                    .foregroundColor(Color.black)
-                                    .buttonStyle(OutlinedFatButtonStyle(cornerRadius: 16))
-                                    .shadow(radius: 24)
-                                    .background(BlurView(style: .extraLight).cornerRadius(16))
-                                }
-                                
-                                Button(action: {
-                                    self.activeSheet = .picker
-                                    self.isShowingSheet = true
-                                }) {
+                                Button(action: self.willOpenImagePicker) {
                                     HStack {
                                         Spacer()
                                         Image(systemName: "cube.box.fill")
@@ -323,12 +310,9 @@ struct HomeView: View {
                                 .foregroundColor(Color.black)
                                 .buttonStyle(OutlinedFatButtonStyle(cornerRadius: 16))
                                 .shadow(radius: 24)
-                                .background(BlurView(style: .extraLight).cornerRadius(16))
+                                .background(LinearGradient(gradient: Gradients.clouds, startPoint: .topLeading, endPoint: .bottomTrailing).cornerRadius(16))
                                 
-                                Button(action: {
-                                    self.activeSheet = .camera
-                                    self.isShowingSheet = true
-                                }) {
+                                Button(action: self.willOpenCamera) {
                                     HStack {
                                         Spacer()
                                         Image(systemName: "camera.fill")
@@ -340,9 +324,10 @@ struct HomeView: View {
                                 .foregroundColor(Color.black)
                                 .buttonStyle(OutlinedFatButtonStyle(cornerRadius: 16))
                                 .shadow(radius: 24)
-                                .background(BlurView(style: .extraLight).cornerRadius(16))
+                                .background(LinearGradient(gradient: Gradients.clouds, startPoint: .topLeading, endPoint: .bottomTrailing).cornerRadius(16))
 
                                 Spacer()
+                                    .frame(minHeight: 168)
                             }
                             .padding(.horizontal, 24)
                             .padding(.top, 128)
@@ -355,7 +340,6 @@ struct HomeView: View {
                 }
             }
         }
-        .background(Color.black)
         .sheet(isPresented: self.$isShowingSheet, onDismiss: self.onDismissSheet) {
             if self.activeSheet == .picker {
                 ImagePickerView().environmentObject(ImagePickerViewOrchestrator(onCapture: self.handleReceive))

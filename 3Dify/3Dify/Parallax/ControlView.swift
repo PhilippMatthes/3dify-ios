@@ -30,12 +30,15 @@ struct ControlView<Content: View>: View {
     @Binding var selectedBlurIntensity: Float
     @Binding var selectedAnimationTypeRawValue: Int
     @Binding var selectedFocalPoint: Float
+    @Binding var shouldShowWatermark: Bool
     
     @State var isShowingSettings = false
     
     var onShowPicker: () -> Void
     var onShowCamera: () -> Void
     var onSaveButtonPressed: () -> Void
+    
+    var willOpenInAppPurchaseView: () -> Void
     
     var springAnimation: Animation {
         .interpolatingSpring(stiffness: 300.0, damping: 20.0, initialVelocity: 10.0)
@@ -193,6 +196,28 @@ struct ControlView<Content: View>: View {
                     
                     Spacer()
                     
+                    if self.shouldShowWatermark {
+                        HStack {
+                            Spacer()
+                            Button(action: self.willOpenInAppPurchaseView) {
+                                HStack {
+                                    Image(systemName: "eye.slash.fill")
+                                        .resizable()
+                                        .frame(width: 12, height: 12)
+                                    Text("Remove watermark")
+                                        .font(.footnote)
+                                }
+                                .foregroundColor(Color.black)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 4)
+                                .background(Capsule().fill(Color.white))
+                                .padding(.vertical, 8)
+                                .padding(.bottom, 24)
+                            }
+                            Spacer()
+                        }
+                    }
+                    
                     if self.isShowingControls && !self.isShowingSettings {
                         HStack {
                             Spacer()
@@ -220,19 +245,28 @@ struct ControlView<Content: View>: View {
 
 struct ControlView_Previews: PreviewProvider {
     static var previews: some View {
-        ControlView(depthImage: .constant(DepthImage(diffuse: UIImage(named: "mango-image")!, depth: UIImage(named: "mango-depth")!, isArtificial: false)),
-                    shouldShowDepth: .constant(false),
-                    isShowingArtificialDepth: .constant(true),
-                    isShowingControls: .constant(true),
-                    selectedAnimationInterval: .constant(2),
-                    selectedAnimationIntensity: .constant(0.05),
-                    selectedBlurIntensity: .constant(5),
-                    selectedAnimationTypeRawValue: .constant(0),
-                    selectedFocalPoint: .constant(0),
-                    isShowingSettings: false,
-                    onShowPicker: {},
-                    onShowCamera: {},
-                    onSaveButtonPressed: {}
+        ControlView(
+            depthImage: .constant(
+                DepthImage(
+                    diffuse: UIImage(named: "mango-image")!,
+                    depth: UIImage(named: "mango-depth")!,
+                    isArtificial: false
+                )
+            ),
+            shouldShowDepth: .constant(false),
+            isShowingArtificialDepth: .constant(true),
+            isShowingControls: .constant(true),
+            selectedAnimationInterval: .constant(2),
+            selectedAnimationIntensity: .constant(0.05),
+            selectedBlurIntensity: .constant(5),
+            selectedAnimationTypeRawValue: .constant(0),
+            selectedFocalPoint: .constant(0),
+            shouldShowWatermark: .constant(false),
+            isShowingSettings: false,
+            onShowPicker: {},
+            onShowCamera: {},
+            onSaveButtonPressed: {},
+            willOpenInAppPurchaseView: {}
         ) {
             VStack {
                 HStack {

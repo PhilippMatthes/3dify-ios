@@ -94,10 +94,16 @@ open class CameraRollVideo: NSObject {
         }
     }
     
-    open func finishWriting(completion: @escaping (URL) -> ()) {
+    open func finishWriting(completion: @escaping (URL?) -> ()) {
         writeInput.markAsFinished()
+        guard assetWriter.error == nil else {
+            print(assetWriter.error!)
+            completion(nil)
+            return
+        }
         assetWriter.finishWriting {
             completion(self.temporaryFileURL)
+            return
         }
     }
     

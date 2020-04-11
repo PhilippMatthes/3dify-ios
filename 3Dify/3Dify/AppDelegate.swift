@@ -7,10 +7,17 @@
 //
 
 import UIKit
+import SwiftRater
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        SwiftRater.usesUntilPrompt = 2
+        SwiftRater.daysBeforeReminding = 1
+        SwiftRater.showLaterButton = true
+        SwiftRater.debugMode = false
+        SwiftRater.appLaunched()
+        
         return true
     }
 

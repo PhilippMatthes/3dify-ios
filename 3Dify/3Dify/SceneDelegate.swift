@@ -9,10 +9,17 @@
 import UIKit
 import SwiftUI
 import MetalKit
+import SwiftRater
 
 class HostingController: UIHostingController<HomeView> {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        SwiftRater.check()
     }
 }
 
@@ -22,7 +29,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 
-        let imageIndexToPick = Int.random(in: 0...7)
+        let imageIndexToPick = Int.random(in: 0...6)
         
         let contentView = HomeView(
             depthImage: DepthImage(
