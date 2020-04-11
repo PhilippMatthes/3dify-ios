@@ -180,7 +180,7 @@ struct InAppPurchaseView: View {
                     VStack(alignment: .center) {
                         Spacer()
                         LinearGradient(
-                            gradient: Gradients.lunada,
+                            gradient: Gradients.learningLeading,
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )

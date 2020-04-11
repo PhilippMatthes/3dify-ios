@@ -82,23 +82,21 @@ struct MetalParallaxViewBestFitContainer: View {
     }
     
     var body: some View {
-        GeometryReader { outerGeometry in
-            GeometryReader { innerGeometry in
-                MetalParallaxViewRepresentable(
-                    shouldShowDepth: self.$shouldShowDepth,
-                    shouldShowWatermark: self.$shouldShowWatermark,
-                    selectedAnimationInterval: self.$selectedAnimationInterval,
-                    selectedAnimationIntensity: self.$selectedAnimationIntensity,
-                    selectedFocalPoint: self.$selectedFocalPoint,
-                    selectedBlurIntensity: self.$selectedBlurIntensity,
-                    selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
-                    depthImage: self.$depthImage,
-                    isPaused: self.$isPaused,
-                    isSaving: self.$isSaving,
-                    onSaveVideoUpdate: self.onSaveVideoUpdate
-                )
-                .frame(rect: self.bestFitLayout(for: innerGeometry.frame(in: .local)))
-            }.frame(rect: outerGeometry.frame(in: .local))
+        GeometryReader { geometry in
+            MetalParallaxViewRepresentable(
+                shouldShowDepth: self.$shouldShowDepth,
+                shouldShowWatermark: self.$shouldShowWatermark,
+                selectedAnimationInterval: self.$selectedAnimationInterval,
+                selectedAnimationIntensity: self.$selectedAnimationIntensity,
+                selectedFocalPoint: self.$selectedFocalPoint,
+                selectedBlurIntensity: self.$selectedBlurIntensity,
+                selectedAnimationTypeRawValue: self.$selectedAnimationTypeRawValue,
+                depthImage: self.$depthImage,
+                isPaused: self.$isPaused,
+                isSaving: self.$isSaving,
+                onSaveVideoUpdate: self.onSaveVideoUpdate
+            )
+            .frame(rect: self.bestFitLayout(for: geometry.frame(in: .local)))
         }
     }
 }
@@ -179,6 +177,7 @@ class MetalParallaxView: MTKView {
     
     var depthImage: DepthImage? {
         didSet {
+            releaseDrawables()
             guard let depthImage = depthImage, let device = device else {return}
             let textureLoader = MTKTextureLoader(device: device)
             
@@ -313,7 +312,7 @@ class MetalParallaxView: MTKView {
         overlaySKView?.allowsTransparency = true
         overlaySKView?.backgroundColor = .clear
         overlaySKView?.frame = bounds
-        
+        overlaySKView?.isPaused = true
         addSubview(overlaySKView!)
     }
     
@@ -412,7 +411,8 @@ extension MetalParallaxView {
         renderQueue.async {
             video.startWriting()
         
-            let loops = 3
+            let approximateVideoLength = 10
+            let loops = Int(floor(Double(approximateVideoLength) / selectedAnimationInterval))
             let fps = 30
             let frames = Int(selectedAnimationInterval) * fps * loops
             var offsetsToRender = (0..<frames).reversed().map { frameIndex -> (Double, CGPoint) in

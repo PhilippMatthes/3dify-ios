@@ -56,6 +56,8 @@ struct HomeView: View {
     
     @State internal var shouldShowDepth = false
     
+    @State internal var imageScale: CGFloat = 1
+    
     internal var springAnimation: Animation {
         .interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0)
     }
@@ -249,20 +251,31 @@ struct HomeView: View {
                             isSaving: self.$isSavingToVideo,
                             onSaveVideoUpdate: self.onSaveVideoUpdate
                         )
+                        .gesture(
+                            MagnificationGesture()
+                                .onChanged { value in
+                                    guard self.isShowingControls else {return}
+                                    self.imageScale *= value
+                                }
+                                .onEnded { _ in
+                                    guard self.isShowingControls else {return}
+                                    withAnimation {
+                                        self.imageScale = 1
+                                    }
+                                }
+                        )
                         .onTapGesture {
                             self.shouldShowDepth.toggle()
                         }
+                        .scaleEffect(self.imageScale)
                         
 //                        Image("7_diffuse").resizable().scaledToFill()
                         
                         if !self.isShowingControls {
-                            BlurView(style: .regular)
-                                .frame(width: 76)
-                                .offset(x: -geometry.size.width / 2 + 32)
                             
-                            VStack(alignment: .leading) {
+                            VStack(alignment: .center) {
                                 Text("3Dify")
-                                .font(.system(size: 64))
+                                .font(.system(size: 100))
                                 .fontWeight(.ultraLight)
                                 .foregroundColor(Color.white)
                                 .shadow(radius: 24)
@@ -272,9 +285,7 @@ struct HomeView: View {
                                 .fontWeight(.semibold)
                                 .foregroundColor(Color.white)
                                 .shadow(radius: 24)
-                                Image(systemName: "arrow.down.right")
-                                .foregroundColor(.white)
-                                .padding(.leading, 4)
+                                .multilineTextAlignment(.center)
                                 
                                 Spacer().frame(height: 24)
                                 
@@ -344,6 +355,7 @@ struct HomeView: View {
                 }
             }
         }
+        .background(Color.black)
         .sheet(isPresented: self.$isShowingSheet, onDismiss: self.onDismissSheet) {
             if self.activeSheet == .picker {
                 ImagePickerView().environmentObject(ImagePickerViewOrchestrator(onCapture: self.handleReceive))

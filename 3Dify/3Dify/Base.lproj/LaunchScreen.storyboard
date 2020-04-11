@@ -19,8 +19,8 @@
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3Dify" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0OJ-9Z-n4r">
-                                <rect key="frame" x="94" y="436.5" width="226.5" height="119.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="100"/>
+                                <rect key="frame" x="107" y="436.5" width="200" height="119.5"/>
+                                <fontDescription key="fontDescription" type="system" weight="ultraLight" pointSize="100"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>

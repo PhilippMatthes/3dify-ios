@@ -43,11 +43,34 @@ struct ControlView<Content: View>: View {
     
     var content: () -> Content
     
+    func contentPaddingTop(in geometry: GeometryProxy) -> CGFloat {
+        if self.isShowingSettings {
+            return 36 + (UIScreen.main.bounds.height / 2) - geometry.safeAreaInsets.top - geometry.safeAreaInsets.bottom
+        } else if self.isShowingControls {
+            return 36 + geometry.safeAreaInsets.top
+        } else {
+            return 0
+        }
+    }
+    
+    func contentPaddingBottom(in geometry: GeometryProxy) -> CGFloat {
+        if self.isShowingControls && !self.isShowingSettings {
+            return 100 + geometry.safeAreaInsets.bottom
+        } else {
+            return 0
+        }
+    }
+    
     var body: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 0) {
-                if self.isShowingControls {
-                    VStack {
+        ZStack(alignment: .center) {
+            GeometryReader { geometry in
+                self.content()
+                    .padding(.top, self.contentPaddingTop(in: geometry))
+                    .padding(.bottom, self.contentPaddingBottom(in: geometry))
+                    .frame(maxWidth: geometry.size.width, maxHeight: geometry.size.height)
+            
+                VStack(spacing: 0) {
+                    if self.isShowingControls {
                         HStack {
                             Button(action: self.onShowPicker) {
                                 Image(systemName: "cube.box.fill")
@@ -66,33 +89,12 @@ struct ControlView<Content: View>: View {
                                     .foregroundColor(self.isShowingSettings ? Color.yellow : Color.white)
                             }
                         }
-                    }
-                    .padding(.top, geometry.safeAreaInsets.top + 12)
-                    .padding(.bottom, 24)
-                    .padding(.horizontal, 24)
-                    .background(Color.black)
-                    .foregroundColor(Color.white)
-                    .transition(.opacity)
-                }
-                
-                ZStack(alignment: .top) {
-                    
-                    self.content()
-                        .padding(.top, self.isShowingSettings ? (UIScreen.main.bounds.height / 2)  - geometry.safeAreaInsets.top - geometry.safeAreaInsets.bottom : 0)
-                    
-                    if self.isShowingArtificialDepth {
-                        HStack {
-                            Image(systemName: "wand.and.rays")
-                                .resizable()
-                                .frame(width: 12, height: 12)
-                            Text("AI Depth")
-                                .font(.footnote)
-                        }
+                        .padding(.top, geometry.safeAreaInsets.top + 12)
+                        .padding(.bottom, 24)
+                        .padding(.horizontal, 24)
+                        .background(Color.black)
                         .foregroundColor(Color.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 4)
-                        .background(Capsule().fill(Color.yellow))
-                        .padding(.vertical, 8)
+                        .transition(.opacity)
                     }
                     
                     if self.isShowingSettings {
@@ -100,12 +102,12 @@ struct ControlView<Content: View>: View {
                             ControlViewDivider()
                             
                             ZStack(alignment: .bottom) {
-                                Slider(value: self.$selectedAnimationInterval, in: 1...5)
+                                Slider(value: self.$selectedAnimationInterval, in: 1...10)
                                 .padding(.bottom, 24)
                                 HStack {
-                                    Text("0.5s").font(.footnote)
+                                    Text("1s").font(.footnote)
                                     Spacer()
-                                    Text("5s").font(.footnote)
+                                    Text("10s").font(.footnote)
                                 }
                                 Text("Animation Interval").font(.footnote)
                             }
@@ -171,27 +173,44 @@ struct ControlView<Content: View>: View {
                         .background(Color(hex: "#222"))
                         .foregroundColor(Color.white)
                         .accentColor(Color.yellow)
-                        .frame(height: self.isShowingControls ? (UIScreen.main.bounds.height / 2) : 0)
+                        .frame(maxHeight: self.isShowingControls ? (UIScreen.main.bounds.height / 2) : 0)
                     }
-                }
-                
-                if self.isShowingControls && !self.isShowingSettings {
-                    HStack {
-                        Spacer()
-                        Button(action: self.onSaveButtonPressed) {
-                            Image(systemName: "square.and.arrow.down.on.square.fill")
-                                .foregroundColor(Color.black)
+                    
+                    if self.isShowingArtificialDepth {
+                        HStack {
+                            Image(systemName: "wand.and.rays")
+                                .resizable()
+                                .frame(width: 12, height: 12)
+                            Text("AI Depth")
+                                .font(.footnote)
                         }
-                        .buttonStyle(CameraButtonStyle())
-                        Spacer()
+                        .foregroundColor(Color.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(Capsule().fill(Color.yellow))
+                        .padding(.vertical, 8)
                     }
-                    .padding(.bottom, 32 + geometry.safeAreaInsets.bottom)
-                    .padding(.top, 32)
-                    .padding(12)
-                    .background(Color.black)
-                    .accentColor(Color.yellow)
-                    .foregroundColor(Color.white)
-                    .transition(.move(edge: .bottom))
+                    
+                    Spacer()
+                    
+                    if self.isShowingControls && !self.isShowingSettings {
+                        HStack {
+                            Spacer()
+                            Button(action: self.onSaveButtonPressed) {
+                                Image(systemName: "square.and.arrow.down.on.square.fill")
+                                    .foregroundColor(Color.black)
+                            }
+                            .buttonStyle(CameraButtonStyle())
+                            Spacer()
+                        }
+                        .padding(.bottom, 32 + geometry.safeAreaInsets.bottom)
+                        .padding(.top, 32)
+                        .padding(12)
+                        .background(Color.black)
+                        .accentColor(Color.yellow)
+                        .foregroundColor(Color.white)
+                        .transition(.move(edge: .bottom))
+                    }
                 }
             }
         }
