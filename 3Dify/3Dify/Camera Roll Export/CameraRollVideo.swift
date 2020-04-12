@@ -25,21 +25,24 @@ open class CameraRollVideo: NSObject {
             return nil
         }
         
-        let temporaryFilePath = "\(path)/temporary_video.mp4"
+        let temporaryFilePath = "\(path)/video.mp4"
         temporaryFileURL =  URL(fileURLWithPath: temporaryFilePath)
         
         if(FileManager.default.fileExists(atPath: temporaryFilePath)) {
-            guard (try? FileManager.default.removeItem(
-                atPath: temporaryFilePath
-            )) != nil else {
+            guard ((try? FileManager.default.removeItem(at: temporaryFileURL)) != nil) else {
                 return nil
             }
         }
 
-        guard let assetWriter = try? AVAssetWriter(
-            url: temporaryFileURL,
-            fileType: AVFileType.mp4
-        ) else {return nil}
+        guard
+            let assetWriter = try? AVAssetWriter(
+                url: temporaryFileURL,
+                fileType: AVFileType.mp4
+            ),
+            assetWriter.error == nil
+        else {
+            return nil
+        }
         
         self.assetWriter = assetWriter
 
@@ -83,15 +86,16 @@ open class CameraRollVideo: NSObject {
     }
     
     open func append(cgImage: CGImage) {
-        autoreleasepool {
-            guard let sampleBuffer = self.newPixelBufferFrom(cgImage: cgImage) else {
-                return
-            }
-            let lastTime = CMTimeMake(value: currentFrame, timescale: self.frameTime.timescale)
-            let presentTime = CMTimeAdd(lastTime, self.frameTime)
-            self.bufferAdaptor.append(sampleBuffer, withPresentationTime: presentTime)
-            self.currentFrame += 1
+        guard
+            let sampleBuffer = self.newPixelBufferFrom(cgImage: cgImage),
+            self.assetWriter.error == nil
+        else {
+            return
         }
+        let lastTime = CMTimeMake(value: currentFrame, timescale: self.frameTime.timescale)
+        let presentTime = CMTimeAdd(lastTime, self.frameTime)
+        self.bufferAdaptor.append(sampleBuffer, withPresentationTime: presentTime)
+        self.currentFrame += 1
     }
     
     open func finishWriting(completion: @escaping (URL?) -> ()) {
@@ -117,7 +121,7 @@ open class CameraRollVideo: NSObject {
         guard status == kCVReturnSuccess && pxbuffer != nil else {
             return nil
         }
-
+        
         CVPixelBufferLockBaseAddress(pxbuffer!, CVPixelBufferLockFlags(rawValue: 0))
         let pxdata = CVPixelBufferGetBaseAddress(pxbuffer!)
         let rgbColorSpace = CGColorSpaceCreateDeviceRGB()

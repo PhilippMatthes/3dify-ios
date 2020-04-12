@@ -134,6 +134,10 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
         view.selectedAnimationInterval = selectedAnimationInterval
         view.selectedAnimationIntensity = selectedAnimationIntensity
         view.isPaused = isPaused
+        view.isSavingToVideo = isSavingToVideo
+        view.isSavingToPhotos = isSavingToPhotos
+        view.onSaveVideoUpdate = onSaveVideoUpdate
+        view.onSavePhotosUpdate = onSavePhotosUpdate
         return view
     }
     
@@ -172,12 +176,14 @@ struct MetalParallaxViewRepresentable: UIViewRepresentable {
         if view.isPaused != isPaused {
             view.isPaused = isPaused
         }
-        if isSavingToVideo {
-            view.renderVideo(update: self.onSaveVideoUpdate)
+        if view.isSavingToVideo != isSavingToVideo {
+            view.isSavingToVideo = isSavingToVideo
         }
-        if isSavingToPhotos {
-            view.renderPhotos(update: self.onSavePhotosUpdate)
+        if view.isSavingToPhotos != isSavingToPhotos {
+            view.isSavingToPhotos = isSavingToPhotos
         }
+        view.onSaveVideoUpdate = onSaveVideoUpdate
+        view.onSavePhotosUpdate = onSavePhotosUpdate
     }
 }
 
@@ -256,7 +262,29 @@ class MetalParallaxView: MTKView {
     var parallaxOcclusionPassOutputDepthTexture: MTLTexture!
     var vBlurPassOutputTexture: MTLTexture!
     var hBlurPassOutputTexture: MTLTexture!
-
+    
+    var isSavingToVideo: Bool? {
+        willSet {
+            if newValue == true && isSavingToVideo != true {
+                renderVideo() { updatedState in
+                    self.onSaveVideoUpdate?(updatedState)
+                }
+            }
+        }
+    }
+    
+    var isSavingToPhotos: Bool? {
+        willSet {
+            if newValue == true && isSavingToPhotos != true {
+                renderPhotos() { updatedState in
+                    self.onSavePhotosUpdate?(updatedState)
+                }
+            }
+        }
+    }
+    
+    var onSaveVideoUpdate: ((SaveState) -> ())?
+    var onSavePhotosUpdate: ((SaveState) -> ())?
     
     let semaphore = DispatchSemaphore(value: 1)
     

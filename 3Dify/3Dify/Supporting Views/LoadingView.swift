@@ -40,52 +40,61 @@ enum LoadingState {
 }
 
 
+extension View {
+    @inlinable public func background<Background>(
+        _ background: Background,
+        edgesIgnoringSafeArea edges: Edge.Set
+    ) -> some View where Background : View {
+        return background
+        .edgesIgnoringSafeArea(edges)
+        .overlay(self)
+    }
+}
+
+
 struct LoadingView<Content: View>: View {
     @Binding var text: String
     @Binding var loadingState: LoadingState
     var content: () -> Content
     
     var body: some View {
-        Color.black
-        .edgesIgnoringSafeArea(.vertical)
-        .overlay(
-            ZStack {
-                self.content()
-                    .blur(radius: loadingState == .hidden ? 0 : 32)
-                    .allowsHitTesting(loadingState == .hidden)
-                
-                if loadingState != .hidden {
-                    ZStack(alignment: .center) {
-                        if loadingState == .loading {
-                            ProgressCircle()
-                            .frame(width: 64, height: 64)
-                            .padding(24)
-                        }
-                        if loadingState == .failed {
-                            Image(systemName: "exclamationmark")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 64, height: 64)
-                        }
-                        if loadingState == .finished {
-                            Image(systemName: "checkmark")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 64, height: 64)
-                        }
-                        VStack {
-                            Text(text)
-                            .padding(.top, 108)
-                            .padding(12)
-                        }
+        ZStack {
+            self.content()
+                .blur(radius: loadingState == .hidden ? 0 : 32)
+                .allowsHitTesting(loadingState == .hidden)
+            
+            if loadingState != .hidden {
+                ZStack(alignment: .center) {
+                    if loadingState == .loading {
+                        ProgressCircle()
+                        .frame(width: 64, height: 64)
+                        .padding(24)
                     }
-                    .frame(width: 256)
-                    .foregroundColor(Color.white)
-                    .background(Color.black)
-                    .cornerRadius(12)
+                    if loadingState == .failed {
+                        Image(systemName: "exclamationmark")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 64, height: 64)
+                    }
+                    if loadingState == .finished {
+                        Image(systemName: "checkmark")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 64, height: 64)
+                    }
+                    VStack {
+                        Text(text)
+                        .padding(.top, 108)
+                        .padding(12)
+                    }
                 }
+                .frame(width: 256)
+                .foregroundColor(Color.white)
+                .background(Color.black)
+                .cornerRadius(12)
             }
-        )
+        }
+        .background(Color.black, edgesIgnoringSafeArea: .all)
     }
 }
 
