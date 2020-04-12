@@ -24,6 +24,7 @@
 		BE2688B0242B5B8700F165C5 /* UIImage+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2688A2242B5B1100F165C5 /* UIImage+Utils.swift */; };
 		BE2688B1242B5B8700F165C5 /* PHAsset+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26887C242B581600F165C5 /* PHAsset+Utils.swift */; };
 		BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE31A11A242A7C7300019FE1 /* DepthImage.swift */; };
+		BE800F3624431293001DE7D1 /* View+BackgroundIgnoringSafeArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE800F3524431293001DE7D1 /* View+BackgroundIgnoringSafeArea.swift */; };
 		BE8535262430F15600557392 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8535252430F15600557392 /* ControlView.swift */; };
 		BE87EA1A243C552300BF1B02 /* ButtonStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE87EA19243C552300BF1B02 /* ButtonStyles.swift */; };
 		BE8B3FDB242FE86E0075F6EA /* CameraRollVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8B3FDA242FE86E0075F6EA /* CameraRollVideo.swift */; };
@@ -69,6 +70,7 @@
 		BE2688A2242B5B1100F165C5 /* UIImage+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Utils.swift"; sourceTree = "<group>"; };
 		BE2688A4242B5B1200F165C5 /* CGImageSource+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGImageSource+Utils.swift"; sourceTree = "<group>"; };
 		BE31A11A242A7C7300019FE1 /* DepthImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthImage.swift; sourceTree = "<group>"; };
+		BE800F3524431293001DE7D1 /* View+BackgroundIgnoringSafeArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+BackgroundIgnoringSafeArea.swift"; sourceTree = "<group>"; };
 		BE8535252430F15600557392 /* ControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlView.swift; sourceTree = "<group>"; };
 		BE87EA19243C552300BF1B02 /* ButtonStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyles.swift; sourceTree = "<group>"; };
 		BE8B3FDA242FE86E0075F6EA /* CameraRollVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraRollVideo.swift; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 			children = (
 				BEFD9CF72440AA7900880A8A /* Core ML */,
 				BE26889E242B5B1100F165C5 /* Computer Vision */,
+				BE800F3524431293001DE7D1 /* View+BackgroundIgnoringSafeArea.swift */,
 			);
 			path = "Supporting Extensions";
 			sourceTree = "<group>";
@@ -464,6 +467,7 @@
 				BEBF3342242F9B09008EEDAD /* CameraPreviewView.swift in Sources */,
 				BE124EC62435DE6C0004A66E /* Blur.metal in Sources */,
 				BE31A11B242A7C7300019FE1 /* DepthImage.swift in Sources */,
+				BE800F3624431293001DE7D1 /* View+BackgroundIgnoringSafeArea.swift in Sources */,
 				BE2688AB242B5B8700F165C5 /* AVDepthData+Utils.swift in Sources */,
 				BED5F75F24310A2F001A2667 /* LoadingView.swift in Sources */,
 				BE1C24FD2426150900276024 /* HomeView.swift in Sources */,

@@ -40,18 +40,6 @@ enum LoadingState {
 }
 
 
-extension View {
-    @inlinable public func background<Background>(
-        _ background: Background,
-        edgesIgnoringSafeArea edges: Edge.Set
-    ) -> some View where Background : View {
-        return background
-        .edgesIgnoringSafeArea(edges)
-        .overlay(self)
-    }
-}
-
-
 struct LoadingView<Content: View>: View {
     @Binding var text: String
     @Binding var loadingState: LoadingState
@@ -94,7 +82,6 @@ struct LoadingView<Content: View>: View {
                 .cornerRadius(12)
             }
         }
-        .background(Color.black, edgesIgnoringSafeArea: .all)
     }
 }
 

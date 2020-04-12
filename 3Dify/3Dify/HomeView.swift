@@ -340,6 +340,7 @@ struct HomeView: View {
                 }
             }
         }
+        .background(Color.black, edgesIgnoringSafeArea: .all)
         .sheet(isPresented: self.$isShowingSheet, onDismiss: self.onDismissSheet) {
             if self.activeSheet == .picker {
                 ImagePickerView().environmentObject(ImagePickerViewOrchestrator(onCapture: self.handleReceive))
