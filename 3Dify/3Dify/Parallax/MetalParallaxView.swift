@@ -73,14 +73,11 @@ struct MetalParallaxViewBestFitContainer: View {
             bestFitHeight = frame.height
         }
         
-        let widthPadding = CGFloat(selectedAnimationIntensity) * (1 / 0.05) * 0.1
-        let heightPadding = CGFloat(selectedAnimationIntensity) * (1 / 0.05) * 0.1
-        
         return CGRect(
-            x: -widthPadding,
-            y: -heightPadding,
-            width: bestFitWidth + 2 * widthPadding,
-            height: bestFitHeight + 2 * heightPadding
+            x: 0,
+            y: 0,
+            width: bestFitWidth,
+            height: bestFitHeight
         )
     }
     
@@ -438,7 +435,7 @@ extension MetalParallaxView {
         var diffuse: UIImage?
         var depth: UIImage?
         
-        let renderQueue = DispatchQueue.main
+        let renderQueue = DispatchQueue(label: "Render Queue", qos: .background)
         let shouldShowDepthAfterwards = self.shouldShowDepth
         
         renderQueue.async {
@@ -528,8 +525,8 @@ extension MetalParallaxView {
             update(.failed)
             return
         }
-        
-        let renderQueue = DispatchQueue.main
+                
+        let renderQueue = DispatchQueue(label: "Render Queue", qos: .background)
         
         renderQueue.async {
             video.startWriting()
@@ -562,7 +559,7 @@ extension MetalParallaxView {
                     update(.saving)
                     self.onBeforeRenderFrame = nil
                     self.onAfterRenderFrame = nil
-                    
+                                        
                     renderQueue.async {
                         video.finishWriting() { url in
                             guard let url = url else {

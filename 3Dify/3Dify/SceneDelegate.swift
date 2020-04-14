@@ -29,7 +29,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 
-        let imageIndexToPick = Int.random(in: 0...6)
+        let imageIndexToPick = Int.random(in: 0...7)
         
         let contentView = HomeView(
             depthImage: DepthImage(

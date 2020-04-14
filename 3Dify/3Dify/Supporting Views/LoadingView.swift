@@ -1,33 +1,14 @@
 import SwiftUI
+import UIKit
 
-struct ProgressCircle: View {
-    @State var angle: Double = 0.0
-    
-    var foreverAnimation: Animation {
-        Animation
-            .linear(duration: 0.5)
-            .repeatForever(autoreverses: false)
+
+struct ProgressCircle: UIViewRepresentable {
+    func makeUIView(context: UIViewRepresentableContext<ProgressCircle>) -> UIActivityIndicatorView {
+        return UIActivityIndicatorView(style: .large)
     }
     
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(lineWidth: 5)
-                .opacity(0.1)
-                .foregroundColor(Color.white)
-            
-            Circle()
-                .trim(from: 0.0, to: 0.75)
-                .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
-                .foregroundColor(Color.white)
-                .rotationEffect(Angle(degrees: self.angle))
-                .onAppear {
-                    withAnimation {
-                        self.angle += 360
-                    }
-                }
-                .animation(foreverAnimation)
-        }
+    func updateUIView(_ uiView: UIActivityIndicatorView, context: Context) {
+        // Do nothing
     }
 }
 
@@ -78,7 +59,7 @@ struct LoadingView<Content: View>: View {
                 }
                 .frame(width: 256)
                 .foregroundColor(Color.white)
-                .background(Color.black)
+                .background(BlurView(style: .dark))
                 .cornerRadius(12)
             }
         }
@@ -89,19 +70,13 @@ struct LoadingView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             LoadingView(text: .constant("Failed"), loadingState: .constant(.failed)) {
-                VStack {
-                    Text("Hello")
-                }
+                Text("Hello")
             }
             LoadingView(text: .constant("Finished"), loadingState: .constant(.finished)) {
-                VStack {
-                    Text("Hello")
-                }
+                Text("Hello")
             }
             LoadingView(text: .constant("Loading..."), loadingState: .constant(.loading)) {
-                VStack {
-                    Text("Hello")
-                }
+                Text("Hello")
             }
         }
     }

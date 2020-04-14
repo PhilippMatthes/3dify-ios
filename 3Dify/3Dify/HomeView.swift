@@ -29,11 +29,11 @@ struct HomeView: View {
     }
     
     @State internal var selectedAnimationRepeatCount: Int = 5
-    @State internal var selectedAnimationIntensity: Float = 0.05
-    @State internal var selectedBlurIntensity: Float = 0
-    @State internal var selectedAnimationInterval: TimeInterval = 4
-    @State internal var selectedFocalPoint: Float = 0.5
-    @State internal var selectedAnimationTypeRawValue = ImageParallaxAnimationType.horizontalSwitch.rawValue
+    @State internal var selectedAnimationIntensity: Float = ControlViewParameters.defaults.selectedAnimationIntensity
+    @State internal var selectedBlurIntensity: Float = ControlViewParameters.defaults.selectedBlurIntensity
+    @State internal var selectedAnimationInterval: TimeInterval = ControlViewParameters.defaults.selectedAnimationInterval
+    @State internal var selectedFocalPoint: Float = ControlViewParameters.defaults.selectedFocalPoint
+    @State internal var selectedAnimationTypeRawValue = ControlViewParameters.defaults.selectedAnimationTypeRawValue
     
     @State internal var activeSheet: SheetType?
     @State internal var isShowingSheet = false
@@ -289,7 +289,7 @@ struct HomeView: View {
                                 .shadow(radius: 24)
                                 .fixedSize(horizontal: false, vertical: true)
                                 Spacer()
-                                Text("Transform your Photos into awesome 3D videos")
+                                Text("Transform your Photos into 3D Videos")
                                 .font(.system(size: 16))
                                 .fontWeight(.semibold)
                                 .foregroundColor(Color.white)
