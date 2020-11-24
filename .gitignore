@@ -1,1 +1,8 @@
-FCRN.mlmodel
+Pods/
+.mapbox
+ci-profile.mobileprovision
+*.p12
+*.p8
+*.dSYM.zip
+*.ipa
+3Dify/3Dify/Depth\ Prediction/FCRN.mlmodel
