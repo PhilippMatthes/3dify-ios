@@ -6,7 +6,10 @@ struct ContentView: View {
     var body: some View {
         Group {
             if let parallaxEnvironment = parallaxEnvironment {
-                ParallaxView().environmentObject(parallaxEnvironment)
+                GeometryReader { proxy in
+                    ParallaxView()
+                        .environmentObject(parallaxEnvironment)
+                }
             } else {
                 ProgressView()
             }

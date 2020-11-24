@@ -1,274 +1,48 @@
-import MetalKit
 import SwiftUI
 
-struct ParallaxView: UIViewRepresentable {
+struct ParallaxView: View {
+    @EnvironmentObject private var environment: ParallaxViewEnvironment
+    
+    private var wrappedView: some View {
+        ParallaxMetalViewRepresentable()
+    }
+    
+    var body: some View {
+        GeometryReader { geometry in
+            let frame = geometry.frame(in: .local)
+            let viewAspectRatio = frame.size.height / frame.size.width
+            let imageHeight = environment.depthImage.diffuseMap.size.height
+            let imageWidth = environment.depthImage.diffuseMap.size.width
+            let imageAspectRatio = imageHeight / imageWidth
+            
+            if imageAspectRatio > viewAspectRatio {
+                let bestFitWidth = frame.width
+                let bestFitHeight = frame.width * imageAspectRatio
+                wrappedView.frame(width: bestFitWidth, height: bestFitHeight)
+            } else {
+                let bestFitWidth = frame.height / imageAspectRatio
+                let bestFitHeight = frame.height
+                wrappedView.frame(width: bestFitWidth, height: bestFitHeight)
+            }
+        }
+    }
+}
+
+fileprivate struct ParallaxMetalViewRepresentable: UIViewRepresentable {
     @EnvironmentObject private var environment: ParallaxViewEnvironment
     
     func makeUIView(
-        context: UIViewRepresentableContext<ParallaxView>
-    ) -> ParallaxMTKView {
-        ParallaxMTKView(environment: environment)
+        context: UIViewRepresentableContext<ParallaxMetalViewRepresentable>
+    ) -> ParallaxMetalView {
+        ParallaxMetalView(environment: environment)
     }
     
     func updateUIView(
-        _ view: ParallaxMTKView,
-        context: UIViewRepresentableContext<ParallaxView>
+        _ view: ParallaxMetalView,
+        context: UIViewRepresentableContext<ParallaxMetalViewRepresentable>
     ) {
         if view.environment != environment {
             view.environment = environment
-        }
-    }
-}
-
-
-class ParallaxMTKView: MTKView {
-    var environment: ParallaxViewEnvironment {
-        willSet {
-            if environment.depthImage != newValue.depthImage {
-                setDepthImage(newValue.depthImage)
-            }
-            if environment.selectedBlurIntensity != newValue.selectedBlurIntensity {
-                setBlurIntensity(newValue.selectedBlurIntensity)
-            }
-            if environment.selectedFocalPoint != newValue.selectedFocalPoint {
-                setFocalPoint(newValue.selectedFocalPoint)
-            }
-        }
-    }
-    
-    /// A semaphore used to ensure that only one frame is rendered at a time.
-    private let semaphore = DispatchSemaphore(value: 1)
-
-    private var animationShouldAnimate: Bool = true
-    
-    private var inputDiffuseTexture: MTLTexture?
-    private var inputDepthTexture: MTLTexture?
-    
-    private let commandQueue: MTLCommandQueue
-    private var parallaxOcclusionPassEncoder: ParallaxOcclusionPassEncoder
-    private var vBlurPassEncoder: BlurPassEncoder
-    private var hBlurPassEncoder: BlurPassEncoder
-    private var overlayView: ParallaxViewOverlay
-    
-    private var parallaxOcclusionPassOutputDiffuseTexture: MTLTexture!
-    private var parallaxOcclusionPassOutputDepthTexture: MTLTexture!
-    private var vBlurPassOutputTexture: MTLTexture!
-    private var hBlurPassOutputTexture: MTLTexture!
-    
-    private func setDepthImage(_ depthImage: DepthImage) {
-        releaseDrawables()
-        guard let device = device else {return}
-        let textureLoader = MTKTextureLoader(device: device)
-        guard
-            let diffuseData = depthImage.diffuseMap.pngData(),
-            let depthData = depthImage.depthMap.pngData()
-        else {return}
-        inputDiffuseTexture = try? textureLoader.newTexture(data: diffuseData)
-        inputDepthTexture = try? textureLoader.newTexture(data: depthData)
-    }
-    
-    private func setBlurIntensity(_ blurIntensity: Float) {
-        vBlurPassEncoder.uniforms.blurIntensity = blurIntensity
-        hBlurPassEncoder.uniforms.blurIntensity = blurIntensity
-    }
-
-    private func setFocalPoint(_ focalPoint: Float) {
-        parallaxOcclusionPassEncoder.uniforms.focalPoint = focalPoint
-        vBlurPassEncoder.uniforms.focalPoint = focalPoint
-        hBlurPassEncoder.uniforms.focalPoint = focalPoint
-    }
-    
-    private func setOffset(_ offset: CGPoint) {
-        parallaxOcclusionPassEncoder.uniforms.offsetX = Float(offset.x)
-        parallaxOcclusionPassEncoder.uniforms.offsetY = Float(offset.y)
-    }
-    
-    init(environment: ParallaxViewEnvironment) {
-        guard
-            let device = MTLCreateSystemDefaultDevice(),
-            let commandQueue = device.makeCommandQueue(),
-            let parallaxEncoder = try? ParallaxOcclusionPassEncoder(device: device),
-            let vBlurPassEncoder = try? BlurPassEncoder(
-                device: device, isVertical: true
-            ),
-            let hBlurPassEncoder = try? BlurPassEncoder(
-                device: device, isVertical: false
-            )
-        else { fatalError("Failed to create the Metal Parallax View.") }
-                
-        self.commandQueue = commandQueue
-        self.environment = environment
-        self.parallaxOcclusionPassEncoder = parallaxEncoder
-        self.vBlurPassEncoder = vBlurPassEncoder
-        self.hBlurPassEncoder = hBlurPassEncoder
-        self.overlayView = ParallaxViewOverlay()
-        
-        super.init(frame: .zero, device: device)
-        
-        delegate = self
-        framebufferOnly = true
-        clearColor = MTLClearColorMake(0, 0, 0, 1.0)
-        contentScaleFactor = UIScreen.main.scale
-        autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        colorPixelFormat = .rgba16Float
-        preferredFramesPerSecond = 60
-        
-        setDepthImage(environment.depthImage)
-        setBlurIntensity(environment.selectedBlurIntensity)
-        setFocalPoint(environment.selectedFocalPoint)
-        
-        addGestureRecognizer(UIPanGestureRecognizer(
-            target: self, action: #selector(userDidPanView(_:)))
-        )
-        
-        addSubview(overlayView)
-    }
-    
-    required init(coder: NSCoder) {
-        fatalError()
-    }
-    
-    public func removeWatermark() {
-        overlayView.removeFromSuperview()
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        overlayView.frame = bounds
-        overlayView.layoutSubviews()
-    }
-    
-    @objc func userDidPanView(_ gestureRecognizer: UIPanGestureRecognizer) {
-        switch gestureRecognizer.state {
-        case .began:
-            animationShouldAnimate = false
-        case .ended:
-            animationShouldAnimate = true
-        default:
-            break
-        }
-        
-        let translation = gestureRecognizer.translation(in: self)
-        setOffset(.init(
-            x: max(min(translation.x / frame.width * 0.3, 0.06), -0.06),
-            y: max(min(translation.y / frame.height * 0.3, 0.06), -0.06)
-        ))
-    }
-}
-
-
-extension ParallaxMTKView: MTKViewDelegate {
-    public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        parallaxOcclusionPassOutputDiffuseTexture = readAndRender(
-            targetTextureOfSize: size, andFormat: .rgba16Float
-        )
-        parallaxOcclusionPassOutputDepthTexture = readAndRender(
-            targetTextureOfSize: size, andFormat: .rgba16Float
-        )
-        vBlurPassOutputTexture = readAndRender(
-            targetTextureOfSize: size, andFormat: .rgba16Float
-        )
-    }
-    
-    private func readAndRender(targetTextureOfSize size: CGSize, andFormat format: MTLPixelFormat) -> MTLTexture {
-        let descriptor = MTLTextureDescriptor.texture2DDescriptor(
-            pixelFormat: format,
-            width: Int(size.width),
-            height: Int(size.height),
-            mipmapped: true
-        )
-        descriptor.storageMode = .private
-        descriptor.usage = [.renderTarget, .shaderRead]
-        return device!.makeTexture(descriptor: descriptor)!
-    }
-    
-    public func draw(in: MTKView) {
-        _ = semaphore.wait(timeout: .distantFuture)
-        let elapsedTime = Date().timeIntervalSince1970
-        
-        if animationShouldAnimate {
-            let progress = 0.5 + (elapsedTime.remainder(dividingBy: environment.selectedAnimationInterval)) / environment.selectedAnimationInterval
-            let newOffset = environment.selectedAnimation.computeOffset(
-                at: CGFloat(progress),
-                selectedAnimationIntensity: CGFloat(environment.selectedAnimationIntensity)
-            )
-            setOffset(newOffset)
-        }
-
-        guard
-            let inputDiffuseTexture = inputDiffuseTexture,
-            let inputDepthTexture = inputDepthTexture,
-            let device = device,
-            let commandBuffer = commandQueue.makeCommandBuffer()
-        else {
-            _ = semaphore.signal()
-            return
-        }
-
-        autoreleasepool {
-            render(
-                inputDiffuseTexture: inputDiffuseTexture,
-                inputDepthTexture: inputDepthTexture,
-                withCommandBuffer: commandBuffer,
-                device: device,
-                atTime: elapsedTime
-            )
-        }
-    }
-    
-    private func scoped(device: MTLDevice, renderBlock: () -> Void) {
-        let scope = MTLCaptureManager.shared().makeCaptureScope(device: device)
-        scope.label = "Capture Scope"
-        scope.begin()
-        
-        renderBlock()
-        
-        scope.end()
-    }
-    
-    private func render(
-        inputDiffuseTexture: MTLTexture,
-        inputDepthTexture: MTLTexture,
-        withCommandBuffer commandBuffer: MTLCommandBuffer,
-        device: MTLDevice,
-        atTime time: TimeInterval
-    ) {
-        guard let currentDrawable = currentDrawable else { return }
-        
-        scoped(device: device) {
-            try? parallaxOcclusionPassEncoder.encode(
-                inCommandBuffer: commandBuffer,
-                inputColorTexture: inputDiffuseTexture,
-                inputDepthTexture: inputDepthTexture,
-                outputColorTexture: parallaxOcclusionPassOutputDiffuseTexture,
-                outputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
-                drawableSize: drawableSize,
-                clearColor: clearColor
-            )
-
-            try? vBlurPassEncoder.encode(
-                inCommandBuffer: commandBuffer,
-                inputColorTexture: parallaxOcclusionPassOutputDiffuseTexture,
-                inputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
-                outputBlurredTexture: vBlurPassOutputTexture,
-                drawableSize: drawableSize,
-                clearColor: clearColor
-            )
-            
-            try? hBlurPassEncoder.encode(
-                inCommandBuffer: commandBuffer,
-                inputColorTexture: vBlurPassOutputTexture,
-                inputDepthTexture: parallaxOcclusionPassOutputDepthTexture,
-                outputBlurredTexture: currentDrawable.texture,
-                drawableSize: drawableSize,
-                clearColor: clearColor
-            )
-        
-            commandBuffer.addScheduledHandler { [weak self] (buffer) in
-                self?.semaphore.signal()
-            }
-            commandBuffer.present(currentDrawable)
-            commandBuffer.commit()
         }
     }
 }

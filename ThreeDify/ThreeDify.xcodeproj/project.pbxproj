@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		BE5C5005256D36EA00014320 /* ParallaxOcclusionPassEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5C5004256D36EA00014320 /* ParallaxOcclusionPassEncoder.swift */; };
 		BE5C500A256D42A300014320 /* BlurPassEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5C5009256D42A300014320 /* BlurPassEncoder.swift */; };
-		BE5C500F256D49A600014320 /* ParallaxViewOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5C500E256D49A600014320 /* ParallaxViewOverlay.swift */; };
+		BE5C5017256D59F700014320 /* ParallaxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5C5016256D59F700014320 /* ParallaxView.swift */; };
 		BEED2A572567B29700C0C6FB /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEED2A562567B29700C0C6FB /* App.swift */; };
 		BEED2A592567B29700C0C6FB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEED2A582567B29700C0C6FB /* ContentView.swift */; };
 		BEED2A5B2567B29800C0C6FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BEED2A5A2567B29800C0C6FB /* Assets.xcassets */; };
@@ -25,7 +25,7 @@
 		BEED2A9E2567CDFC00C0C6FB /* ProjectTexture.metal in Sources */ = {isa = PBXBuildFile; fileRef = BEED2A9D2567CDFC00C0C6FB /* ProjectTexture.metal */; };
 		BEED2AA72567CE7E00C0C6FB /* ParallaxOcclusion.metal in Sources */ = {isa = PBXBuildFile; fileRef = BEED2AA62567CE7E00C0C6FB /* ParallaxOcclusion.metal */; };
 		BEED2AAA2567CEA200C0C6FB /* Blur.metal in Sources */ = {isa = PBXBuildFile; fileRef = BEED2AA92567CEA200C0C6FB /* Blur.metal */; };
-		BEED2AB22567CF5300C0C6FB /* ParallaxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEED2AB12567CF5300C0C6FB /* ParallaxView.swift */; };
+		BEED2AB22567CF5300C0C6FB /* ParallaxMetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEED2AB12567CF5300C0C6FB /* ParallaxMetalView.swift */; };
 		BEED2AB62567CF7B00C0C6FB /* ParallaxViewEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEED2AB52567CF7B00C0C6FB /* ParallaxViewEnvironment.swift */; };
 		BEED2ABA2567CFA500C0C6FB /* ParallaxAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEED2AB92567CFA500C0C6FB /* ParallaxAnimation.swift */; };
 /* End PBXBuildFile section */
@@ -33,7 +33,7 @@
 /* Begin PBXFileReference section */
 		BE5C5004256D36EA00014320 /* ParallaxOcclusionPassEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxOcclusionPassEncoder.swift; sourceTree = "<group>"; };
 		BE5C5009256D42A300014320 /* BlurPassEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurPassEncoder.swift; sourceTree = "<group>"; };
-		BE5C500E256D49A600014320 /* ParallaxViewOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxViewOverlay.swift; sourceTree = "<group>"; };
+		BE5C5016256D59F700014320 /* ParallaxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxView.swift; sourceTree = "<group>"; };
 		BEED2A532567B29700C0C6FB /* ThreeDify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThreeDify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEED2A562567B29700C0C6FB /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		BEED2A582567B29700C0C6FB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -53,7 +53,7 @@
 		BEED2AA22567CE5D00C0C6FB /* ThreeDify-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ThreeDify-Bridging-Header.h"; sourceTree = "<group>"; };
 		BEED2AA62567CE7E00C0C6FB /* ParallaxOcclusion.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ParallaxOcclusion.metal; sourceTree = "<group>"; };
 		BEED2AA92567CEA200C0C6FB /* Blur.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Blur.metal; sourceTree = "<group>"; };
-		BEED2AB12567CF5300C0C6FB /* ParallaxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxView.swift; sourceTree = "<group>"; };
+		BEED2AB12567CF5300C0C6FB /* ParallaxMetalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxMetalView.swift; sourceTree = "<group>"; };
 		BEED2AB52567CF7B00C0C6FB /* ParallaxViewEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxViewEnvironment.swift; sourceTree = "<group>"; };
 		BEED2AB92567CFA500C0C6FB /* ParallaxAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxAnimation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -180,10 +180,10 @@
 		BEED2AB02567CF4500C0C6FB /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				BEED2AB12567CF5300C0C6FB /* ParallaxView.swift */,
+				BE5C5016256D59F700014320 /* ParallaxView.swift */,
 				BEED2AB52567CF7B00C0C6FB /* ParallaxViewEnvironment.swift */,
+				BEED2AB12567CF5300C0C6FB /* ParallaxMetalView.swift */,
 				BEED2AB92567CFA500C0C6FB /* ParallaxAnimation.swift */,
-				BE5C500E256D49A600014320 /* ParallaxViewOverlay.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -259,14 +259,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE5C500A256D42A300014320 /* BlurPassEncoder.swift in Sources */,
+				BE5C5017256D59F700014320 /* ParallaxView.swift in Sources */,
 				BEED2A7F2567C00A00C0C6FB /* CameraPreviewView.swift in Sources */,
 				BEED2A852567C12400C0C6FB /* CameraView.swift in Sources */,
 				BEED2A592567B29700C0C6FB /* ContentView.swift in Sources */,
-				BEED2AB22567CF5300C0C6FB /* ParallaxView.swift in Sources */,
+				BEED2AB22567CF5300C0C6FB /* ParallaxMetalView.swift in Sources */,
 				BEED2A762567B97C00C0C6FB /* CameraImageProcessor.swift in Sources */,
 				BEED2A682567B2BF00C0C6FB /* CameraSnapshotButton.swift in Sources */,
 				BE5C5005256D36EA00014320 /* ParallaxOcclusionPassEncoder.swift in Sources */,
-				BE5C500F256D49A600014320 /* ParallaxViewOverlay.swift in Sources */,
 				BEED2AAA2567CEA200C0C6FB /* Blur.metal in Sources */,
 				BEED2A922567CC5C00C0C6FB /* DepthImage.swift in Sources */,
 				BEED2A8D2567CC2A00C0C6FB /* CameraImage.swift in Sources */,
