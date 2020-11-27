@@ -7,9 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE2B692A25710A0A0043D2B9 /* FCRN.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = BE2B692925710A0A0043D2B9 /* FCRN.mlmodel */; };
+		BE2B693C25710AEB0043D2B9 /* NonMaxSuppression.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B692D25710AEA0043D2B9 /* NonMaxSuppression.swift */; };
+		BE2B693D25710AEB0043D2B9 /* UIImage+CVPixelBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B692E25710AEA0043D2B9 /* UIImage+CVPixelBuffer.swift */; };
+		BE2B693E25710AEB0043D2B9 /* UIImage+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B692F25710AEA0043D2B9 /* UIImage+Extensions.swift */; };
+		BE2B693F25710AEB0043D2B9 /* MLModel+Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693025710AEA0043D2B9 /* MLModel+Images.swift */; };
+		BE2B694025710AEB0043D2B9 /* MLMultiArray+Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693125710AEA0043D2B9 /* MLMultiArray+Image.swift */; };
+		BE2B694125710AEB0043D2B9 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693225710AEA0043D2B9 /* Array+Extensions.swift */; };
+		BE2B694225710AEB0043D2B9 /* CGImage+CVPixelBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693325710AEA0043D2B9 /* CGImage+CVPixelBuffer.swift */; };
+		BE2B694325710AEB0043D2B9 /* CoreML+Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693425710AEA0043D2B9 /* CoreML+Combine.swift */; };
+		BE2B694425710AEB0043D2B9 /* Predictions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693525710AEA0043D2B9 /* Predictions.swift */; };
+		BE2B694525710AEB0043D2B9 /* UIImage+RawBytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693625710AEB0043D2B9 /* UIImage+RawBytes.swift */; };
+		BE2B694625710AEB0043D2B9 /* CGImage+RawBytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693725710AEB0043D2B9 /* CGImage+RawBytes.swift */; };
+		BE2B694725710AEB0043D2B9 /* CGImagePropertyOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693825710AEB0043D2B9 /* CGImagePropertyOrientation.swift */; };
+		BE2B694825710AEB0043D2B9 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693925710AEB0043D2B9 /* Math.swift */; };
+		BE2B694925710AEB0043D2B9 /* MLMultiArray+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693A25710AEB0043D2B9 /* MLMultiArray+Helpers.swift */; };
+		BE2B694A25710AEB0043D2B9 /* CVPixelBuffer+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B693B25710AEB0043D2B9 /* CVPixelBuffer+Helpers.swift */; };
+		BE2B694E257111530043D2B9 /* DemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B694D257111530043D2B9 /* DemoView.swift */; };
 		BE5C5005256D36EA00014320 /* ParallaxOcclusionPassEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5C5004256D36EA00014320 /* ParallaxOcclusionPassEncoder.swift */; };
 		BE5C500A256D42A300014320 /* BlurPassEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5C5009256D42A300014320 /* BlurPassEncoder.swift */; };
 		BE5C5017256D59F700014320 /* ParallaxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5C5016256D59F700014320 /* ParallaxView.swift */; };
+		BEBB3DEE257130DD001D8C23 /* BilateralFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB3DED257130DD001D8C23 /* BilateralFilter.swift */; };
+		BEBB3DF1257130E2001D8C23 /* BilateralFilter.cikernel in Resources */ = {isa = PBXBuildFile; fileRef = BEBB3DF0257130E2001D8C23 /* BilateralFilter.cikernel */; };
 		BEED2A572567B29700C0C6FB /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEED2A562567B29700C0C6FB /* App.swift */; };
 		BEED2A592567B29700C0C6FB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEED2A582567B29700C0C6FB /* ContentView.swift */; };
 		BEED2A5B2567B29800C0C6FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BEED2A5A2567B29800C0C6FB /* Assets.xcassets */; };
@@ -31,9 +50,28 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE2B692925710A0A0043D2B9 /* FCRN.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = FCRN.mlmodel; sourceTree = "<group>"; };
+		BE2B692D25710AEA0043D2B9 /* NonMaxSuppression.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NonMaxSuppression.swift; sourceTree = "<group>"; };
+		BE2B692E25710AEA0043D2B9 /* UIImage+CVPixelBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+CVPixelBuffer.swift"; sourceTree = "<group>"; };
+		BE2B692F25710AEA0043D2B9 /* UIImage+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extensions.swift"; sourceTree = "<group>"; };
+		BE2B693025710AEA0043D2B9 /* MLModel+Images.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MLModel+Images.swift"; sourceTree = "<group>"; };
+		BE2B693125710AEA0043D2B9 /* MLMultiArray+Image.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MLMultiArray+Image.swift"; sourceTree = "<group>"; };
+		BE2B693225710AEA0043D2B9 /* Array+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
+		BE2B693325710AEA0043D2B9 /* CGImage+CVPixelBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGImage+CVPixelBuffer.swift"; sourceTree = "<group>"; };
+		BE2B693425710AEA0043D2B9 /* CoreML+Combine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CoreML+Combine.swift"; sourceTree = "<group>"; };
+		BE2B693525710AEA0043D2B9 /* Predictions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Predictions.swift; sourceTree = "<group>"; };
+		BE2B693625710AEB0043D2B9 /* UIImage+RawBytes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+RawBytes.swift"; sourceTree = "<group>"; };
+		BE2B693725710AEB0043D2B9 /* CGImage+RawBytes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGImage+RawBytes.swift"; sourceTree = "<group>"; };
+		BE2B693825710AEB0043D2B9 /* CGImagePropertyOrientation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGImagePropertyOrientation.swift; sourceTree = "<group>"; };
+		BE2B693925710AEB0043D2B9 /* Math.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
+		BE2B693A25710AEB0043D2B9 /* MLMultiArray+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MLMultiArray+Helpers.swift"; sourceTree = "<group>"; };
+		BE2B693B25710AEB0043D2B9 /* CVPixelBuffer+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CVPixelBuffer+Helpers.swift"; sourceTree = "<group>"; };
+		BE2B694D257111530043D2B9 /* DemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoView.swift; sourceTree = "<group>"; };
 		BE5C5004256D36EA00014320 /* ParallaxOcclusionPassEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxOcclusionPassEncoder.swift; sourceTree = "<group>"; };
 		BE5C5009256D42A300014320 /* BlurPassEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurPassEncoder.swift; sourceTree = "<group>"; };
 		BE5C5016256D59F700014320 /* ParallaxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxView.swift; sourceTree = "<group>"; };
+		BEBB3DED257130DD001D8C23 /* BilateralFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BilateralFilter.swift; sourceTree = "<group>"; };
+		BEBB3DF0257130E2001D8C23 /* BilateralFilter.cikernel */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = BilateralFilter.cikernel; sourceTree = "<group>"; };
 		BEED2A532567B29700C0C6FB /* ThreeDify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThreeDify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEED2A562567B29700C0C6FB /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		BEED2A582567B29700C0C6FB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -69,6 +107,56 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE2B692C25710AD80043D2B9 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				BE2B693225710AEA0043D2B9 /* Array+Extensions.swift */,
+				BE2B693325710AEA0043D2B9 /* CGImage+CVPixelBuffer.swift */,
+				BE2B693725710AEB0043D2B9 /* CGImage+RawBytes.swift */,
+				BE2B693825710AEB0043D2B9 /* CGImagePropertyOrientation.swift */,
+				BE2B693425710AEA0043D2B9 /* CoreML+Combine.swift */,
+				BE2B693B25710AEB0043D2B9 /* CVPixelBuffer+Helpers.swift */,
+				BE2B693925710AEB0043D2B9 /* Math.swift */,
+				BE2B693025710AEA0043D2B9 /* MLModel+Images.swift */,
+				BE2B693A25710AEB0043D2B9 /* MLMultiArray+Helpers.swift */,
+				BE2B693125710AEA0043D2B9 /* MLMultiArray+Image.swift */,
+				BE2B692D25710AEA0043D2B9 /* NonMaxSuppression.swift */,
+				BE2B693525710AEA0043D2B9 /* Predictions.swift */,
+				BE2B692E25710AEA0043D2B9 /* UIImage+CVPixelBuffer.swift */,
+				BE2B692F25710AEA0043D2B9 /* UIImage+Extensions.swift */,
+				BE2B693625710AEB0043D2B9 /* UIImage+RawBytes.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		BE2B694C2571114A0043D2B9 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BE2B694D257111530043D2B9 /* DemoView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		BE49E7C72570FE6900D88843 /* Estimation */ = {
+			isa = PBXGroup;
+			children = (
+				BEBB3DEC257130D3001D8C23 /* Filters */,
+				BE2B694C2571114A0043D2B9 /* Views */,
+				BE2B692C25710AD80043D2B9 /* Helpers */,
+				BE2B692925710A0A0043D2B9 /* FCRN.mlmodel */,
+			);
+			path = Estimation;
+			sourceTree = "<group>";
+		};
+		BEBB3DEC257130D3001D8C23 /* Filters */ = {
+			isa = PBXGroup;
+			children = (
+				BEBB3DF0257130E2001D8C23 /* BilateralFilter.cikernel */,
+				BEBB3DED257130DD001D8C23 /* BilateralFilter.swift */,
+			);
+			path = Filters;
+			sourceTree = "<group>";
+		};
 		BEED2A4A2567B29600C0C6FB = {
 			isa = PBXGroup;
 			children = (
@@ -88,6 +176,7 @@
 		BEED2A552567B29700C0C6FB /* ThreeDify */ = {
 			isa = PBXGroup;
 			children = (
+				BE49E7C72570FE6900D88843 /* Estimation */,
 				BEED2AA22567CE5D00C0C6FB /* ThreeDify-Bridging-Header.h */,
 				BEED2A892567CB8C00C0C6FB /* Parallax */,
 				BEED2A662567B2B400C0C6FB /* Camera */,
@@ -246,6 +335,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BEBB3DF1257130E2001D8C23 /* BilateralFilter.cikernel in Resources */,
 				BEED2A5E2567B29800C0C6FB /* Preview Assets.xcassets in Resources */,
 				BEED2A5B2567B29800C0C6FB /* Assets.xcassets in Resources */,
 			);
@@ -259,22 +349,40 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE5C500A256D42A300014320 /* BlurPassEncoder.swift in Sources */,
+				BE2B694A25710AEB0043D2B9 /* CVPixelBuffer+Helpers.swift in Sources */,
+				BE2B694425710AEB0043D2B9 /* Predictions.swift in Sources */,
+				BE2B694825710AEB0043D2B9 /* Math.swift in Sources */,
+				BE2B693C25710AEB0043D2B9 /* NonMaxSuppression.swift in Sources */,
+				BE2B692A25710A0A0043D2B9 /* FCRN.mlmodel in Sources */,
+				BE2B694225710AEB0043D2B9 /* CGImage+CVPixelBuffer.swift in Sources */,
 				BE5C5017256D59F700014320 /* ParallaxView.swift in Sources */,
 				BEED2A7F2567C00A00C0C6FB /* CameraPreviewView.swift in Sources */,
 				BEED2A852567C12400C0C6FB /* CameraView.swift in Sources */,
 				BEED2A592567B29700C0C6FB /* ContentView.swift in Sources */,
 				BEED2AB22567CF5300C0C6FB /* ParallaxMetalView.swift in Sources */,
 				BEED2A762567B97C00C0C6FB /* CameraImageProcessor.swift in Sources */,
+				BEBB3DEE257130DD001D8C23 /* BilateralFilter.swift in Sources */,
+				BE2B694E257111530043D2B9 /* DemoView.swift in Sources */,
+				BE2B694125710AEB0043D2B9 /* Array+Extensions.swift in Sources */,
+				BE2B694525710AEB0043D2B9 /* UIImage+RawBytes.swift in Sources */,
 				BEED2A682567B2BF00C0C6FB /* CameraSnapshotButton.swift in Sources */,
+				BE2B693F25710AEB0043D2B9 /* MLModel+Images.swift in Sources */,
 				BE5C5005256D36EA00014320 /* ParallaxOcclusionPassEncoder.swift in Sources */,
 				BEED2AAA2567CEA200C0C6FB /* Blur.metal in Sources */,
 				BEED2A922567CC5C00C0C6FB /* DepthImage.swift in Sources */,
+				BE2B694725710AEB0043D2B9 /* CGImagePropertyOrientation.swift in Sources */,
+				BE2B694625710AEB0043D2B9 /* CGImage+RawBytes.swift in Sources */,
 				BEED2A8D2567CC2A00C0C6FB /* CameraImage.swift in Sources */,
 				BEED2A9E2567CDFC00C0C6FB /* ProjectTexture.metal in Sources */,
+				BE2B693D25710AEB0043D2B9 /* UIImage+CVPixelBuffer.swift in Sources */,
+				BE2B693E25710AEB0043D2B9 /* UIImage+Extensions.swift in Sources */,
 				BEED2A572567B29700C0C6FB /* App.swift in Sources */,
+				BE2B694925710AEB0043D2B9 /* MLMultiArray+Helpers.swift in Sources */,
 				BEED2A6C2567B43B00C0C6FB /* CameraSession.swift in Sources */,
+				BE2B694025710AEB0043D2B9 /* MLMultiArray+Image.swift in Sources */,
 				BEED2AA72567CE7E00C0C6FB /* ParallaxOcclusion.metal in Sources */,
 				BEED2AB62567CF7B00C0C6FB /* ParallaxViewEnvironment.swift in Sources */,
+				BE2B694325710AEB0043D2B9 /* CoreML+Combine.swift in Sources */,
 				BEED2A722567B61800C0C6FB /* CameraDeviceFinder.swift in Sources */,
 				BEED2ABA2567CFA500C0C6FB /* ParallaxAnimation.swift in Sources */,
 			);

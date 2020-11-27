@@ -1,0 +1,75 @@
+//
+// 3Dify App
+//
+// Project website: https://github.com/3dify-app
+//
+// Authors:
+// - Philipp Matthes 2020, Contact: mail@philippmatth.es
+//
+// Copyright notice: All rights reserved by the authors given above. Do not
+// remove or change this copyright notice without confirmation of the authors.
+//
+
+// The sample size of the kernel
+#define KERNEL_SIZE 11
+// Inverse square root of pi times 2
+#define INV_SQRT_PI_2 0.3989422803
+
+float gauss(float x, float sigma) {
+    return INV_SQRT_PI_2 * exp(-(pow(x, 2.0)) / (2.0 * pow(sigma, 2.0))) / sigma;
+}
+
+float gauss3(vec3 x, float sigma) {
+    return INV_SQRT_PI_2 * exp(-(dot(x, x)) / (2.0 * pow(sigma, 2.0))) / sigma;
+}
+
+kernel vec4 BilateralFilter(
+    sampler diffuse,
+    sampler depth,
+    float sigmaR,
+    float sigmaS
+) {
+    const int KernelRadius = (KERNEL_SIZE - 1) / 2;
+
+    float conv[KERNEL_SIZE];
+    for (int i = 0; i <= KernelRadius; i++) {
+        float value = gauss(float(i), sigmaR);
+        conv[KernelRadius + i] = value;
+        conv[KernelRadius - i] = value;
+    }
+
+    float normalizationFactor = 0.0;
+    vec3 color = vec3(0.0);
+
+    vec2 diffuseSize = samplerSize(diffuse);
+    vec2 depthSize = samplerSize(depth);
+    float scaleX = diffuseSize.x / depthSize.x;
+    float scaleY = diffuseSize.y / depthSize.y;
+
+    vec2 pixelCoordinates = samplerCoord(diffuse);
+
+    vec3 diffusePixel = sample(diffuse, pixelCoordinates).rgb;
+    vec3 depthPixel = sample(depth, pixelCoordinates).rgb;
+
+    float spacialWeightBaseReference = 1.0 / gauss(0.0, sigmaS);
+
+    for (int i = -KernelRadius; i <= KernelRadius; i++) {
+        for (int j = -KernelRadius; j <= KernelRadius; j++) {
+
+            vec2 offsetCoord = pixelCoordinates + vec2(i / diffuseSize.x, j / diffuseSize.y);
+            vec3 offsetDiffusePixel = sample(diffuse, offsetCoord).rgb;
+            vec3 offsetDepthPixel = sample(depth, offsetCoord).rgb;
+
+            vec3 dist = offsetDiffusePixel - diffusePixel;
+
+            float range = conv[KernelRadius + i] * conv[KernelRadius + j];
+            float spacial = gauss3(dist, sigmaS) * spacialWeightBaseReference;
+            float weight = range * spacial;
+
+            color += weight * offsetDepthPixel;
+            normalizationFactor += weight;
+        }
+    }
+
+    return vec4(depthPixel, 1.0);
+}

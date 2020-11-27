@@ -26,12 +26,6 @@ struct ContentView: View {
                 ProgressView()
             }
         }
-        .onAppear(perform: {
-            parallaxEnvironment = .init(depthImage: DepthImage(
-                diffuseMap: UIImage(named: "6_diffuse")!,
-                depthMap: UIImage(named: "6_depth")!
-            ))
-        })
     }
 }
 
