@@ -14,7 +14,7 @@ import SwiftUI
 import Vision
 
 struct DemoView: View {
-    @State private var image = UIImage(named: "test_2")!
+    @State private var image = UIImage(named: "test_1")!
 
     private func runInference() {
         let context = CIContext()
@@ -62,8 +62,8 @@ struct DemoView: View {
         let filter = BilateralFilter(
             diffuse: CIImage(cgImage: cgImage),
             depth: CIImage(cgImage: depthCGImage),
-            sigmaR: 15,
-            sigmaS: 0.3
+            sigmaR: 20,
+            sigmaS: 0.05
         )
         let outputImage = filter.outputImage!
         let outputCGImage = context.createCGImage(

@@ -11,7 +11,7 @@
 //
 
 // The sample size of the kernel
-#define SAMPLE_SIZE 15
+#define SAMPLE_SIZE 25
 // Inverse square root of pi times 2
 #define INV_SQRT_PI_2 0.39894
 
@@ -49,7 +49,7 @@ kernel vec4 BilateralFilter(
     float bZ = 1.0 / normpdf(0.0, sigmaS);
     // The destination of the current pixel in working space coordinates
     vec2 dWorkspace = destCoord();
-    // The diffuse value of the target pixel
+    // The diffuse and depth values of the target pixel
     vec3 targetDiffusePixel = sample(diffuse, samplerCoord(diffuse)).rgb;
     // The final rgb color which is going to be summed up
     vec3 finalColorRGB = vec3(0.0);
@@ -61,6 +61,7 @@ kernel vec4 BilateralFilter(
             vec2 imageSpaceSampleCoordinate =
                 samplerTransform(diffuse, workingSpaceSampleCoordinate);
             vec3 sampleDiffusePixel = sample(diffuse, imageSpaceSampleCoordinate).rgb;
+            vec3 sampleDepthPixel = sample(depth, imageSpaceSampleCoordinate).rgb;
 
             vec3 delta = sampleDiffusePixel - targetDiffusePixel;
             float factor = normpdf3(delta, sigmaS)
@@ -69,7 +70,7 @@ kernel vec4 BilateralFilter(
                            * sampleKernel[sampleKernelSize + y];
 
             Z += factor;
-            finalColorRGB += factor * sampleDiffusePixel;
+            finalColorRGB += factor * sampleDepthPixel;
         }
     }
 
