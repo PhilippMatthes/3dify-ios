@@ -15,31 +15,34 @@
 // Inverse square root of pi times 2
 #define INV_SQRT_PI_2 0.3989422803
 
-float gauss(float x, float sigma) {
-    return INV_SQRT_PI_2 * exp(-(pow(x, 2.0)) / (2.0 * pow(sigma, 2.0))) / sigma;
+// Compute the normal probability distribution on a float value.
+float normpdf(float x, float sigma) {
+    return INV_SQRT_PI_2 * exp(-0.5 * x * x / (sigma * sigma)) / sigma;
 }
 
-float gauss3(vec3 x, float sigma) {
-    return INV_SQRT_PI_2 * exp(-(dot(x, x)) / (2.0 * pow(sigma, 2.0))) / sigma;
+// Compute the normal probability distribution on a 3-dimensional vector.
+float normpdf3(vec3 v, float sigma) {
+    return INV_SQRT_PI_2 * exp(-0.5 * dot(v, v) / (sigma * sigma)) / sigma;
 }
 
+// Blur the input depth image but preserve Edges from the diffuse map.
 kernel vec4 BilateralFilter(
     sampler diffuse,
     sampler depth,
     float sigmaR,
     float sigmaS
 ) {
-    const int KernelRadius = (KERNEL_SIZE - 1) / 2;
+    const int kernelRadius = (KERNEL_SIZE - 1) / 2;
+    vec3 finalColor = vec3(0.0);
 
     float conv[KERNEL_SIZE];
-    for (int i = 0; i <= KernelRadius; i++) {
-        float value = gauss(float(i), sigmaR);
-        conv[KernelRadius + i] = value;
-        conv[KernelRadius - i] = value;
+    for (int i = 0; i <= kernelRadius; i++) {
+        float value = normpdf(float(i), sigmaR);
+        conv[kernelRadius + i] = value;
+        conv[kernelRadius - i] = value;
     }
 
     float normalizationFactor = 0.0;
-    vec3 color = vec3(0.0);
 
     vec2 diffuseSize = samplerSize(diffuse);
     vec2 depthSize = samplerSize(depth);
@@ -51,25 +54,25 @@ kernel vec4 BilateralFilter(
     vec3 diffusePixel = sample(diffuse, pixelCoordinates).rgb;
     vec3 depthPixel = sample(depth, pixelCoordinates).rgb;
 
-    float spacialWeightBaseReference = 1.0 / gauss(0.0, sigmaS);
+    float spacialWeightBaseReference = 1.0 / normpdf(0.0, sigmaS);
 
-    for (int i = -KernelRadius; i <= KernelRadius; i++) {
-        for (int j = -KernelRadius; j <= KernelRadius; j++) {
-
-            vec2 offsetCoord = pixelCoordinates + vec2(i / diffuseSize.x, j / diffuseSize.y);
+    for (int i = -kernelRadius; i <= kernelRadius; i++) {
+        for (int j = -kernelRadius; j <= kernelRadius; j++) {
+            vec2 offsetVector = vec2(i / diffuseSize.x, j / diffuseSize.y);
+            vec2 offsetCoord = pixelCoordinates + offsetVector;
             vec3 offsetDiffusePixel = sample(diffuse, offsetCoord).rgb;
             vec3 offsetDepthPixel = sample(depth, offsetCoord).rgb;
 
             vec3 dist = offsetDiffusePixel - diffusePixel;
 
-            float range = conv[KernelRadius + i] * conv[KernelRadius + j];
-            float spacial = gauss3(dist, sigmaS) * spacialWeightBaseReference;
+            float range = conv[kernelRadius + i] * conv[kernelRadius + j];
+            float spacial = normpdf3(dist, sigmaS) * spacialWeightBaseReference;
             float weight = range * spacial;
 
-            color += weight * offsetDepthPixel;
+            finalColor += weight * offsetDiffusePixel;
             normalizationFactor += weight;
         }
     }
 
-    return vec4(depthPixel, 1.0);
+    return vec4(finalColor, 1.0);
 }

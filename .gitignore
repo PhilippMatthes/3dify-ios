@@ -5,4 +5,4 @@ ci-profile.mobileprovision
 *.p8
 *.dSYM.zip
 *.ipa
-3Dify/3Dify/Depth\ Prediction/FCRN.mlmodel
+FCRN.mlmodel
