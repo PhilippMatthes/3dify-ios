@@ -11,9 +11,9 @@
 //
 
 // The sample size of the kernel
-#define KERNEL_SIZE 11
+#define SAMPLE_SIZE 15
 // Inverse square root of pi times 2
-#define INV_SQRT_PI_2 0.3989422803
+#define INV_SQRT_PI_2 0.39894
 
 // Compute the normal probability distribution on a float value.
 float normpdf(float x, float sigma) {
@@ -25,54 +25,53 @@ float normpdf3(vec3 v, float sigma) {
     return INV_SQRT_PI_2 * exp(-0.5 * dot(v, v) / (sigma * sigma)) / sigma;
 }
 
-// Blur the input depth image but preserve Edges from the diffuse map.
+// Blur the input depth image but preserve edges from the diffuse map.
 kernel vec4 BilateralFilter(
     sampler diffuse,
     sampler depth,
-    float sigmaR,
-    float sigmaS
+    float sigmaR, // Range
+    float sigmaS // Spacial
 ) {
-    const int kernelRadius = (KERNEL_SIZE - 1) / 2;
-    vec3 finalColor = vec3(0.0);
-
-    float conv[KERNEL_SIZE];
-    for (int i = 0; i <= kernelRadius; i++) {
-        float value = normpdf(float(i), sigmaR);
-        conv[kernelRadius + i] = value;
-        conv[kernelRadius - i] = value;
+    // Create the one-dimensional sample kernel. Note that for
+    // real-time rendering applications the kernel should be
+    // precomputed for better rendering efficiency
+    const int sampleKernelSize = (SAMPLE_SIZE - 1) / 2;
+    float sampleKernel[SAMPLE_SIZE];
+    for (int i = 0; i <= sampleKernelSize; ++i) {
+        float sampleKernelValue = normpdf(float(i), sigmaR);
+        sampleKernel[sampleKernelSize + i] = sampleKernelValue;
+        sampleKernel[sampleKernelSize - i] = sampleKernelValue;
     }
 
-    float normalizationFactor = 0.0;
+    // Normalization factor
+    float Z = 0.0;
+    // Spacial weight base reference
+    float bZ = 1.0 / normpdf(0.0, sigmaS);
+    // The destination of the current pixel in working space coordinates
+    vec2 dWorkspace = destCoord();
+    // The diffuse value of the target pixel
+    vec3 targetDiffusePixel = sample(diffuse, samplerCoord(diffuse)).rgb;
+    // The final rgb color which is going to be summed up
+    vec3 finalColorRGB = vec3(0.0);
 
-    vec2 diffuseSize = samplerSize(diffuse);
-    vec2 depthSize = samplerSize(depth);
-    float scaleX = diffuseSize.x / depthSize.x;
-    float scaleY = diffuseSize.y / depthSize.y;
+    for (int x = -sampleKernelSize; x <= sampleKernelSize; ++x) {
+        for (int y = -sampleKernelSize; y <= sampleKernelSize; ++y) {
+            // Sample the current partial kernel pixel of the diffuse map
+            vec2 workingSpaceSampleCoordinate = dWorkspace + vec2(x, y);
+            vec2 imageSpaceSampleCoordinate =
+                samplerTransform(diffuse, workingSpaceSampleCoordinate);
+            vec3 sampleDiffusePixel = sample(diffuse, imageSpaceSampleCoordinate).rgb;
 
-    vec2 pixelCoordinates = samplerCoord(diffuse);
+            vec3 delta = sampleDiffusePixel - targetDiffusePixel;
+            float factor = normpdf3(delta, sigmaS)
+                           * bZ
+                           * sampleKernel[sampleKernelSize + x]
+                           * sampleKernel[sampleKernelSize + y];
 
-    vec3 diffusePixel = sample(diffuse, pixelCoordinates).rgb;
-    vec3 depthPixel = sample(depth, pixelCoordinates).rgb;
-
-    float spacialWeightBaseReference = 1.0 / normpdf(0.0, sigmaS);
-
-    for (int i = -kernelRadius; i <= kernelRadius; i++) {
-        for (int j = -kernelRadius; j <= kernelRadius; j++) {
-            vec2 offsetVector = vec2(i / diffuseSize.x, j / diffuseSize.y);
-            vec2 offsetCoord = pixelCoordinates + offsetVector;
-            vec3 offsetDiffusePixel = sample(diffuse, offsetCoord).rgb;
-            vec3 offsetDepthPixel = sample(depth, offsetCoord).rgb;
-
-            vec3 dist = offsetDiffusePixel - diffusePixel;
-
-            float range = conv[kernelRadius + i] * conv[kernelRadius + j];
-            float spacial = normpdf3(dist, sigmaS) * spacialWeightBaseReference;
-            float weight = range * spacial;
-
-            finalColor += weight * offsetDiffusePixel;
-            normalizationFactor += weight;
+            Z += factor;
+            finalColorRGB += factor * sampleDiffusePixel;
         }
     }
 
-    return vec4(finalColor, 1.0);
+    return vec4(finalColorRGB / Z, 1.0);
 }
