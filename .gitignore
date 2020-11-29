@@ -5,4 +5,5 @@ ci-profile.mobileprovision
 *.p8
 *.dSYM.zip
 *.ipa
+Pydnet.mlmodel
 FCRN.mlmodel

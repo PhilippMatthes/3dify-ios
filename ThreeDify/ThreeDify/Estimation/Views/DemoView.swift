@@ -14,69 +14,23 @@ import SwiftUI
 import Vision
 
 struct DemoView: View {
-    @State private var image = UIImage(named: "test_1")!
+    @State private var image = UIImage(named: "test_5")!
 
     private func runInference() {
-        let context = CIContext()
-        let model = try! VNCoreMLModel(for: FCRN().model)
-        let cgImage = image.cgImage!
-
-        var result: MLMultiArray?
-
-        let dispatchGroup = DispatchGroup()
-        dispatchGroup.enter()
-
-        let request = VNCoreMLRequest(model: model) { request, error in
-            guard
-                error == nil,
-                let observations = request.results as? [VNCoreMLFeatureValueObservation],
-                let value = observations.first?.featureValue.multiArrayValue
-            else { fatalError() }
-            result = value
-            dispatchGroup.leave()
-        }
-        request.imageCropAndScaleOption = .scaleFill
-
-        try! VNImageRequestHandler(
-            cgImage: cgImage, options: [:]
-        ).perform([request])
-
-        dispatchGroup.wait()
-
-        guard let array = result else { fatalError() }
-
-        var minValue: Double = .greatestFiniteMagnitude
-        var maxValue: Double = 0
-
-        for i in 0 ..< 128 {
-            for j in 0 ..< 160 {
-                let index = i * 128 + j
-                let value = array[index].doubleValue
-                minValue = min(minValue, value)
-                maxValue = max(maxValue, value)
+        try! EstimationPipeline(image: image).estimate { result in
+            switch result {
+            case .success(let depthImage):
+                self.image = depthImage
+            case .failure(let error):
+                fatalError(error.localizedDescription)
             }
         }
-
-        let depthCGImage = array.cgImage(min: maxValue, max: minValue)!
-
-        let filter = BilateralFilter(
-            diffuse: CIImage(cgImage: cgImage),
-            depth: CIImage(cgImage: depthCGImage),
-            sigmaR: 20,
-            sigmaS: 0.05
-        )
-        let outputImage = filter.outputImage!
-        let outputCGImage = context.createCGImage(
-            outputImage, from: outputImage.extent
-        )!
-
-        image = UIImage(cgImage: outputCGImage)
     }
 
     var body: some View {
         Image(uiImage: image)
             .resizable()
-            .scaledToFill()
+            .scaledToFit()
             .onAppear(perform: runInference)
     }
 }

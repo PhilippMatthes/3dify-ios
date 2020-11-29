@@ -14,6 +14,19 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var parallaxEnvironment: ParallaxViewEnvironment?
+
+    @State private var image = UIImage(named: "test_3")!
+
+    private func runInference() {
+        try! EstimationPipeline(image: image).estimate { result in
+            switch result {
+            case .success(let depthImage):
+                parallaxEnvironment = .init(depthImage: DepthImage(diffuseMap: image, depthMap: depthImage))
+            case .failure(let error):
+                fatalError(error.localizedDescription)
+            }
+        }
+    }
     
     var body: some View {
         Group {
@@ -24,6 +37,7 @@ struct ContentView: View {
                 }
             } else {
                 ProgressView()
+                    .onAppear(perform: runInference)
             }
         }
     }
