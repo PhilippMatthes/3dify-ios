@@ -69,6 +69,16 @@ class BilateralFilter: CIFilter {
         }
     }
 
+    func outputCGImage(withContext context: CIContext) -> CGImage? {
+        guard
+            let outputImage = outputImage,
+            let outputCGImage = context.createCGImage(
+                outputImage, from: outputImage.extent
+            )
+        else { return nil }
+        return outputCGImage
+    }
+
     override var attributes: [String : Any] {
         [
             kCIAttributeFilterDisplayName: "Bilateral Filter",

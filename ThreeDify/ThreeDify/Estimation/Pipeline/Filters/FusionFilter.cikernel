@@ -1,0 +1,52 @@
+//
+// 3Dify App
+//
+// Project website: https://github.com/3dify-app
+//
+// Authors:
+// - Philipp Matthes 2020, Contact: mail@philippmatth.es
+//
+// Copyright notice: All rights reserved by the authors given above. Do not
+// remove or change this copyright notice without confirmation of the authors.
+//
+
+float dLength(vec3 p1, vec3 p2) {
+    vec3 d = p1 - p2;
+    return sqrt(
+        pow(d.x, 2.0)
+        + pow(d.y, 2.0)
+        + pow(d.z, 2.0)
+    );
+}
+
+kernel vec4 FusionFilter(
+    sampler originalImageSobelImage,
+    sampler fcrnDepthImage,
+    sampler fcrnDepthSobelImage,
+    sampler pydnetDepthImage,
+    sampler pydnetDepthSobelImage,
+    sampler fastDepthDepthImage,
+    sampler fastDepthDepthSobelImage
+) {
+    vec2 texCoords = samplerCoord(originalImageSobelImage);
+    vec3 originalSobelPixel = sample(originalImageSobelImage, texCoords).rgb;
+    vec3 fcrnDepthPixel = sample(fcrnDepthImage, texCoords).rgb;
+    vec3 fcrnDepthSobelPixel = sample(fcrnDepthSobelImage, texCoords).rgb;
+    vec3 pydnetDepthPixel = sample(pydnetDepthImage, texCoords).rgb;
+    vec3 pydnetDepthSobelPixel = sample(pydnetDepthSobelImage, texCoords).rgb;
+    vec3 fastDepthDepthPixel = sample(fastDepthDepthImage, texCoords).rgb;
+    vec3 fastDepthDepthSobelPixel = sample(fastDepthDepthSobelImage, texCoords).rgb;
+
+    float fcrnDiff = dLength(fcrnDepthSobelPixel, originalSobelPixel);
+    float pydnetDiff = dLength(pydnetDepthSobelPixel, originalSobelPixel);
+    float fastDepthDiff = dLength(fastDepthDepthSobelPixel, originalSobelPixel);
+    float totalDiff = fcrnDiff + pydnetDiff + fastDepthDiff;
+
+    float fcrnWeight = (totalDiff - fcrnDiff) / (totalDiff + pydnetDiff + fastDepthDiff);
+    float pydnetWeight = (totalDiff - pydnetDiff) / (totalDiff + fcrnDiff + fastDepthDiff);
+    float fastDepthWeight = (totalDiff - fastDepthDiff) / (totalDiff + fcrnDiff + pydnetDiff);
+
+    vec3 fusedPixel = (fcrnDepthPixel * fcrnWeight) + (pydnetDepthPixel * pydnetWeight) + (fastDepthDepthPixel * fastDepthWeight);
+
+    return vec4(fusedPixel, 1.0);
+}

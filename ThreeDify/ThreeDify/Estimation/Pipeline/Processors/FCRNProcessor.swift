@@ -13,7 +13,7 @@
 import UIKit
 import Vision
 
-class FCRNProcessor {
+class FCRNProcessor: DepthProcessor {
     let model: VNCoreMLModel
     let fit: VNImageCropAndScaleOption
 
@@ -27,12 +27,22 @@ class FCRNProcessor {
         case requestFailed
         case inferenceFailed
         case normalizationFailed
+        case filteringFailed
     }
 
     func process(
         originalImage: UIImage,
         completion: @escaping (Result<UIImage, Error>) -> Void
     ) {
+        guard
+            let originalCGImage = originalImage.cgImage
+        else {
+            completion(.failure(ProcessingError.originalImageNotCGImageConvertible))
+            return
+        }
+
+        let context = CIContext()
+
         let request = VNCoreMLRequest(model: model) { request, error in
             guard
                 error == nil,
@@ -51,14 +61,20 @@ class FCRNProcessor {
                 return
             }
 
-            completion(.success(UIImage(cgImage: normalizedCGImage)))
-        }
+            let bilateralFilter = BilateralFilter(
+                diffuse: CIImage(cgImage: originalCGImage),
+                depth: CIImage(cgImage: normalizedCGImage),
+                sigmaR: 30,
+                sigmaS: 0.02
+            )
+            guard
+                let filteredCGImage = bilateralFilter.outputCGImage(withContext: context)
+            else {
+                completion(.failure(ProcessingError.filteringFailed))
+                return
+            }
 
-        guard
-            let originalCGImage = originalImage.cgImage
-        else {
-            completion(.failure(ProcessingError.originalImageNotCGImageConvertible))
-            return
+            completion(.success(UIImage(cgImage: filteredCGImage)))
         }
 
         request.imageCropAndScaleOption = fit

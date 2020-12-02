@@ -14,7 +14,7 @@ import SwiftUI
 import Vision
 
 struct DemoView: View {
-    @State private var image = UIImage(named: "test_5")!
+    @State private var image = UIImage(named: "test_3")!
 
     private func runInference() {
         try! EstimationPipeline(image: image).estimate { result in
@@ -30,13 +30,14 @@ struct DemoView: View {
     var body: some View {
         Image(uiImage: image)
             .resizable()
-            .scaledToFit()
+            .scaledToFill()
             .onAppear(perform: runInference)
+            .edgesIgnoringSafeArea(.all)
     }
 }
 
 struct DemoView_Previews: PreviewProvider {
     static var previews: some View {
-        DemoView()
+        DemoView().edgesIgnoringSafeArea(.all)
     }
 }

@@ -14,7 +14,7 @@ import UIKit
 import Vision
 import Accelerate
 
-class PydnetProcessor {
+class PydnetProcessor: DepthProcessor {
     let model: Pydnet
 
     required init() {
@@ -77,15 +77,8 @@ class PydnetProcessor {
             sigmaR: 30,
             sigmaS: 0.05
         )
-        guard let filteredImage = bilateralFilter.outputImage else {
-            completion(.failure(ProcessingError.filteringFailed))
-            return
-        }
-
         guard
-            let filteredCGImage = context.createCGImage(
-                filteredImage, from: filteredImage.extent
-            )
+            let filteredCGImage = bilateralFilter.outputCGImage(withContext: context)
         else {
             completion(.failure(ProcessingError.filteringFailed))
             return
