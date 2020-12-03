@@ -17,6 +17,10 @@ class FCRNProcessor: DepthProcessor {
     let model: VNCoreMLModel
     let fit: VNImageCropAndScaleOption
 
+    var description: String {
+        return "FCRN Neural Processor"
+    }
+
     required init(fit: VNImageCropAndScaleOption = .scaleFill) throws {
         self.model = try VNCoreMLModel(for: FCRN().model)
         self.fit = fit

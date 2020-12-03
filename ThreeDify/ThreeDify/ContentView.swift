@@ -15,7 +15,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var parallaxEnvironment: ParallaxViewEnvironment?
 
-    @State private var image = UIImage(named: "test_3")!
+    @State private var image = UIImage(named: "test_4")!
 
     private func runInference() {
         try! EstimationPipeline(image: image).estimate { result in

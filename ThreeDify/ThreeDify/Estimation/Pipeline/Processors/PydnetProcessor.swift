@@ -17,6 +17,10 @@ import Accelerate
 class PydnetProcessor: DepthProcessor {
     let model: Pydnet
 
+    var description: String {
+        return "Pydnet Neural Processor"
+    }
+
     required init() {
         self.model = Pydnet()
     }
@@ -84,14 +88,16 @@ class PydnetProcessor: DepthProcessor {
             return
         }
 
+        let filteredImage = UIImage(cgImage: filteredCGImage)
         guard
-            let finalCGImage = normalize(cgImage: filteredCGImage)
+            let finalImage = NormalizationFilter(image: filteredImage)
+                .normalize()
         else {
             completion(.failure(ProcessingError.normalizationFailed))
             return
         }
 
-        completion(.success(UIImage(cgImage: finalCGImage)))
+        completion(.success(finalImage))
     }
 
     private func makeInputPixelBuffer(
@@ -126,64 +132,5 @@ class PydnetProcessor: DepthProcessor {
         else { return nil }
 
         return createdPixelBuffer
-    }
-
-    func normalize(cgImage: CGImage) -> CGImage? {
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-
-        var format = vImage_CGImageFormat(
-            bitsPerComponent: UInt32(cgImage.bitsPerComponent),
-            bitsPerPixel: UInt32(cgImage.bitsPerPixel),
-            colorSpace: Unmanaged.passRetained(colorSpace),
-            bitmapInfo: cgImage.bitmapInfo,
-            version: 0,
-            decode: nil,
-            renderingIntent: cgImage.renderingIntent
-        )
-
-        var source = vImage_Buffer()
-        var result = vImageBuffer_InitWithCGImage(
-            &source,
-            &format,
-            nil,
-            cgImage,
-            vImage_Flags(kvImageNoFlags)
-        )
-
-        guard result == kvImageNoError else { return nil }
-
-        defer { free(source.data) }
-
-        var destination = vImage_Buffer()
-        result = vImageBuffer_Init(
-            &destination,
-            vImagePixelCount(cgImage.height),
-            vImagePixelCount(cgImage.width),
-            32,
-            vImage_Flags(kvImageNoFlags)
-        )
-
-        guard result == kvImageNoError else { return nil }
-
-        result = vImageContrastStretch_ARGB8888(
-            &source,
-            &destination,
-            vImage_Flags(kvImageNoFlags)
-        )
-
-        guard result == kvImageNoError else { return nil }
-
-        defer { free(destination.data) }
-
-        let finalCGImage = vImageCreateCGImageFromBuffer(
-            &destination,
-            &format,
-            nil,
-            nil,
-            vImage_Flags(kvImageNoFlags),
-            nil
-        ).takeRetainedValue()
-
-        return finalCGImage
     }
 }

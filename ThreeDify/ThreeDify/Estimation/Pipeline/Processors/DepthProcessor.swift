@@ -13,7 +13,7 @@
 import Foundation
 import UIKit
 
-protocol DepthProcessor {
+protocol DepthProcessor: CustomStringConvertible {
     func process(
         originalImage: UIImage,
         completion: @escaping (Result<UIImage, Error>) -> Void

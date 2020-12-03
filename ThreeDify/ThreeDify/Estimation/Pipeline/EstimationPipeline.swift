@@ -13,12 +13,94 @@
 import Foundation
 import UIKit
 import Accelerate
+import CoreGraphics
+
+struct ProcessorResult {
+    let depthImage: UIImage
+    let description: String
+
+    func evaluate(confidenceInImage image: UIImage) -> EvaluatedProcessorResult? {
+        guard
+            let originalCGImage = image.cgImage,
+            let depthCGImage = depthImage.cgImage
+        else { return nil }
+
+        let originalCIImage = CIImage(cgImage: originalCGImage)
+        let depthCIImage = CIImage(cgImage: depthCGImage)
+        let context = CIContext()
+        let originalFilter = SobelFilter(image: originalCIImage)
+        let depthFilter = SobelFilter(image: depthCIImage)
+
+        guard
+            let originalSobelCGImage = originalFilter
+                .outputCGImage(withContext: context),
+            let depthSobelCGImage = depthFilter
+                .outputCGImage(withContext: context)
+        else { return nil }
+
+        let rect = CGRect(origin: .zero, size: image.size)
+        UIGraphicsBeginImageContext(image.size)
+        UIImage(cgImage: originalSobelCGImage).draw(in: rect)
+        UIImage(cgImage: depthSobelCGImage)
+            .draw(in: rect, blendMode: .difference, alpha: 1)
+        defer { UIGraphicsEndImageContext() }
+        guard
+            let differenceImage = UIGraphicsGetImageFromCurrentImageContext(),
+            let differenceCGImage = differenceImage.cgImage
+        else { return nil }
+
+        // Compute the RMS of each pixel value
+        var pixelData = [UInt8](
+            repeating: 0,
+            count: Int(image.size.width) * Int(image.size.height) * 4
+        )
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        guard
+            let cgContext = CGContext(
+                data: &pixelData,
+                width: Int(image.size.width),
+                height: Int(image.size.height),
+                bitsPerComponent: 8,
+                bytesPerRow: 4 * Int(image.size.width),
+                space: colorSpace,
+                bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+            )
+        else { return nil }
+        cgContext.draw(differenceCGImage, in: rect)
+
+        let pixelDataFloatValues = pixelData.map { Float($0) }
+        let pixelDataStride = vDSP_Stride(1)
+        let pixelDataLength = vDSP_Length(pixelDataFloatValues.count)
+        var rms: Float = .nan
+        vDSP_rmsqv(pixelDataFloatValues, pixelDataStride, &rms, pixelDataLength)
+
+        return EvaluatedProcessorResult(result: self, rms: rms)
+    }
+}
+
+
+struct EvaluatedProcessorResult {
+    let depthImage: UIImage
+    let description: String
+    let rms: Float
+
+    init(result: ProcessorResult, rms: Float) {
+        self.depthImage = result.depthImage
+        self.description = result.description
+        self.rms = rms
+    }
+}
+
 
 class EstimationPipeline {
     private let image: UIImage
     private let fcrnProcessor: FCRNProcessor
     private let pydnetProcessor: PydnetProcessor
     private let fastDepthProcessor: FastDepthProcessor
+
+    private var processors: [DepthProcessor] {
+        [fcrnProcessor, pydnetProcessor, fastDepthProcessor]
+    }
 
     enum ProcessingError: Error {
         case combinationFailed
@@ -33,52 +115,28 @@ class EstimationPipeline {
     }
 
     func estimate(completion: @escaping (Result<UIImage, Error>) -> Void) {
-        var fcrnDepthImage: UIImage?
-        var pydnetImage: UIImage?
-        var fastDepthImage: UIImage?
-
         let dispatchGroup = DispatchGroup()
 
-        dispatchGroup.enter()
-        fcrnProcessor.process(originalImage: image) { result in
-            defer { dispatchGroup.leave() }
-            switch result {
-            case .failure(let error):
-                print("WARNING: FCRN Processor encountered error: \(error)")
-            case .success(let depthImage):
-                fcrnDepthImage = depthImage
-            }
-        }
-
-        dispatchGroup.enter()
-        pydnetProcessor.process(originalImage: image) { result in
-            defer { dispatchGroup.leave() }
-            switch result {
-            case .failure(let error):
-                print("WARNING: Pydnet processor encountered error: \(error)")
-            case .success(let depthImage):
-                pydnetImage = depthImage
-            }
-        }
-
-        dispatchGroup.enter()
-        fastDepthProcessor.process(originalImage: image) { result in
-            defer { dispatchGroup.leave() }
-            switch result {
-            case .failure(let error):
-                print("WARNING: FastDepth encountered error: \(error)")
-            case .success(let depthImage):
-                fastDepthImage = depthImage
+        var results = [ProcessorResult]()
+        for processor in processors {
+            dispatchGroup.enter()
+            processor.process(originalImage: image) { result in
+                defer { dispatchGroup.leave() }
+                switch result {
+                case .failure(let error):
+                    print("WARNING: \(processor.description) error: \(error)")
+                case .success(let depthImage):
+                    results.append(ProcessorResult(
+                        depthImage: depthImage,
+                        description: processor.description
+                    ))
+                }
             }
         }
 
         dispatchGroup.notify(queue: .main) {
             guard
-                let combinedDepthImage = self.combine(
-                    fcrnDepthImage: fcrnDepthImage,
-                    pydnetImage: pydnetImage,
-                    fastDepthImage: fastDepthImage
-                )
+                let combinedDepthImage = self.combine(results: results)
             else {
                 completion(.failure(ProcessingError.combinationFailed))
                 return
@@ -87,59 +145,41 @@ class EstimationPipeline {
         }
     }
 
-    func combine(
-        fcrnDepthImage: UIImage?,
-        pydnetImage: UIImage?,
-        fastDepthImage: UIImage?
-    ) -> UIImage? {
+    func combine(results: [ProcessorResult]) -> UIImage? {
+        guard !results.isEmpty else { return nil }
+
+        let evaluatedResults = results.compactMap { result in
+            result.evaluate(confidenceInImage: image)
+        }
+
+        guard !evaluatedResults.isEmpty else { return nil }
+
+        let rmsValues = evaluatedResults.map { $0.rms }
         guard
-            let originalCGImage = image.cgImage,
-            let fcrnDepthImage = fcrnDepthImage,
-            let fcrnDepthCGImage = fcrnDepthImage.cgImage,
-            let pydnetImage = pydnetImage,
-            let pydnetCGImage = pydnetImage.cgImage,
-            let fastDepthImage = fastDepthImage,
-            let fastDepthCGImage = fastDepthImage.cgImage
+            let maxRMS = rmsValues.max(),
+            let minRMS = rmsValues.min(),
+            maxRMS != minRMS
         else { return nil }
 
-        let originalCIImage = CIImage(cgImage: originalCGImage)
-        let fcrnDepthCIImage = CIImage(cgImage: fcrnDepthCGImage)
-        let pydnetDepthCIImage = CIImage(cgImage: pydnetCGImage)
-        let fastDepthDepthCIImage = CIImage(cgImage: fastDepthCGImage)
+        let rect = CGRect(origin: .zero, size: image.size)
+        UIGraphicsBeginImageContext(image.size)
+        for result in evaluatedResults {
+            let alpha = CGFloat(1 - (result.rms - minRMS) / (maxRMS - minRMS))
+            result.depthImage.draw(
+                in: rect,
+                blendMode: .normal,
+                alpha: alpha
+            )
 
-        let context = CIContext()
-
-        let originalFilter = SobelFilter(image: originalCIImage)
-        let fcrnFilter = SobelFilter(image: fcrnDepthCIImage)
-        let pydnetFilter = SobelFilter(image: pydnetDepthCIImage)
-        let fastDepthFilter = SobelFilter(image: fastDepthDepthCIImage)
-
+            print("DEBUG: Result of \(result.description) has RMSE \(result.rms) and was mapped to an alpha value of \(alpha).")
+        }
+        defer { UIGraphicsEndImageContext() }
         guard
-            let originalSobelCGImage = originalFilter.outputCGImage(withContext: context),
-            let fcrnSobelCGImage = fcrnFilter.outputCGImage(withContext: context),
-            let pydnetSobelCGImage = pydnetFilter.outputCGImage(withContext: context),
-            let fastDepthSobelCGImage = fastDepthFilter.outputCGImage(withContext: context)
-        else { return nil }
+            let combinedImage = UIGraphicsGetImageFromCurrentImageContext(),
+            let normalizedImage = NormalizationFilter(image: combinedImage)
+                .normalize()
+        else { return nil}
 
-        let originalSobelCIImage = CIImage(cgImage: originalSobelCGImage)
-        let fcrnSobelCIImage = CIImage(cgImage: fcrnSobelCGImage)
-        let pydnetSobelCIImage = CIImage(cgImage: pydnetSobelCGImage)
-        let fastDepthSobelCIImage = CIImage(cgImage: fastDepthSobelCGImage)
-
-        let fusionFilter = FusionFilter(
-            originalImageSobelImage: originalSobelCIImage,
-            fcrnDepthImage: fcrnDepthCIImage,
-            fcrnDepthSobelImage: fcrnSobelCIImage,
-            pydnetDepthImage: pydnetDepthCIImage,
-            pydnetDepthSobelImage: pydnetSobelCIImage,
-            fastDepthDepthImage: fastDepthDepthCIImage,
-            fastDepthDepthSobelImage: fastDepthSobelCIImage
-        )
-
-        guard
-            let fusionCGImage = fusionFilter.outputCGImage(withContext: context)
-        else { return nil }
-
-        return UIImage(cgImage: fusionCGImage)
+        return normalizedImage
     }
 }

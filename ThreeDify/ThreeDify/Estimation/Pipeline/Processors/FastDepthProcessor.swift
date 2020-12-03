@@ -17,6 +17,10 @@ class FastDepthProcessor: DepthProcessor {
     let model: VNCoreMLModel
     let fit: VNImageCropAndScaleOption
 
+    var description: String {
+        return "FastDepth Neural Processor"
+    }
+
     required init(fit: VNImageCropAndScaleOption = .scaleFill) throws {
         self.model = try VNCoreMLModel(for: FastDepth().model)
         self.fit = fit
