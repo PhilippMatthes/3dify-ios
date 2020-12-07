@@ -25,10 +25,10 @@ float normpdf3(vec3 v, float sigma) {
     return INV_SQRT_PI_2 * exp(-0.5 * dot(v, v) / (sigma * sigma)) / sigma;
 }
 
-// Blur the input depth image but preserve edges from the diffuse map.
+// Blur the input target image but preserve edges from the source map.
 kernel vec4 BilateralFilter(
-    sampler diffuse,
-    sampler depth,
+    sampler source,
+    sampler target,
     float sigmaR, // Range
     float sigmaS // Spacial
 ) {
@@ -49,28 +49,28 @@ kernel vec4 BilateralFilter(
     float bZ = 1.0 / normpdf(0.0, sigmaS);
     // The destination of the current pixel in working space coordinates
     vec2 dWorkspace = destCoord();
-    // The diffuse and depth values of the target pixel
-    vec3 targetDiffusePixel = sample(diffuse, samplerCoord(diffuse)).rgb;
+    // The source and target values of the target pixel
+    vec3 targetSourcePixel = sample(source, samplerCoord(source)).rgb;
     // The final rgb color which is going to be summed up
     vec3 finalColorRGB = vec3(0.0);
 
     for (int x = -sampleKernelSize; x <= sampleKernelSize; ++x) {
         for (int y = -sampleKernelSize; y <= sampleKernelSize; ++y) {
-            // Sample the current partial kernel pixel of the diffuse map
+            // Sample the current partial kernel pixel of the source map
             vec2 workingSpaceSampleCoordinate = dWorkspace + vec2(x, y);
             vec2 imageSpaceSampleCoordinate =
-                samplerTransform(diffuse, workingSpaceSampleCoordinate);
-            vec3 sampleDiffusePixel = sample(diffuse, imageSpaceSampleCoordinate).rgb;
-            vec3 sampleDepthPixel = sample(depth, imageSpaceSampleCoordinate).rgb;
+                samplerTransform(source, workingSpaceSampleCoordinate);
+            vec3 sampleSourcePixel = sample(source, imageSpaceSampleCoordinate).rgb;
+            vec3 sampleTargetPixel = sample(target, imageSpaceSampleCoordinate).rgb;
 
-            vec3 delta = sampleDiffusePixel - targetDiffusePixel;
+            vec3 delta = sampleSourcePixel - targetSourcePixel;
             float factor = normpdf3(delta, sigmaS)
                            * bZ
                            * sampleKernel[sampleKernelSize + x]
                            * sampleKernel[sampleKernelSize + y];
 
             Z += factor;
-            finalColorRGB += factor * sampleDepthPixel;
+            finalColorRGB += factor * sampleTargetPixel;
         }
     }
 

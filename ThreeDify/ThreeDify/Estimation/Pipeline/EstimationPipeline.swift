@@ -74,6 +74,8 @@ struct ProcessorResult {
         var rms: Float = .nan
         vDSP_rmsqv(pixelDataFloatValues, pixelDataStride, &rms, pixelDataLength)
 
+        print("DEBUG: Result of \(description) has RMS \(rms).")
+
         return EvaluatedProcessorResult(result: self, rms: rms)
     }
 }
@@ -155,31 +157,52 @@ class EstimationPipeline {
         guard !evaluatedResults.isEmpty else { return nil }
 
         let rmsValues = evaluatedResults.map { $0.rms }
+        let totalRMS = rmsValues.reduce(0, +)
+
         guard
-            let maxRMS = rmsValues.max(),
             let minRMS = rmsValues.min(),
-            maxRMS != minRMS
+            let maxRMS = rmsValues.max(),
+            totalRMS != 0
         else { return nil }
 
         let rect = CGRect(origin: .zero, size: image.size)
         UIGraphicsBeginImageContext(image.size)
         for result in evaluatedResults {
-            let alpha = CGFloat(1 - (result.rms - minRMS) / (maxRMS - minRMS))
+            // Normalize the rms value between 0 and 1
+            let normalizedRMS = (result.rms - minRMS) / (maxRMS - minRMS)
+            // Mirror the rms value to the center value 0.5
+            // to get inverse mappings of rms to alpha
+            let mirroredNormalizedRMS = ((normalizedRMS - 0.5) * -1) + 0.5
+            let mirroredRMS = minRMS + (mirroredNormalizedRMS * (maxRMS - minRMS))
+            let alpha = CGFloat(mirroredRMS / totalRMS)
+            print("DEBUG: Result of \(result.description) was mapped to alpha value of \(alpha).")
             result.depthImage.draw(
                 in: rect,
                 blendMode: .normal,
                 alpha: alpha
             )
-
-            print("DEBUG: Result of \(result.description) has RMSE \(result.rms) and was mapped to an alpha value of \(alpha).")
         }
         defer { UIGraphicsEndImageContext() }
         guard
             let combinedImage = UIGraphicsGetImageFromCurrentImageContext(),
             let normalizedImage = NormalizationFilter(image: combinedImage)
-                .normalize()
+                .normalize(),
+            let normalizedCGImage = normalizedImage.cgImage,
+            let originalCGImage = image.cgImage
         else { return nil}
 
-        return normalizedImage
+        let bilateralFilter = BilateralFilter(
+            source: CIImage(cgImage: originalCGImage),
+            target: CIImage(cgImage: normalizedCGImage),
+            sigmaR: 30,
+            sigmaS: 0.01
+        )
+
+        let context = CIContext()
+        guard
+            let outputImage = bilateralFilter.outputCGImage(withContext: context)
+        else { return nil }
+
+        return UIImage(cgImage: outputImage)
     }
 }

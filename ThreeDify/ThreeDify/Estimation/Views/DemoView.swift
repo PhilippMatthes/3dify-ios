@@ -14,7 +14,7 @@ import SwiftUI
 import Vision
 
 struct DemoView: View {
-    @State private var image = UIImage(named: "test_4")!
+    @State private var image = UIImage(named: "test_1")!
 
     private func runInference() {
         try! EstimationPipeline(image: image).estimate { result in

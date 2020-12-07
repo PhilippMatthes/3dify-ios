@@ -13,19 +13,23 @@
 import CoreImage
 
 class BilateralFilter: CIFilter {
-    private var diffuse: CIImage
-    private var depth: CIImage
+    /// The source for the bilateral filtering.
+    private var source: CIImage
+
+    /// The target image to be blurred.
+    private var target: CIImage
+
     private var sigmaR: NSNumber
     private var sigmaS: NSNumber
 
     init(
-        diffuse: CIImage,
-        depth: CIImage,
+        source: CIImage,
+        target: CIImage,
         sigmaR: NSNumber = 15,
         sigmaS: NSNumber = 0.2
     ) {
-        self.diffuse = diffuse
-        self.depth = depth
+        self.source = source
+        self.target = target
         self.sigmaR = sigmaR
         self.sigmaS = sigmaS
         super.init()
@@ -56,13 +60,13 @@ class BilateralFilter: CIFilter {
                 )
             }
             let arguments = [
-                CISampler(image: diffuse),
-                CISampler(image: depth),
+                CISampler(image: source),
+                CISampler(image: target),
                 sigmaR,
                 sigmaS
             ]
             return kernel.apply(
-                extent: diffuse.extent,
+                extent: source.extent,
                 roiCallback: rangeOfInterestCallback,
                 arguments: arguments
             )
@@ -77,34 +81,5 @@ class BilateralFilter: CIFilter {
             )
         else { return nil }
         return outputCGImage
-    }
-
-    override var attributes: [String : Any] {
-        [
-            kCIAttributeFilterDisplayName: "Bilateral Filter",
-            kCIAttributeFilterCategories: [
-                kCICategoryDistortionEffect
-            ],
-            "diffuse": [
-                kCIAttributeClass: "CIImage",
-                kCIAttributeDisplayName: "Diffuse Image",
-                kCIAttributeType: kCIAttributeTypeImage
-            ],
-            "depth": [
-                kCIAttributeClass: "CIImage",
-                kCIAttributeDisplayName: "Depth Image",
-                kCIAttributeType: kCIAttributeTypeImage
-            ],
-            "sigmaR": [
-                kCIAttributeClass: "NSNumber",
-                kCIAttributeDisplayName: "Sigma R (Range)",
-                kCIAttributeType: kCIAttributeTypeScalar
-            ],
-            "sigmaS": [
-                kCIAttributeClass: "NSNumber",
-                kCIAttributeDisplayName: "Sigma S (Spatial)",
-                kCIAttributeType: kCIAttributeTypeScalar
-            ],
-        ]
     }
 }

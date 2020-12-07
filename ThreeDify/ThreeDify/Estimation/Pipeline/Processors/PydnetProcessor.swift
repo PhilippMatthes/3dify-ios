@@ -26,7 +26,6 @@ class PydnetProcessor: DepthProcessor {
     }
 
     enum ProcessingError: Error {
-        case originalImageNotCGImageConvertible
         case inputPixelBufferCreationFailed
         case inferenceFailed
         case createOutputCGImageFailed
@@ -38,13 +37,6 @@ class PydnetProcessor: DepthProcessor {
         originalImage: UIImage,
         completion: @escaping (Result<UIImage, Error>) -> Void
     ) {
-        guard
-            let originalCGImage = originalImage.cgImage
-        else {
-            completion(.failure(ProcessingError.originalImageNotCGImageConvertible))
-            return
-        }
-
         guard
             let pixelBuffer = makeInputPixelBuffer(
                 fromOriginalImage: originalImage
@@ -75,20 +67,7 @@ class PydnetProcessor: DepthProcessor {
             return
         }
 
-        let bilateralFilter = BilateralFilter(
-            diffuse: CIImage(cgImage: originalCGImage),
-            depth: CIImage(cgImage: outputCGImage),
-            sigmaR: 30,
-            sigmaS: 0.05
-        )
-        guard
-            let filteredCGImage = bilateralFilter.outputCGImage(withContext: context)
-        else {
-            completion(.failure(ProcessingError.filteringFailed))
-            return
-        }
-
-        let filteredImage = UIImage(cgImage: filteredCGImage)
+        let filteredImage = UIImage(cgImage: outputCGImage)
         guard
             let finalImage = NormalizationFilter(image: filteredImage)
                 .normalize()

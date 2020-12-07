@@ -45,8 +45,6 @@ class FastDepthProcessor: DepthProcessor {
             return
         }
 
-        let context = CIContext()
-
         let request = VNCoreMLRequest(model: model) { request, error in
             guard
                 error == nil,
@@ -64,21 +62,7 @@ class FastDepthProcessor: DepthProcessor {
                 completion(.failure(ProcessingError.normalizationFailed))
                 return
             }
-
-            let bilateralFilter = BilateralFilter(
-                diffuse: CIImage(cgImage: originalCGImage),
-                depth: CIImage(cgImage: normalizedCGImage),
-                sigmaR: 30,
-                sigmaS: 0.02
-            )
-            guard
-                let filteredCGImage = bilateralFilter.outputCGImage(withContext: context)
-            else {
-                completion(.failure(ProcessingError.filteringFailed))
-                return
-            }
-
-            completion(.success(UIImage(cgImage: filteredCGImage)))
+            completion(.success(UIImage(cgImage: normalizedCGImage)))
         }
 
         request.imageCropAndScaleOption = fit
