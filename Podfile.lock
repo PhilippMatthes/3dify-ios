@@ -1,0 +1,20 @@
+PODS:
+  - SwiftLint (0.41.0)
+  - SwiftRater (1.8.0)
+
+DEPENDENCIES:
+  - SwiftLint
+  - SwiftRater
+
+SPEC REPOS:
+  trunk:
+    - SwiftLint
+    - SwiftRater
+
+SPEC CHECKSUMS:
+  SwiftLint: c585ebd615d9520d7fbdbe151f527977b0534f1e
+  SwiftRater: 6094fa6e9b3866ff8beca0a871b4b5f9ab896a6d
+
+PODFILE CHECKSUM: 233ba4ebf688a661c0b3b93ec796288bc0e5d324
+
+COCOAPODS: 1.10.0

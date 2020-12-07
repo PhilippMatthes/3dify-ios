@@ -1,0 +1,78 @@
+//
+// 3Dify App
+//
+// Project website: https://github.com/3dify-app
+//
+// Authors:
+// - Philipp Matthes 2020, Contact: mail@philippmatth.es
+//
+// Copyright notice: All rights reserved by the authors given above. Do not
+// remove or change this copyright notice without confirmation of the authors.
+//
+
+// The sample size of the kernel
+#define SAMPLE_SIZE 25
+// Inverse square root of pi times 2
+#define INV_SQRT_PI_2 0.39894
+
+// Compute the normal probability distribution on a float value.
+float normpdf(float x, float sigma) {
+    return INV_SQRT_PI_2 * exp(-0.5 * x * x / (sigma * sigma)) / sigma;
+}
+
+// Compute the normal probability distribution on a 3-dimensional vector.
+float normpdf3(vec3 v, float sigma) {
+    return INV_SQRT_PI_2 * exp(-0.5 * dot(v, v) / (sigma * sigma)) / sigma;
+}
+
+// Blur the input target image but preserve edges from the source map.
+kernel vec4 BilateralFilter(
+    sampler source,
+    sampler target,
+    float sigmaR, // Range
+    float sigmaS // Spacial
+) {
+    // Create the one-dimensional sample kernel. Note that for
+    // real-time rendering applications the kernel should be
+    // precomputed for better rendering efficiency
+    const int sampleKernelSize = (SAMPLE_SIZE - 1) / 2;
+    float sampleKernel[SAMPLE_SIZE];
+    for (int i = 0; i <= sampleKernelSize; ++i) {
+        float sampleKernelValue = normpdf(float(i), sigmaR);
+        sampleKernel[sampleKernelSize + i] = sampleKernelValue;
+        sampleKernel[sampleKernelSize - i] = sampleKernelValue;
+    }
+
+    // Normalization factor
+    float Z = 0.0;
+    // Spacial weight base reference
+    float bZ = 1.0 / normpdf(0.0, sigmaS);
+    // The destination of the current pixel in working space coordinates
+    vec2 dWorkspace = destCoord();
+    // The source and target values of the target pixel
+    vec3 targetSourcePixel = sample(source, samplerCoord(source)).rgb;
+    // The final rgb color which is going to be summed up
+    vec3 finalColorRGB = vec3(0.0);
+
+    for (int x = -sampleKernelSize; x <= sampleKernelSize; ++x) {
+        for (int y = -sampleKernelSize; y <= sampleKernelSize; ++y) {
+            // Sample the current partial kernel pixel of the source map
+            vec2 workingSpaceSampleCoordinate = dWorkspace + vec2(x, y);
+            vec2 imageSpaceSampleCoordinate =
+                samplerTransform(source, workingSpaceSampleCoordinate);
+            vec3 sampleSourcePixel = sample(source, imageSpaceSampleCoordinate).rgb;
+            vec3 sampleTargetPixel = sample(target, imageSpaceSampleCoordinate).rgb;
+
+            vec3 delta = sampleSourcePixel - targetSourcePixel;
+            float factor = normpdf3(delta, sigmaS)
+                           * bZ
+                           * sampleKernel[sampleKernelSize + x]
+                           * sampleKernel[sampleKernelSize + y];
+
+            Z += factor;
+            finalColorRGB += factor * sampleTargetPixel;
+        }
+    }
+
+    return vec4(finalColorRGB / Z, 1.0);
+}

@@ -1,0 +1,33 @@
+excluded:
+  - Pods
+
+disabled_rules:
+  - variable_name
+  - todo
+
+opt_in_rules:
+  - missing_docs
+
+custom_rules:
+  auto_generated_leftovers:
+    regex: 'func [^\n]*\{\n(\s*super\.[^\n]*\n(\s*\/\/[^\n]*\n)*|(\s*\/\/[^\n]*\n)+)\s*\}'
+    message: "Delete auto-generated functions that you don't use"
+  header_contact_information:
+    name: "Header Contact Information"
+    regex: '(Contact\: <#T##email: String##String#>)'
+    match_kinds:
+      - comment
+    message: "Please give your contact information."
+    severity: error
+  comments_space:
+    name: "Space After Comment"
+    regex: '(^ *//\w+)'
+    message: "There should be a space after //"
+    severity: warning
+  double_space:
+    include: "*.swift"
+    name: "Double space"
+    regex: '([a-z,A-Z] \s+)'
+    message: "Double space between keywords"
+    match_kinds: keyword
+    severity: warning
