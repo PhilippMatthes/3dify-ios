@@ -10,13 +10,9 @@
 // remove or change this copyright notice without confirmation of the authors.
 //
 
-import SwiftUI
+import UIKit
 
-@main
-struct App: SwiftUI.App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+struct ParallaxImage: Equatable {
+    let diffuseMap: UIImage
+    let depthMap: UIImage
 }

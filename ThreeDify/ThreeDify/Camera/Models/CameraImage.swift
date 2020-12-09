@@ -12,7 +12,7 @@
 
 import UIKit
 
-struct CameraImage {
+struct CameraImage: SelectionImage {
     let diffuseImage: UIImage
     let depthImage: UIImage?
 }

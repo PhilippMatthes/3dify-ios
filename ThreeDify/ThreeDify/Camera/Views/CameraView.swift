@@ -13,7 +13,11 @@
 import SwiftUI
 
 struct CameraView: View {
+    @Environment(\.presentationMode) private var presentationMode
+
     private let session = CameraSession()
+
+    let onCaptureImage: (CameraImage) -> Void
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -23,11 +27,16 @@ struct CameraView: View {
         }
         .environmentObject(session)
         .onAppear(perform: session.authorizeAndCapture)
+        .onChange(of: session.capturedImage, perform: { image in
+            guard let image = image else { return }
+            presentationMode.wrappedValue.dismiss()
+            onCaptureImage(image)
+        })
     }
 }
 
 struct CameraView_Previews: PreviewProvider {
     static var previews: some View {
-        CameraView()
+        CameraView() { _ in }
     }
 }

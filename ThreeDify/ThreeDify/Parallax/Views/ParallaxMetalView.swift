@@ -16,8 +16,8 @@ import MetalKit
 class ParallaxMetalView: MTKView {
     var environment: ParallaxViewEnvironment {
         willSet {
-            if environment.depthImage != newValue.depthImage {
-                setDepthImage(newValue.depthImage)
+            if environment.parallaxImage != newValue.parallaxImage {
+                setDepthImage(newValue.parallaxImage)
             }
             if environment.selectedBlurIntensity != newValue.selectedBlurIntensity {
                 setBlurIntensity(newValue.selectedBlurIntensity)
@@ -46,13 +46,13 @@ class ParallaxMetalView: MTKView {
     private var vBlurPassOutputTexture: MTLTexture!
     private var hBlurPassOutputTexture: MTLTexture!
     
-    private func setDepthImage(_ depthImage: DepthImage) {
+    private func setDepthImage(_ parallaxImage: ParallaxImage) {
         releaseDrawables()
         guard let device = device else {return}
         let textureLoader = MTKTextureLoader(device: device)
         guard
-            let diffuseData = depthImage.diffuseMap.pngData(),
-            let depthData = depthImage.depthMap.pngData()
+            let diffuseData = parallaxImage.diffuseMap.pngData(),
+            let depthData = parallaxImage.depthMap.pngData()
         else {return}
         inputDiffuseTexture = try? textureLoader.newTexture(data: diffuseData)
         inputDepthTexture = try? textureLoader.newTexture(data: depthData)
@@ -103,7 +103,7 @@ class ParallaxMetalView: MTKView {
         colorPixelFormat = .rgba16Float
         preferredFramesPerSecond = 60
         
-        setDepthImage(environment.depthImage)
+        setDepthImage(environment.parallaxImage)
         setBlurIntensity(environment.selectedBlurIntensity)
         setFocalPoint(environment.selectedFocalPoint)
         

@@ -18,7 +18,7 @@ class ParallaxViewEnvironment: NSObject, ObservableObject {
     @Published var selectedFocalPoint: Float
     @Published var selectedBlurIntensity: Float
     @Published var selectedAnimation: ParallaxAnimation
-    @Published var depthImage: DepthImage
+    @Published var parallaxImage: ParallaxImage
     
     init(
         selectedAnimationInterval: TimeInterval = 4,
@@ -26,13 +26,13 @@ class ParallaxViewEnvironment: NSObject, ObservableObject {
         selectedFocalPoint: Float = 0.5,
         selectedBlurIntensity: Float = 0,
         selectedAnimation: ParallaxAnimation = .horizontalSwitch,
-        depthImage: DepthImage
+        parallaxImage: ParallaxImage
     ) {
         self.selectedAnimationInterval = selectedAnimationInterval
         self.selectedAnimationIntensity = selectedAnimationIntensity
         self.selectedFocalPoint = selectedFocalPoint
         self.selectedBlurIntensity = selectedBlurIntensity
         self.selectedAnimation = selectedAnimation
-        self.depthImage = depthImage
+        self.parallaxImage = parallaxImage
     }
 }

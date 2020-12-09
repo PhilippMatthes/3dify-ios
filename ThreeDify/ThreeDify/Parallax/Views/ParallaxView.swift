@@ -23,8 +23,8 @@ struct ParallaxView: View {
         GeometryReader { geometry in
             let frame = geometry.frame(in: .local)
             let viewAspectRatio = frame.size.height / frame.size.width
-            let imageHeight = environment.depthImage.diffuseMap.size.height
-            let imageWidth = environment.depthImage.diffuseMap.size.width
+            let imageHeight = environment.parallaxImage.diffuseMap.size.height
+            let imageWidth = environment.parallaxImage.diffuseMap.size.width
             let imageAspectRatio = imageHeight / imageWidth
             
             if imageAspectRatio > viewAspectRatio {

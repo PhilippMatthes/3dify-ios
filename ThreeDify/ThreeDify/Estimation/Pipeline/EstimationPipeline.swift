@@ -15,9 +15,11 @@ import UIKit
 import Accelerate
 import CoreGraphics
 
-struct ProcessorResult {
+struct ProcessorResult: Identifiable {
     let depthImage: UIImage
     let description: String
+
+    var id: String { description }
 
     func evaluate(confidenceInImage image: UIImage) -> EvaluatedProcessorResult? {
         guard
@@ -101,7 +103,7 @@ class EstimationPipeline {
     private let fastDepthProcessor: FastDepthProcessor
 
     private var processors: [DepthProcessor] {
-        [fcrnProcessor, pydnetProcessor, fastDepthProcessor]
+        [pydnetProcessor, fastDepthProcessor, fcrnProcessor]
     }
 
     enum ProcessingError: Error {
@@ -116,7 +118,10 @@ class EstimationPipeline {
         fastDepthProcessor = try FastDepthProcessor()
     }
 
-    func estimate(completion: @escaping (Result<UIImage, Error>) -> Void) {
+    func estimate(
+        onProgress: @escaping ([ProcessorResult]) -> Void,
+        completion: @escaping (Result<UIImage, Error>) -> Void
+    ) {
         let dispatchGroup = DispatchGroup()
 
         var results = [ProcessorResult]()
@@ -132,6 +137,7 @@ class EstimationPipeline {
                         depthImage: depthImage,
                         description: processor.description
                     ))
+                    onProgress(results)
                 }
             }
         }

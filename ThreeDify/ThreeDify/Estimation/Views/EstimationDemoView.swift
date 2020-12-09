@@ -13,11 +13,13 @@
 import SwiftUI
 import Vision
 
-struct DemoView: View {
+struct EstimationDemoView: View {
     @State private var image = UIImage(named: "test_3")!
 
     private func runInference() {
-        try! EstimationPipeline(image: image).estimate { result in
+        try! EstimationPipeline(image: image).estimate { newResults in
+
+        } completion: { result in
             switch result {
             case .success(let depthImage):
                 self.image = depthImage
@@ -36,8 +38,8 @@ struct DemoView: View {
     }
 }
 
-struct DemoView_Previews: PreviewProvider {
+struct EstimationDemoView_Previews: PreviewProvider {
     static var previews: some View {
-        DemoView().edgesIgnoringSafeArea(.all)
+        EstimationDemoView().edgesIgnoringSafeArea(.all)
     }
 }
